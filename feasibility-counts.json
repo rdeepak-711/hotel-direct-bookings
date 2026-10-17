@@ -1,0 +1,83 @@
+{
+ "date": "2026-10-18",
+ "hotels": [
+  [
+   "The Press Hotel, Autograph Collection",
+   5
+  ],
+  [
+   "The Francis Hotel",
+   5
+  ],
+  [
+   "Blind Tiger Portland \u2013 Danforth Street",
+   5
+  ],
+  [
+   "Blind Tiger Portland \u2013 Carleton Street",
+   5
+  ],
+  [
+   "Inn at Portland",
+   5
+  ],
+  [
+   "Portland Harbor Hotel",
+   5
+  ],
+  [
+   "Hilton Garden Inn Portland Downtown Waterfront",
+   5
+  ],
+  [
+   "Inn at St John",
+   5
+  ],
+  [
+   "Portland Regency Hotel & Spa",
+   5
+  ],
+  [
+   "Hyatt Place Portland Downtown-Old Port Square",
+   5
+  ],
+  [
+   "Cambria Hotel Portland Downtown Old Port",
+   5
+  ],
+  [
+   "Holiday Inn Portland-By The Bay",
+   5
+  ]
+ ],
+ "total": 60,
+ "neg": 16,
+ "all": {
+  "check-in info": 19,
+  "parking": 14,
+  "staff": 37,
+  "location": 41,
+  "room/bed": 42,
+  "booking/OTA": 10,
+  "contact/phone": 5,
+  "cancel/refund": 2,
+  "clean": 23,
+  "noise": 10,
+  "breakfast/food": 26,
+  "fees/price": 8
+ },
+ "neg_themes": {
+  "booking/OTA": 6,
+  "contact/phone": 4,
+  "cancel/refund": 2,
+  "check-in info": 6,
+  "staff": 12,
+  "location": 11,
+  "room/bed": 15,
+  "noise": 2,
+  "breakfast/food": 7,
+  "parking": 3,
+  "fees/price": 3,
+  "clean": 7
+ }
+}

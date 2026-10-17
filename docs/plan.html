@@ -1,0 +1,316 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direct Booking Check Plan</title>
+<style>
+  :root {
+    --bg: #fbfaf7; --panel: #ffffff; --ink: #1d232b; --muted: #5d6673; --line: #e3e0d8;
+    --accent: #1f5f8b; --accent-soft: #e6f0f7; --good: #2f7d4f; --good-soft: #e7f4ec;
+    --warn: #a2631a; --warn-soft: #fbf0e1; --bad: #a83a32; --bad-soft: #fbe9e7; --code: #f2efe8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171b; --panel: #1b1f25; --ink: #e7e9ec; --muted: #9aa3ae; --line: #2c323a;
+      --accent: #6fb1e0; --accent-soft: #1b2b38; --good: #6cc391; --good-soft: #17291f;
+      --warn: #e2a65a; --warn-soft: #2d2416; --bad: #ec8a80; --bad-soft: #301c1a; --code: #232830;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171b; --panel: #1b1f25; --ink: #e7e9ec; --muted: #9aa3ae; --line: #2c323a;
+    --accent: #6fb1e0; --accent-soft: #1b2b38; --good: #6cc391; --good-soft: #17291f;
+    --warn: #e2a65a; --warn-soft: #2d2416; --bad: #ec8a80; --bad-soft: #301c1a; --code: #232830;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 16px 80px; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 6px; }
+  h2 { font-size: 1.35rem; margin: 48px 0 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+  h3 { font-size: 1.05rem; margin: 22px 0 6px; }
+  p { margin: 8px 0; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  nav { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 20px 0; }
+  nav ol { margin: 4px 0; padding-left: 20px; columns: 2; column-gap: 24px; }
+  nav a { color: var(--accent); text-decoration: none; }
+  code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+  .tldr { background: var(--accent-soft); border-color: transparent; }
+  .good { background: var(--good-soft); border-color: transparent; }
+  .warn { background: var(--warn-soft); border-color: transparent; }
+  .label { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 10px 0; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+  .tablewrap { overflow-x: auto; }
+  .report { background: var(--panel); border: 2px solid var(--accent); border-radius: 12px; padding: 18px; margin: 14px 0; }
+  .report h4 { margin: 14px 0 4px; font-size: .95rem; }
+  .report .score { display: inline-block; font-weight: 700; padding: 1px 8px; border-radius: 6px; }
+  .ok { background: var(--good-soft); color: var(--good); }
+  .meh { background: var(--warn-soft); color: var(--warn); }
+  .no { background: var(--bad-soft); color: var(--bad); }
+  .top3 { background: var(--accent-soft); border-radius: 8px; padding: 10px 14px; margin: 10px 0; }
+  .top3 ol { margin: 4px 0; padding-left: 20px; }
+  .quote { border-left: 3px solid var(--line); padding-left: 10px; color: var(--muted); font-style: italic; margin: 4px 0; }
+  .fix { font-size: .85rem; color: var(--accent); }
+  .steps { counter-reset: s; list-style: none; padding: 0; }
+  .steps li { counter-increment: s; position: relative; padding: 10px 12px 10px 48px; margin: 8px 0; background: var(--panel); border: 1px solid var(--line); border-radius: 10px; }
+  .steps li::before { content: counter(s); position: absolute; left: 12px; top: 10px; width: 26px; height: 26px; border-radius: 50%; background: var(--accent); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: .85rem; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; background: var(--code); color: var(--muted); margin-left: 6px; }
+  .changed { border-left: 4px solid var(--good); }
+  svg { width: 100%; height: auto; display: block; }
+  svg text { fill: var(--ink); font: 13px -apple-system, Inter, sans-serif; }
+  svg .box { fill: var(--panel); stroke: var(--line); stroke-width: 1.5; }
+  svg .boxa { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+  svg .boxg { fill: var(--good-soft); stroke: var(--good); stroke-width: 1.5; }
+  svg .boxw { fill: var(--warn-soft); stroke: var(--warn); stroke-width: 1.5; }
+  svg .arrow { stroke: var(--muted); stroke-width: 1.5; fill: none; marker-end: url(#ah); }
+  svg .small { font-size: 11px; fill: var(--muted); }
+  @media (max-width: 640px) { nav ol { columns: 1; } h1 { font-size: 1.6rem; } }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Direct Booking Check: the plan</h1>
+<p class="sub">Final version, 18 Oct 2026, before any code. Repo: <code>/Volumes/asus/projects/hotel-direct-bookings</code>. Research: <code>/Volumes/asus/career-ops/research/hotelzify/</code> and <code>findings.md</code>. Sections marked with a green bar changed in this revision.</p>
+
+<div class="card tldr">
+  <div class="label">In one paragraph</div>
+  <p>A web tool where you type a US hotel's name and, in about 30 seconds, get a one-page check of the signs that guests are being pushed to booking sites like Expedia instead of booking direct, and what to fix first. It reads real public data: the hotel's Google listing and reviews, its Tripadvisor reviews and ranking, and its own website as loaded in a real browser. An AI reads the reviews and pulls out what guests love and what they had to work out for themselves, but every point it makes must quote a real review word for word, or code throws it away. It is a working, automatic version of the free report Hotelzify's founder hands out to US hotel owners at AAHOA events.</p>
+</div>
+
+<div class="card changed">
+  <div class="label">Decisions taken in this revision</div>
+  <ul style="margin:6px 0">
+    <li><b>Name:</b> "Direct Booking Check". The word "leakage" overpromised: we see signs, not bookings. It stays in the explanation, not the title.</li>
+    <li><b>Stack:</b> Next.js + TypeScript on Vercel, tests with Vitest. One project, one-command deploy, your web stack.</li>
+    <li><b>Builder:</b> the usual <code>handoff</code>: Claude writes the spec and failing tests, Codex builds, Claude reviews.</li>
+    <li><b>Two faces, one codebase:</b> the public site names generic fix categories; the version sent to the founder adds Hotelzify's product names. Switched by one flag.</li>
+    <li><b>PageSpeed is the main website source</b>, not a plain page fetch. It loads the site in a real browser, so it sees JavaScript-built pages too.</li>
+    <li><b>Hotel matching by coordinates</b>, not name text.</li>
+    <li><b>Top 3 fixes</b> at the top of every report.</li>
+  </ul>
+</div>
+
+<nav>
+  <div class="label">Contents</div>
+  <ol>
+    <li><a href="#why">Why this, for this job</a></li>
+    <li><a href="#see">What a hotel owner sees</a></li>
+    <li><a href="#flow">How a report gets made</a></li>
+    <li><a href="#data">Where the data comes from, and its limits</a></li>
+    <li><a href="#ai">The AI part, and how it is kept honest</a></li>
+    <li><a href="#security">Security and reliability calls</a></li>
+    <li><a href="#models">Which AI model runs it</a></li>
+    <li><a href="#days">The 2-day build</a></li>
+    <li><a href="#out">What is deliberately left out</a></li>
+    <li><a href="#package">What you send Hotelzify</a></li>
+    <li><a href="#risks">Risks and weak spots</a></li>
+    <li><a href="#next">Next step</a></li>
+  </ol>
+</nav>
+
+<h2 id="why">1. Why this, for this job</h2>
+<div class="tablewrap"><table>
+  <tr><th>The post says</th><th>This build shows it by</th></tr>
+  <tr><td>"Ship a customer-visible improvement in your first month"</td><td>Hotel owners read this report. Shippable in a month; done in 2 days.</td></tr>
+  <tr><td>"Work with sales and customer success"</td><td>It automates the report their founder already uses to win US hotels.</td></tr>
+  <tr><td>"Understand the real problem"</td><td>Built from guest and owner research, and a feasibility check on 60 real reviews that killed our first idea.</td></tr>
+  <tr><td>"Integrations… and the data behind them"</td><td>Four real data sources joined into one report, plus a clear path to the Google Business Profile API.</td></tr>
+  <tr><td>"Architecture, reliability and security… guest and payment data"</td><td>Section 6: explicit calls, each with a reason.</td></tr>
+  <tr><td>"How honestly you tell us where it went wrong"</td><td>The quote check exists because AI invents things. Every drop is logged and written up.</td></tr>
+  <tr><td>"What to build and what to leave out"</td><td>Section 9.</td></tr>
+  <tr><td>The 48-hour challenge: "pick a real hotel problem, build a working prototype"</td><td>This is that challenge, done before they ask.</td></tr>
+</table></div>
+
+<h3>Why not the other ideas</h3>
+<ul>
+  <li><b>Finding each hotel's booking complaints in its reviews:</b> killed by data. In 60 real reviews, booking and contact problems were rare (8–16%), and with only 5–8 reviews per hotel most reports would come out empty.</li>
+  <li><b>An AI phone agent:</b> guests say "if an AI agent takes the call, I would hang up."</li>
+  <li><b>A commission calculator:</b> Hotelzify already has one on its homepage.</li>
+  <li><b>A grounded reply assistant (the earlier concierge):</b> no real data, and it doesn't touch how they sell.</li>
+</ul>
+
+<h2 id="see" class="changed" style="padding-left:10px">2. What a hotel owner sees</h2>
+<p>A mock-up with a fictional hotel. The real report fills every number from live data. Written for an owner: no jargon, "booking sites like Expedia" instead of "OTA".</p>
+<div class="report">
+  <div class="label">Direct Booking Check</div>
+  <h3 style="margin:4px 0">Harborside Inn · Portland, ME</h3>
+  <p style="color:var(--muted);font-size:.85rem;margin:0">From your Google listing, 5 Google reviews, 3 Tripadvisor reviews and your website, checked 18 Oct 2026. Small sample: we show patterns, not percentages.</p>
+
+  <div class="top3">
+    <b>Fix these first</b>
+    <ol>
+      <li>Your website scores 38/100 on mobile speed. Most guests book on a phone; slow sites send them to Expedia.</li>
+      <li>Your Google listing has no description. Guests see Expedia's text about you before yours.</li>
+      <li>Two of eight recent reviews mention confusion about parking. Put it on the booking page.</li>
+    </ol>
+  </div>
+
+  <h4>1. Google listing</h4>
+  <p><span class="score ok">4.5★</span> from 1,313 reviews · website linked <span class="score ok">yes</span> · phone <span class="score ok">yes</span> · description <span class="score no">missing</span> · Tripadvisor rank <span class="score meh">#12 of 48 hotels in Portland</span></p>
+  <p class="fix">→ Fix: a description built from what guests praise (section 3). Category: Google profile.</p>
+
+  <h4>2. Website (as loaded on a phone)</h4>
+  <p>Mobile speed <span class="score no">38/100</span> · "Book now" <span class="score ok">found</span> · booking runs on <span class="score meh">another company's domain (synxis.com)</span> · tap-to-call <span class="score no">not found</span> · secure (HTTPS) <span class="score ok">yes</span></p>
+  <p class="fix">→ Fix: a faster mobile booking page on your own domain, with a tap-to-call button. Category: booking website.</p>
+
+  <h4>3. What guests love (use this in ads and on your website)</h4>
+  <p><b>Location next to the Old Port</b> · 4 of 8 reviews</p>
+  <div class="quote">"steps from the Old Port and every restaurant we wanted" (Google, Sep 2026)</div>
+  <p><b>Breakfast</b> · 3 of 8 reviews</p>
+  <div class="quote">"the blueberry pancakes alone are worth the stay" (Tripadvisor, Oct 2026)</div>
+  <p class="fix">→ Draft headline: "Steps from the Old Port, with a breakfast guests write home about." Category: marketing.</p>
+
+  <h4>4. What guests had to work out for themselves</h4>
+  <p><b>Parking</b> · 2 of 8 reviews</p>
+  <div class="quote">"wish we'd known parking was a block away" (Google, Aug 2026)</div>
+  <p class="fix">→ Fix: answer this on the booking page and in your chat or phone assistant. Category: guest messaging.</p>
+
+  <p style="font-size:.85rem;color:var(--muted);margin-top:14px">Why it matters: bookings made through sites like Expedia are cancelled about twice as often as direct ones (21.8% vs 10.6%, Cloudbeds 2026), and guests say they get sent back and forth between the site and the hotel when something goes wrong.</p>
+</div>
+<p><b>The founder's version</b> adds one line under each category: "Category: Google profile → Hotelzify Google Business Profile optimisation", and so on. Same report, one flag.</p>
+
+<h2 id="flow">3. How a report gets made</h2>
+<div class="card">
+<svg viewBox="0 0 820 470" role="img" aria-label="Report pipeline">
+  <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill: var(--muted)"/></marker></defs>
+  <rect class="box" x="290" y="10" width="240" height="44" rx="8"/><text x="410" y="37" text-anchor="middle">Owner types "Harborside Inn Portland"</text>
+  <path class="arrow" d="M410 54 V80"/>
+  <rect class="boxa" x="290" y="82" width="240" height="44" rx="8"/><text x="410" y="109" text-anchor="middle">Pick the right hotel from a list</text>
+  <path class="arrow" d="M410 126 V150"/>
+  <rect class="box" x="10" y="152" width="190" height="62" rx="8"/><text x="105" y="176" text-anchor="middle">Google Places</text><text class="small" x="105" y="196" text-anchor="middle">listing + 5 reviews + location</text>
+  <rect class="box" x="215" y="152" width="190" height="62" rx="8"/><text x="310" y="176" text-anchor="middle">Tripadvisor (Terra)</text><text class="small" x="310" y="196" text-anchor="middle">match by coordinates · 3 reviews · rank</text>
+  <rect class="box" x="420" y="152" width="190" height="62" rx="8"/><text x="515" y="176" text-anchor="middle">PageSpeed</text><text class="small" x="515" y="196" text-anchor="middle">real-browser load of the site</text>
+  <rect class="box" x="625" y="152" width="185" height="62" rx="8"/><text x="717" y="176" text-anchor="middle">Plain page fetch</text><text class="small" x="717" y="196" text-anchor="middle">fallback only</text>
+  <text class="small" x="410" y="236" text-anchor="middle">all run at the same time; any one can fail and the report still comes out, that section marked "not available"</text>
+  <path class="arrow" d="M105 214 V280 H250"/><path class="arrow" d="M310 214 V270"/>
+  <rect class="boxa" x="200" y="272" width="220" height="56" rx="8"/><text x="310" y="294" text-anchor="middle">AI reads the 8 reviews</text><text class="small" x="310" y="312" text-anchor="middle">praise + questions, each with a quote</text>
+  <path class="arrow" d="M310 328 V352"/>
+  <rect class="boxg" x="200" y="354" width="220" height="56" rx="8"/><text x="310" y="376" text-anchor="middle">Quote check (code)</text><text class="small" x="310" y="394" text-anchor="middle">quote not in a real review → dropped</text>
+  <path class="arrow" d="M515 214 V300 H560"/><path class="arrow" d="M717 214 V300 H700"/>
+  <rect class="boxg" x="560" y="272" width="140" height="56" rx="8"/><text x="630" y="294" text-anchor="middle">Website checks</text><text class="small" x="630" y="312" text-anchor="middle">plain code, no AI</text>
+  <path class="arrow" d="M420 382 H520"/><path class="arrow" d="M630 328 V370 H600"/>
+  <rect class="boxw" x="520" y="354" width="200" height="56" rx="8"/><text x="620" y="376" text-anchor="middle">Report builder (code)</text><text class="small" x="620" y="394" text-anchor="middle">findings → fixes → top 3</text>
+  <path class="arrow" d="M620 410 V440 H420"/>
+  <rect class="box" x="230" y="420" width="190" height="40" rx="8"/><text x="325" y="445" text-anchor="middle">Report page</text>
+</svg>
+<p style="color:var(--muted);font-size:.85rem">Green = plain code decides. Blue = AI involved. Only one step uses AI; everything that can be a rule is a rule.</p>
+</div>
+
+<h2 id="data" class="changed" style="padding-left:10px">4. Where the data comes from, and its limits</h2>
+<div class="tablewrap"><table>
+  <tr><th>Source</th><th>What we get</th><th>Limit</th><th>Tested</th></tr>
+  <tr><td>Google Places API (New)</td><td>Name, address, coordinates, rating, review count, website, phone, description, up to 5 reviews</td><td>5 reviews max (Google picks "most relevant"). <b>Review text may not be stored.</b> Paid per call after a free allowance.</td><td>Key works, 18 Oct</td></tr>
+  <tr><td>Tripadvisor Terra API</td><td>3 most recent reviews, rating, <b>ranking in its city</b></td><td>Free plan: 3 reviews, 1,000 calls a month. Matched by Google's coordinates plus name similarity, because matching by name text found nothing in the test run.</td><td>Key works, 18 Oct; coordinate match not yet</td></tr>
+  <tr><td>Google PageSpeed Insights API</td><td>Mobile performance score, plus the Lighthouse audits: HTTPS, viewport, tap targets, and the <b>list of every network request the page made</b>, which reveals the booking engine (Cloudbeds, SynXis, bookmystay.io…) even on JavaScript-built sites</td><td>Free; slow (10–30 s), so it runs in parallel. The Lighthouse data is also where "Book now" and tap-to-call are looked for.</td><td>Not yet</td></tr>
+  <tr><td>Plain page fetch</td><td>Same checks on the raw home page</td><td>Fallback only, when PageSpeed fails or times out. Locked down (section 6).</td><td>Not yet</td></tr>
+</table></div>
+<div class="card warn">
+  <p><b>What Google doesn't tell us:</b> whether the hotel has a "Book" link on its Google listing. That data isn't in the Places API, so the report won't claim it.</p>
+  <p><b>8 reviews per hotel is thin.</b> The report says so at the top and talks about patterns ("3 of 8 reviews"), never percentages. In production the hotel connects its own Google Business Profile, which gives the full review history: that's the day-60 integration to propose.</p>
+</div>
+
+<h2 id="ai">5. The AI part, and how it is kept honest</h2>
+<p>One AI call per report. It gets the 8 reviews (each with an ID) and must return, in a fixed JSON format:</p>
+<ul>
+  <li><b>Praise themes:</b> a short name, the IDs of the reviews that mention it, and a word-for-word quote from each.</li>
+  <li><b>Things guests had to work out:</b> same format.</li>
+  <li><b>Draft headline and ad lines</b> built only from the praise themes.</li>
+</ul>
+<div class="card good">
+  <h3 style="margin-top:0">The quote check (same idea as escalation-gate)</h3>
+  <p>Code checks every quote is really in the review it cites (ignoring case and spacing). A theme whose quotes all fail is <b>dropped</b>. Theme counts ("3 of 8 reviews") are recomputed by code from the IDs that passed, never taken from the AI. Every dropped claim is logged, and those logs become the "where the AI went wrong" section of the write-up.</p>
+  <p>Why: free models (used for demos) invent more. A selling point a hotel can't back up is worse than no selling point.</p>
+</div>
+<p><b>What the check doesn't catch:</b> a real quote filed under the wrong theme ("the parking was easy" under "parking confusion"). The write-up names this gap.</p>
+
+<h2 id="security" class="changed" style="padding-left:10px">6. Security and reliability calls</h2>
+<p>The post says "US hotels trust us with guest and payment data". This tool handles no payments, but it handles other people's data and keys, so each call is made on purpose:</p>
+<div class="tablewrap"><table>
+  <tr><th>Call</th><th>Why</th></tr>
+  <tr><td><b>Review text is never stored.</b> Fetched live, used for one report, then gone. Only Google place IDs may be kept.</td><td>Google's Places terms. Also: no database of guest-written text to leak.</td></tr>
+  <tr><td><b>Reviewer names shown only as Google requires</b> (attribution beside each Google review), never logged.</td><td>Reviewers are people; keep personal data to the minimum.</td></tr>
+  <tr><td><b>Bring-your-own keys never touch our server.</b> The viewer's OpenRouter key stays in their browser, which calls OpenRouter directly.</td><td>The safest key is one we never hold.</td></tr>
+  <tr><td><b>Our API keys stay server-side</b> in environment variables, never sent to the browser.</td><td>Stops key theft and surprise bills.</td></tr>
+  <tr><td><b>The fallback fetch is locked down:</b> http/https only, blocks private and internal addresses, 8-second timeout, 2 MB cap, at most 3 redirects.</td><td>Fetching a URL someone else controls is a classic way to attack a server (SSRF).</td></tr>
+  <tr><td><b>The real spending guard is a hard daily quota on the Places key, set in Google Cloud.</b> Per-visitor rate limiting in the app is best-effort only, because Vercel runs many short-lived copies of the server and an in-memory counter resets with each one.</td><td>A link shared on X can't run up the Google bill, even if the app-level limit is bypassed.</td></tr>
+  <tr><td><b>Each source can fail alone.</b> Timeouts on every call; the report shows "not available" for that section instead of failing.</td><td>One slow API shouldn't kill the report.</td></tr>
+  <tr><td><b>Review text is treated as data, not instructions</b> in the AI prompt, and the output must match a strict format.</td><td>A review saying "ignore your instructions" shouldn't change the report.</td></tr>
+</table></div>
+
+<h2 id="models">7. Which AI model runs it</h2>
+<div class="tablewrap"><table>
+  <tr><th>Mode</th><th>Where it runs</th><th>Used for</th></tr>
+  <tr><td>OpenRouter, demo key</td><td>Server, your OpenRouter account, a <code>:free</code> model</td><td>The public link, X, the founder. 50 reports a day, 1,000 after a one-time $10 credit.</td></tr>
+  <tr><td>OpenRouter, viewer's own key</td><td>Viewer's browser → OpenRouter</td><td>Anyone who wants a better model or more runs.</td></tr>
+  <tr><td>Fake</td><td>Tests</td><td>Free, instant, identical every run.</td></tr>
+  <tr><td><code>claude -p</code></td><td>Your laptop only, on your Claude subscription</td><td>Local runs during the build. A thin wrapper, built last; cut if time is short.</td></tr>
+</table></div>
+
+<h2 id="days" class="changed" style="padding-left:10px">8. The 2-day build</h2>
+<p>Bottom up: each layer is tested before the next starts. Codex builds via <code>handoff</code>; the spec and failing tests come first.</p>
+<h3>Day 1: data and logic, no UI</h3>
+<ol class="steps">
+  <li><b>Quote check</b> <span class="pill">pure logic</span><br>Verify quotes against reviews; recompute counts; log drops.</li>
+  <li><b>Website checks from Lighthouse data</b> <span class="pill">pure logic</span><br>Speed score, HTTPS, viewport, booking engine domain from the network requests, "Book now" and tap-to-call. Tested on saved PageSpeed responses.</li>
+  <li><b>Safe fallback fetcher</b><br>The locked-down URL fetch, plus the same checks on raw HTML.</li>
+  <li><b>Google, Tripadvisor, PageSpeed clients</b><br>Tested against recorded sample responses, plus one live smoke test you run. Tripadvisor matched by coordinates + name similarity.</li>
+  <li><b>Report builder</b><br>Joins everything, maps each finding to a fix and a category, ranks the top 3, handles missing sections. Flag for the founder's version.</li>
+</ol>
+<h3>Day 2: AI, page, ship</h3>
+<ol class="steps" start="6">
+  <li><b>AI layer</b><br>One interface, strict JSON output, OpenRouter + fake first.</li>
+  <li><b>Pages</b><br>Search → pick hotel → report. Works on a phone.</li>
+  <li><b>Quotas</b><br>Google Cloud hard cap set; best-effort per-visitor limit in the app.</li>
+  <li><b>Deploy</b> to Vercel with the demo model.</li>
+  <li><b>Run it on 10 real US independent hotels</b>; write up what it found and where the AI went wrong. Then <code>claude -p</code> wrapper if time remains.</li>
+</ol>
+<div class="card warn"><b>If day 2 slips, cut in this order:</b> Tripadvisor source → viewer's-own-key mode → <code>claude -p</code> wrapper. Never cut the quote check or PageSpeed.</div>
+
+<h2 id="out">9. What is deliberately left out</h2>
+<div class="tablewrap"><table>
+  <tr><th>Left out</th><th>Why</th></tr>
+  <tr><td>Price comparison with Expedia and Booking.com</td><td>No legal API for their prices; scraping breaks their terms.</td></tr>
+  <tr><td>A generic "why book direct" section</td><td>It was the same text for every hotel, which undercuts the real-data claim. Reduced to one footnote line.</td></tr>
+  <tr><td>"What do ChatGPT and Google's AI say about this hotel"</td><td>Good v2; doubles the AI cost and is hard to check.</td></tr>
+  <tr><td>Accounts, saved reports, database</td><td>Not needed to prove the idea; storing reviews is against Google's terms anyway.</td></tr>
+  <tr><td>PDF export</td><td>The page is the report.</td></tr>
+  <tr><td>Competitor comparison (5 nearby hotels)</td><td>6× the API calls per report. v2.</td></tr>
+  <tr><td>Hotels outside the US</td><td>The job is the US business.</td></tr>
+</table></div>
+
+<h2 id="package">10. What you send Hotelzify</h2>
+<ol>
+  <li><b>Live link</b> to the tool, plus the GitHub repo.</li>
+  <li><b>Founder's-version reports on 3–5 real US independent hotels</b>, shared privately, never posted.</li>
+  <li><b>A short write-up</b>: the problem and evidence, what you built and left out, the security calls, where the AI went wrong.</li>
+  <li><b>One page for a hotel owner</b> in plain English.</li>
+  <li><b>A one-page "first 90 days" draft</b>: month 1 = this; day 60 = Google Business Profile integration for full review history; day 90 = themes to check with customers.</li>
+  <li><b>The Wellfound note</b>, and later the 2-minute voice note.</li>
+</ol>
+
+<h2 id="risks">11. Risks and weak spots</h2>
+<div class="card warn">
+  <ul>
+    <li><b>They may already have this internally.</b> Say "a working, automatic version of the report you hand out", never "new".</li>
+    <li><b>Posting real hotels' weak spots on X is unfair to them.</b> On X, show the tool and your process, not a named hotel's bad score. Real reports go only privately.</li>
+    <li><b>No Hotelzify name or branding on the public site.</b> "Built by Deepak R, not affiliated with any company." The founder's version is a flag, not a public page.</li>
+    <li><b>Google's terms on sending review text to a third-party AI</b> are unclear. Check before going public; if it's a problem, the public demo runs the AI step on Tripadvisor reviews only.</li>
+    <li><b>Website checks can still miss things</b> on unusual sites. The report says "not found", never "missing".</li>
+    <li><b>Booking engine on another domain</b> is also true of Hotelzify's own hotels (<code>bookmystay.io</code>). Raise it in the CEO call as an insight, not in public as a criticism.</li>
+    <li><b>Hotelzify's own Trustpilot is 2.5</b>, partly guests distrusting the <code>.io</code> domain. Same: CEO call, not public.</li>
+    <li><b>2 days is tight.</b> Cut order is in section 8.</li>
+  </ul>
+</div>
+
+<h2 id="next">12. Next step</h2>
+<div class="card">
+  <p>All decisions are taken. Next: <code>spec/site.md</code> and the failing tests (Vitest), committed on <code>main</code>, then <code>handoff</code>. The spec will also ask for <code>docs/decisions.md</code>, <code>docs/flow.md</code> and <code>docs/mental-model.md</code>, written one at a time after the build.</p>
+  <p class="sub" style="margin:8px 0 0">Time: about 12–14 hours over 2 days. Feeds Tier 1 (the job). Moves phase 1.</p>
+</div>
+
+</main>
+</body>
+</html>
