@@ -154,7 +154,7 @@
   @keyframes sh { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
   .phone .timer { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); text-align: center; }
   .phone .timer b { display: block; font-size: 38px; font-weight: 700; color: var(--coral); letter-spacing: -.03em; }
-  .phone .timer span { font-size: 12px; color: var(--muted); }
+  .phone .timer > span { font-size: 12px; color: var(--muted); }
   .phone .spin { width: 28px; height: 28px; border: 3px solid var(--line-2); border-top-color: var(--coral); border-radius: 50%; margin: 0 auto 8px; animation: rot 1s linear infinite; }
   @keyframes rot { to { transform: rotate(360deg); } }
   .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
@@ -219,7 +219,7 @@
         <text x="20" y="124" font-size="10" fill="var(--muted)" font-family="Plus Jakarta Sans">0</text>
         <text x="190" y="124" font-size="10" fill="var(--muted)" font-family="Plus Jakarta Sans">100</text>
       </svg>
-      <div class="stat" style="margin-top:-30px"><span class="count" data-to="54">54</span><span class="muted" style="font-size:20px;font-weight:600">/100</span></div>
+      <div class="stat" style="margin-top:6px"><span class="count" data-to="54">54</span><span class="muted" style="font-size:20px;font-weight:600">/100</span></div>
       <div class="small muted">Weighted from the four checks below. Under 60 means guests have a reason to book elsewhere.</div>
       <div class="rings">
         <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle class="ringArc" data-len="42.8" cx="30" cy="30" r="22" fill="none" stroke="var(--coral)" stroke-width="7" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="95.4" transform="rotate(-90 30 30)"/></svg><span class="v count" data-to="31">31</span><span class="l">Website</span></div>
