@@ -586,7 +586,7 @@
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setSize(W, H);
     mount.appendChild(renderer.domElement);
     var scene = new THREE.Scene();
-    var camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100); camera.position.set(0, 5.2, 8.5); camera.lookAt(0, 0.8, 0);
+    var camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100); camera.position.set(0, 5.8, 10); camera.lookAt(0, 1.1, 0);
     scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.1));
     var sun = new THREE.DirectionalLight(0xffffff, .7); sun.position.set(4, 8, 5); scene.add(sun);
 
@@ -614,17 +614,17 @@
         disc.position.set(x, .03, z); group.add(disc);
         var l0 = label('no score', '#' + col('--muted').getHexString()); l0.position.set(x, .5, z); group.add(l0); return;
       }
-      var hgt = h.score / 22;
+      var hgt = h.score / 32;
       var m = new THREE.Mesh(new THREE.CylinderGeometry(h.you ? .5 : .4, h.you ? .5 : .4, hgt, 40), new THREE.MeshStandardMaterial({ color: h.you ? col('--coral') : col('--navy-2'), roughness: .55, metalness: .05 }));
       m.position.set(x, hgt / 2, z); m.userData.h = hgt; m.scale.y = 0.001; group.add(m);
       var l = label(String(h.score), h.you ? coral : ink); l.position.set(x, hgt + .45, z); group.add(l);
       if (h.you) { var ring = new THREE.Mesh(new THREE.RingGeometry(.62, .72, 48), new THREE.MeshBasicMaterial({ color: col('--coral'), side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.y = .01; group.add(ring); }
     });
     // average marker: translucent ring at the neighbours' average height (76)
-    var avgH = 76 / 22;
+    var avgH = 76 / 32;
     var avg = new THREE.Mesh(new THREE.RingGeometry(4.0, 4.2, 96), new THREE.MeshBasicMaterial({ color: col('--coral'), transparent: true, opacity: .35, side: THREE.DoubleSide }));
     avg.rotation.x = -Math.PI / 2; avg.position.y = avgH; group.add(avg);
-    var avgL = label('neighbours avg 76', coral); avgL.position.set(0, avgH + .35, -4.0); avgL.scale.set(2.2, .83, 1); group.add(avgL);
+    var avgL = label('avg 76', coral); avgL.position.set(0, avgH + .35, -4.0); group.add(avgL);
 
     // grow pillars
     var t0 = performance.now(), pillars = group.children.filter(function (o) { return o.userData.h; });
