@@ -1,0 +1,22 @@
+{
+  "praise": [
+    { "name": "Location next to the Old Port", "quotes": [
+      { "reviewId": "g-1", "quote": "Steps from the Old Port and every restaurant we wanted" },
+      { "reviewId": "g-4", "quote": "Walkable to everything in the Old Port" }
+    ] },
+    { "name": "Rooftop pool", "quotes": [
+      { "reviewId": "g-2", "quote": "the rooftop pool was a highlight" }
+    ] },
+    { "name": "Breakfast", "quotes": [
+      { "reviewId": "g-4", "quote": "The blueberry pancakes alone are worth the stay" },
+      { "reviewId": "g-9", "quote": "best breakfast in Maine" }
+    ] }
+  ],
+  "questions": [
+    { "name": "Parking", "quotes": [
+      { "reviewId": "g-2", "quote": "Wish we'd known  parking was a block away" }
+    ] }
+  ],
+  "headline": "Rooftop pool and pancakes in the Old Port.",
+  "adLines": [ "Swim above the harbor." ]
+}

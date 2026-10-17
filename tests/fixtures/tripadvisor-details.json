@@ -1,0 +1,10 @@
+{
+  "data": {
+    "id": 555002,
+    "names": [ { "language": "en", "value": "The Harborside Inn", "primary": true } ],
+    "rating": 4.5,
+    "num_reviews": 980,
+    "ranking": { "rank": 12, "total": 48, "geo": "Portland", "category": "hotels", "text": "#12 of 48 hotels in Portland" },
+    "web_url": "https://www.tripadvisor.com/Hotel_Review-555002"
+  }
+}

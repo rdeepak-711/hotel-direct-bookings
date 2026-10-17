@@ -1,0 +1,30 @@
+{
+  "id": "http://old-inn-example.com/",
+  "lighthouseResult": {
+    "finalUrl": "http://old-inn-example.com/",
+    "categories": { "performance": { "score": 0.91 } },
+    "audits": {
+      "is-on-https": { "score": 0 },
+      "viewport": { "score": 0 },
+      "tap-targets": { "score": 1 },
+      "network-requests": {
+        "details": {
+          "type": "table",
+          "items": [
+            { "url": "http://old-inn-example.com/", "resourceType": "Document" },
+            { "url": "http://old-inn-example.com/style.css", "resourceType": "Stylesheet" }
+          ]
+        }
+      },
+      "link-text": {
+        "details": {
+          "type": "table",
+          "items": [
+            { "href": "http://old-inn-example.com/about.html", "text": "About us" },
+            { "href": "tel:+12075550142", "text": "Call us" }
+          ]
+        }
+      }
+    }
+  }
+}
