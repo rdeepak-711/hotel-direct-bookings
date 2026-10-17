@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Report Mockup</title>
+<style>
+  :root {
+    --bg: #f6f5f1; --panel: #ffffff; --ink: #1c2229; --muted: #5f6873; --line: #e2dfd7;
+    --accent: #1f5f8b; --accent-soft: #e6f0f7; --good: #2f7d4f; --good-soft: #e7f4ec;
+    --warn: #a2631a; --warn-soft: #fbf0e1; --bad: #a83a32; --bad-soft: #fbe9e7;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171b; --panel: #1b1f25; --ink: #e7e9ec; --muted: #9aa3ae; --line: #2c323a;
+      --accent: #6fb1e0; --accent-soft: #1b2b38; --good: #6cc391; --good-soft: #17291f;
+      --warn: #e2a65a; --warn-soft: #2d2416; --bad: #ec8a80; --bad-soft: #301c1a;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171b; --panel: #1b1f25; --ink: #e7e9ec; --muted: #9aa3ae; --line: #2c323a;
+    --accent: #6fb1e0; --accent-soft: #1b2b38; --good: #6cc391; --good-soft: #17291f;
+    --warn: #e2a65a; --warn-soft: #2d2416; --bad: #ec8a80; --bad-soft: #301c1a;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.55 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 24px 16px 72px; }
+  .banner { background: var(--warn-soft); color: var(--warn); border-radius: 8px; padding: 8px 12px; font-size: .85rem; margin-bottom: 18px; }
+  header.site { display: flex; justify-content: space-between; align-items: center; padding: 6px 0 18px; border-bottom: 1px solid var(--line); margin-bottom: 20px; }
+  header.site .brand { font-weight: 700; letter-spacing: .01em; }
+  header.site .brand span { color: var(--accent); }
+  header.site a { color: var(--muted); font-size: .85rem; text-decoration: none; }
+  h1 { font-size: 1.7rem; line-height: 1.2; margin: 0; }
+  .addr { color: var(--muted); margin: 2px 0 0; }
+  .sample { color: var(--muted); font-size: .85rem; margin: 8px 0 18px; }
+  .top3 { background: var(--accent-soft); border-radius: 12px; padding: 16px 18px; margin: 0 0 22px; }
+  .top3 h2 { margin: 0 0 8px; font-size: 1.05rem; }
+  .top3 ol { margin: 0; padding-left: 22px; }
+  .top3 li { margin: 6px 0; }
+  .top3 li small { display: block; color: var(--muted); font-size: .82rem; }
+  section.card { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; margin: 14px 0; }
+  section.card h2 { font-size: 1.05rem; margin: 0 0 10px; display: flex; align-items: baseline; gap: 10px; }
+  section.card h2 .cat { font-size: .72rem; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); }
+  .row { display: flex; flex-wrap: wrap; gap: 8px 14px; margin: 6px 0; }
+  .kv { font-size: .92rem; }
+  .pill { display: inline-block; font-weight: 700; padding: 1px 8px; border-radius: 6px; font-size: .85rem; }
+  .ok { background: var(--good-soft); color: var(--good); }
+  .meh { background: var(--warn-soft); color: var(--warn); }
+  .no { background: var(--bad-soft); color: var(--bad); }
+  .fix { margin: 10px 0 0; padding: 10px 12px; background: var(--bg); border-radius: 8px; font-size: .92rem; }
+  .fix b { color: var(--accent); }
+  .theme { margin: 12px 0; }
+  .theme .name { font-weight: 600; }
+  .theme .count { color: var(--muted); font-size: .85rem; margin-left: 6px; }
+  blockquote { margin: 6px 0 6px 0; padding: 6px 12px; border-left: 3px solid var(--line); color: var(--muted); font-style: italic; font-size: .95rem; }
+  blockquote cite { display: block; font-style: normal; font-size: .78rem; margin-top: 2px; }
+  .copybox { background: var(--bg); border: 1px dashed var(--line); border-radius: 8px; padding: 10px 12px; margin: 10px 0 0; font-size: .95rem; }
+  .copybox .label { font-size: .72rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); display: block; margin-bottom: 4px; }
+  .partner { display: inline-block; margin-left: 8px; font-size: .78rem; color: var(--good); background: var(--good-soft); padding: 0 6px; border-radius: 4px; }
+  .footnote { color: var(--muted); font-size: .85rem; margin: 20px 0 0; }
+  footer.site { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--muted); font-size: .8rem; }
+  .toggle { font-size: .85rem; color: var(--accent); cursor: pointer; background: none; border: 1px solid var(--line); border-radius: 6px; padding: 3px 10px; }
+  body:not(.partner-on) .partner { display: none; }
+  .sidenote { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px; margin: 28px 0 0; font-size: .9rem; }
+  .sidenote h3 { margin: 0 0 6px; font-size: .95rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="banner">Mock-up, 18 Oct 2026. The hotel is fictional and every number is made up to show the layout. The real page fills all of this from live data.</div>
+
+<header class="site">
+  <div class="brand">Direct <span>Booking</span> Check</div>
+  <div><button class="toggle" onclick="document.body.classList.toggle('partner-on');this.textContent=document.body.classList.contains('partner-on')?'Hide partner view':'Show partner view'">Show partner view</button></div>
+</header>
+
+<h1>Harborside Inn</h1>
+<p class="addr">12 Commercial St, Portland, ME 04101</p>
+<p class="sample">From your Google listing, 5 Google reviews, 3 Tripadvisor reviews and your website as loaded on a phone. Checked 18 Oct 2026. Small sample: we show patterns, not percentages.</p>
+
+<div class="top3">
+  <h2>Fix these first</h2>
+  <ol>
+    <li>Your website scores <b>38/100</b> on mobile speed. Most guests book on a phone; a slow page sends them to Expedia instead.<small>Booking website</small></li>
+    <li>Your Google listing has <b>no description</b>. Guests read Expedia's words about you before yours.<small>Google profile</small></li>
+    <li><b>2 of 8</b> recent reviews mention confusion about parking. Nobody could find the answer before arriving.<small>Guest messaging</small></li>
+  </ol>
+</div>
+
+<section class="card">
+  <h2>Google listing <span class="cat">Google profile</span></h2>
+  <div class="row">
+    <span class="kv">Rating <span class="pill ok">4.5★</span> from 1,313 reviews</span>
+    <span class="kv">Website linked <span class="pill ok">yes</span></span>
+    <span class="kv">Phone <span class="pill ok">yes</span></span>
+    <span class="kv">Description <span class="pill no">none</span></span>
+    <span class="kv">Tripadvisor <span class="pill meh">#12 of 48 hotels in Portland</span></span>
+  </div>
+  <div class="fix"><b>Fix:</b> add a description built from what guests praise below: location next to the Old Port, breakfast, friendly staff. <span class="partner">Hotelzify: Google Business Profile optimisation</span></div>
+</section>
+
+<section class="card">
+  <h2>Your website, as a guest sees it on a phone <span class="cat">Booking website</span></h2>
+  <div class="row">
+    <span class="kv">Mobile speed <span class="pill no">38/100</span></span>
+    <span class="kv">"Book now" <span class="pill ok">found</span></span>
+    <span class="kv">Booking runs on <span class="pill meh">be.synxis.com (SynXis)</span></span>
+    <span class="kv">Tap-to-call <span class="pill no">not found on the home page</span></span>
+    <span class="kv">Secure (HTTPS) <span class="pill ok">yes</span></span>
+    <span class="kv">Fits a phone screen <span class="pill ok">yes</span></span>
+  </div>
+  <div class="fix"><b>Fix:</b> a faster mobile booking page on your own domain, with a tap-to-call button. Guests trust a booking page that carries your name more than one on another company's address. <span class="partner">Hotelzify: booking website</span></div>
+</section>
+
+<section class="card">
+  <h2>What guests love <span class="cat">Marketing</span></h2>
+  <div class="theme">
+    <span class="name">Location next to the Old Port</span><span class="count">4 of 8 reviews</span>
+    <blockquote>"Steps from the Old Port and every restaurant we wanted"<cite>Google review by A. Guest, Sep 2026</cite></blockquote>
+    <blockquote>"Perfect base for exploring the Old Port on foot"<cite>Tripadvisor, Oct 2026</cite></blockquote>
+  </div>
+  <div class="theme">
+    <span class="name">Breakfast</span><span class="count">2 of 8 reviews</span>
+    <blockquote>"The blueberry pancakes alone are worth the stay"<cite>Google review by D. Guest, Jul 2026</cite></blockquote>
+  </div>
+  <div class="theme">
+    <span class="name">Friendly staff</span><span class="count">2 of 8 reviews</span>
+    <blockquote>"The staff remembered our names by day two"<cite>Google review by A. Guest, Sep 2026</cite></blockquote>
+  </div>
+  <div class="copybox"><span class="label">Draft headline for your website and ads</span>Steps from the Old Port, with a breakfast guests write home about.</div>
+  <div class="copybox"><span class="label">Draft ad lines</span>Walk to every restaurant in the Old Port.<br>Blueberry pancakes worth the stay.</div>
+  <div class="fix"><b>Fix:</b> use these on your booking page and in your Google and Meta ads. Every line comes from a real guest, so you can back it up. <span class="partner">Hotelzify: AI marketing</span></div>
+</section>
+
+<section class="card">
+  <h2>What guests had to work out for themselves <span class="cat">Guest messaging</span></h2>
+  <div class="theme">
+    <span class="name">Parking</span><span class="count">2 of 8 reviews</span>
+    <blockquote>"wish we'd known parking was a block away in a paid garage"<cite>Google review by B. Guest, Aug 2026</cite></blockquote>
+    <blockquote>"Parking situation was confusing, no instructions anywhere before arrival"<cite>Tripadvisor, Sep 2026</cite></blockquote>
+  </div>
+  <div class="theme">
+    <span class="name">Check-in time</span><span class="count">1 of 8 reviews</span>
+    <blockquote>"Check-in isn't until 4 PM which we didn't realise, so we waited in the lobby with bags"<cite>Google review by E. Guest, Jun 2026</cite></blockquote>
+  </div>
+  <div class="fix"><b>Fix:</b> answer both on the booking page and in the confirmation email, and make sure your chat or phone assistant knows them. <span class="partner">Hotelzify: AI concierge</span></div>
+</section>
+
+<p class="footnote">Why direct bookings matter: Cloudbeds' 2026 data shows bookings made through sites like Expedia are cancelled about twice as often as direct bookings, and guests say they get sent back and forth between the site and the hotel when something goes wrong.</p>
+
+<footer class="site">
+  Built by Deepak R. Not affiliated with any company. Review text is fetched live from Google and Tripadvisor and never stored. Google reviews shown with the attribution Google requires.
+</footer>
+
+<div class="sidenote">
+  <h3>How to read this mock-up</h3>
+  <p>The toggle at the top switches between the <b>public view</b> (generic categories) and the <b>partner view</b>, which adds the matching Hotelzify product under each fix. Same page, one flag. In the live tool the partner view is <code>?audience=partner</code> in the link, and that link is only sent to Hotelzify.</p>
+  <p>Hard rules the live page follows: no percentages (8 reviews is too few); "not found", never "missing"; every quote verified word for word against the review; no full review text shown; "booking sites like Expedia", never "OTA".</p>
+</div>
+
+</div>
+</body>
+</html>
