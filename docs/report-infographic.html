@@ -1,0 +1,483 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direct Booking Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #faf8f5; --panel: #ffffff; --well: #f4efeb; --ink: #0f1e36; --muted: #4a5568; --line: #e5e0d8; --line-2: #d8d2c5;
+    --coral: #e25545; --coral-soft: #feece9; --green: #15803d; --green-bright: #22c55e; --green-soft: #dcfce7;
+    --navy-2: #1a2e4c; --grey: #9aa3ae; --amber: #b7791f; --amber-soft: #fdf3dc;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #12161d; --panel: #1a1f28; --well: #222835; --ink: #e9ecf1; --muted: #a2abb8; --line: #2b3240; --line-2: #37404f;
+      --coral: #f07a6c; --coral-soft: #3a1f1c; --green: #5fcf8a; --green-bright: #4ade80; --green-soft: #15301f;
+      --navy-2: #8fb4e3; --grey: #6b7684; --amber: #e0b35a; --amber-soft: #352a14;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #12161d; --panel: #1a1f28; --well: #222835; --ink: #e9ecf1; --muted: #a2abb8; --line: #2b3240; --line-2: #37404f;
+    --coral: #f07a6c; --coral-soft: #3a1f1c; --green: #5fcf8a; --green-bright: #4ade80; --green-soft: #15301f;
+    --navy-2: #8fb4e3; --grey: #6b7684; --amber: #e0b35a; --amber-soft: #352a14;
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.6 "Plus Jakarta Sans", -apple-system, system-ui, sans-serif; font-variant-numeric: tabular-nums; }
+  h1, h2, h3, .serif { font-family: "Newsreader", Georgia, serif; font-weight: 500; letter-spacing: -0.01em; margin: 0; }
+  h1 { font-size: clamp(32px, 5vw, 48px); line-height: 1.1; font-weight: 400; letter-spacing: -0.02em; }
+  h2 { font-size: clamp(24px, 3vw, 32px); line-height: 1.2; }
+  h3 { font-size: 20px; font-weight: 600; }
+  .wrap { max-width: 1120px; margin: 0 auto; padding: 0 16px 80px; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .eyebrow.coral { color: var(--coral); } .eyebrow.green { color: var(--green); }
+  .muted { color: var(--muted); }
+  .small { font-size: 13px; line-height: 1.5; }
+  .stat { font-size: 40px; font-weight: 700; letter-spacing: -.03em; line-height: 1; }
+  .pill { display: inline-block; padding: 2px 10px; border-radius: 999px; font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; white-space: nowrap; }
+  .pill.bad { background: var(--coral-soft); color: var(--coral); }
+  .pill.good { background: var(--green-soft); color: var(--green); }
+  .pill.neutral { background: var(--well); color: var(--ink); border: 1px solid var(--line); }
+  .pill.warn { background: var(--amber-soft); color: var(--amber); }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 16px; padding: 24px; }
+  .card.top-coral { border-top: 3px solid var(--coral); } .card.top-green { border-top: 3px solid var(--green); } .card.top-navy { border-top: 3px solid var(--ink); }
+  .well { background: var(--well); border-radius: 10px; padding: 14px 16px; }
+  section { margin: 56px 0; }
+  section > header { margin-bottom: 20px; max-width: 720px; }
+  section > header p { margin: 6px 0 0; color: var(--muted); }
+  .grid { display: grid; gap: 20px; }
+  .g2 { grid-template-columns: 1fr 1fr; } .g3 { grid-template-columns: repeat(3, 1fr); }
+  .g-hero { grid-template-columns: 1.1fr .9fr; align-items: center; }
+  @media (max-width: 860px) { .g2, .g3, .g-hero { grid-template-columns: 1fr; } }
+
+  /* top bar */
+  .bar { display: flex; justify-content: space-between; align-items: center; padding: 18px 0; border-bottom: 1px solid var(--line); margin-bottom: 36px; gap: 12px; flex-wrap: wrap; }
+  .brand { font-family: "Newsreader", serif; font-size: 20px; font-weight: 600; }
+  .brand span { color: var(--coral); }
+  .toggle { font: 600 13px "Plus Jakarta Sans", sans-serif; color: var(--ink); background: transparent; border: 1.5px solid var(--ink); border-radius: 8px; padding: 7px 14px; cursor: pointer; }
+  .toggle:hover { background: var(--well); }
+  .partner { display: none; margin-top: 10px; padding: 8px 12px; background: var(--green-soft); color: var(--green); border-radius: 8px; font-size: 13px; font-weight: 600; }
+  body.partner-on .partner { display: block; }
+  .mock { background: var(--amber-soft); color: var(--amber); border-radius: 8px; padding: 8px 14px; font-size: 13px; margin-bottom: 20px; }
+
+  /* hero */
+  .hero .addr { color: var(--muted); margin: 6px 0 18px; font-size: 16px; }
+  .hero .lede { font-family: "Newsreader", serif; font-size: 22px; line-height: 1.35; font-style: italic; color: var(--ink); max-width: 520px; }
+  .gauge-wrap { text-align: center; }
+  .gauge-wrap .stat { font-size: 56px; }
+  .rings { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 22px; }
+  .ring { text-align: center; }
+  .ring svg { width: 68px; height: 68px; }
+  .ring .v { font-weight: 700; font-size: 16px; display: block; margin-top: -4px; }
+  .ring .l { font-size: 12px; color: var(--muted); display: block; }
+
+  /* leak flow */
+  .flow { display: grid; grid-template-columns: repeat(4, 1fr); gap: 0; align-items: stretch; }
+  .step { position: relative; padding: 20px 22px 20px 20px; background: var(--panel); border: 1px solid var(--line); }
+  .step:first-child { border-radius: 14px 0 0 14px; } .step:last-child { border-radius: 0 14px 14px 0; }
+  .step + .step { border-left: none; }
+  .step::after { content: ""; position: absolute; right: -11px; top: 50%; width: 20px; height: 20px; background: var(--panel); border-right: 1px solid var(--line); border-top: 1px solid var(--line); transform: translateY(-50%) rotate(45deg); z-index: 2; }
+  .step:last-child::after { display: none; }
+  .step .n { font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: .08em; }
+  .step .t { font-family: "Newsreader", serif; font-size: 19px; font-weight: 600; margin: 6px 0 4px; line-height: 1.2; }
+  .step .s { font-size: 13px; color: var(--muted); }
+  .step .dot { position: absolute; top: 18px; right: 20px; width: 10px; height: 10px; border-radius: 50%; }
+  .dot.red { background: var(--coral); } .dot.green { background: var(--green-bright); } .dot.grey { background: var(--grey); }
+  .step.leak { background: var(--coral-soft); }
+  .step.leak .t { color: var(--coral); }
+  .step svg.ic { width: 28px; height: 28px; stroke: var(--ink); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  .leak-stat { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 20px; }
+  .leak-stat .card { padding: 18px 20px; }
+  @media (max-width: 860px) { .flow { grid-template-columns: 1fr; } .step { border-radius: 0 !important; border-left: 1px solid var(--line) !important; } .step:first-child { border-radius: 14px 14px 0 0 !important; } .step:last-child { border-radius: 0 0 14px 14px !important; } .step::after { display: none; } .leak-stat { grid-template-columns: 1fr; } }
+
+  /* fix cards */
+  .fix { position: relative; }
+  .fix .num { position: absolute; top: -14px; left: 20px; width: 30px; height: 30px; border-radius: 50%; background: var(--ink); color: #fff; font-weight: 700; display: grid; place-items: center; font-size: 14px; }
+  .fix h3 { margin: 10px 0 6px; }
+  .fix .meta { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; margin: 12px 0; }
+  .impact { display: inline-flex; gap: 3px; align-items: flex-end; }
+  .impact i { display: block; width: 7px; background: var(--line-2); border-radius: 2px; }
+  .impact i:nth-child(1) { height: 8px; } .impact i:nth-child(2) { height: 12px; } .impact i:nth-child(3) { height: 16px; }
+  .impact i.on { background: var(--coral); }
+  .fix .why { color: var(--muted); font-size: 14px; }
+  .fix .do { margin-top: 12px; }
+
+  /* gap table */
+  table.gap { width: 100%; border-collapse: separate; border-spacing: 0; font-size: 14px; }
+  table.gap th { text-align: left; font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); padding: 0 12px 10px; font-weight: 700; }
+  table.gap td { padding: 14px 12px; border-top: 1px solid var(--line); vertical-align: middle; }
+  table.gap tr.hot td { background: var(--coral-soft); }
+  table.gap tr.hot td:first-child { border-radius: 10px 0 0 10px; } table.gap tr.hot td:last-child { border-radius: 0 10px 10px 0; }
+  .dots { display: inline-flex; gap: 4px; vertical-align: middle; margin-right: 8px; }
+  .dots i { width: 11px; height: 11px; border-radius: 50%; background: var(--line-2); display: block; }
+  .dots i.on { background: var(--ink); }
+  tr.hot .dots i.on { background: var(--coral); }
+  .mark { font-weight: 700; font-size: 16px; }
+  .mark.no { color: var(--coral); } .mark.yes { color: var(--green); }
+  .quote { background: var(--well); border-radius: 12px; padding: 14px 16px; margin: 10px 0; position: relative; }
+  .quote p { margin: 0; font-family: "Newsreader", serif; font-style: italic; font-size: 17px; line-height: 1.4; }
+  .quote cite { display: block; font-style: normal; font-size: 12px; color: var(--muted); margin-top: 6px; }
+  .quote::before { content: "“"; position: absolute; left: 12px; top: -6px; font-family: "Newsreader", serif; font-size: 40px; color: var(--coral); opacity: .5; line-height: 1; }
+  .quote p { padding-left: 14px; }
+  .verified { display: inline-flex; align-items: center; gap: 4px; color: var(--green); font-size: 11px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+
+  /* radar */
+  .radar svg { width: 100%; max-width: 360px; height: auto; display: block; margin: 0 auto; }
+  .radar text { font-family: "Plus Jakarta Sans", sans-serif; font-size: 11px; fill: var(--muted); font-weight: 600; }
+  .bullets .row { margin: 14px 0; }
+  .bullets .lbl { display: flex; justify-content: space-between; font-size: 13px; margin-bottom: 4px; }
+  .bullet { position: relative; height: 14px; background: var(--well); border-radius: 7px; overflow: visible; }
+  .bullet .you { position: absolute; left: 0; top: 3px; height: 8px; border-radius: 4px; background: var(--ink); }
+  .bullet .them { position: absolute; top: -3px; width: 3px; height: 20px; background: var(--coral); border-radius: 2px; }
+  .bullet .them.ok { background: var(--green); }
+  .legend { display: flex; gap: 16px; font-size: 12px; color: var(--muted); margin-top: 10px; flex-wrap: wrap; }
+  .legend i { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -2px; margin-right: 5px; }
+  .flags { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; margin-top: 18px; }
+  .flag { background: var(--well); border-radius: 10px; padding: 12px; text-align: center; }
+  .flag .v { font-weight: 700; font-size: 18px; } .flag .l { font-size: 12px; color: var(--muted); }
+  .heads { display: flex; justify-content: center; gap: 3px; margin-top: 6px; }
+  .heads i { width: 14px; height: 14px; border-radius: 50% 50% 4px 4px; background: var(--line-2); display: block; }
+  .heads i.on { background: var(--ink); } .heads i.you { background: var(--coral); }
+  @media (max-width: 560px) { .flags { grid-template-columns: 1fr; } }
+
+  /* phone */
+  .phone-grid { display: grid; grid-template-columns: 260px 1fr; gap: 28px; align-items: center; }
+  @media (max-width: 760px) { .phone-grid { grid-template-columns: 1fr; justify-items: center; } }
+  .phone { width: 230px; height: 460px; border: 10px solid var(--ink); border-radius: 36px; background: var(--panel); position: relative; overflow: hidden; margin: 0 auto; }
+  .phone .notch { position: absolute; top: 0; left: 50%; transform: translateX(-50%); width: 90px; height: 22px; background: var(--ink); border-radius: 0 0 14px 14px; }
+  .phone .sk { position: absolute; left: 16px; right: 16px; background: var(--well); border-radius: 6px; overflow: hidden; }
+  .phone .sk::after { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, rgba(255,255,255,.6), transparent); animation: sh 1.6s infinite; }
+  @keyframes sh { from { transform: translateX(-100%); } to { transform: translateX(100%); } }
+  .phone .timer { position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); text-align: center; }
+  .phone .timer b { display: block; font-size: 38px; font-weight: 700; color: var(--coral); letter-spacing: -.03em; }
+  .phone .timer span { font-size: 12px; color: var(--muted); }
+  .phone .spin { width: 28px; height: 28px; border: 3px solid var(--line-2); border-top-color: var(--coral); border-radius: 50%; margin: 0 auto 8px; animation: rot 1s linear infinite; }
+  @keyframes rot { to { transform: rotate(360deg); } }
+  .checks { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin: 16px 0; }
+  .check { display: flex; gap: 10px; align-items: flex-start; padding: 12px; border-radius: 10px; border: 1px solid var(--line); }
+  .check.bad { background: var(--coral-soft); border-color: transparent; } .check.good { background: var(--green-soft); border-color: transparent; }
+  .check b { display: block; font-size: 14px; } .check span { font-size: 12px; color: var(--muted); }
+  .check .m { font-weight: 700; font-size: 18px; line-height: 1; }
+  .check.bad .m { color: var(--coral); } .check.good .m { color: var(--green); }
+  @media (max-width: 560px) { .checks { grid-template-columns: 1fr; } }
+  .speed { position: relative; height: 18px; border-radius: 9px; background: linear-gradient(90deg, var(--coral) 0 50%, var(--amber) 50% 90%, var(--green-bright) 90%); opacity: .9; margin: 8px 0 24px; }
+  .speed .you, .speed .them { position: absolute; top: -8px; width: 4px; height: 34px; border-radius: 2px; }
+  .speed .you { background: var(--ink); } .speed .them { background: var(--panel); border: 2px solid var(--ink); width: 6px; }
+  .speed .tag { position: absolute; top: 30px; transform: translateX(-50%); font-size: 11px; font-weight: 700; white-space: nowrap; }
+
+  /* praise */
+  .bubbles { display: flex; gap: 16px; align-items: flex-end; justify-content: center; flex-wrap: wrap; margin: 8px 0 20px; }
+  .bubble { border-radius: 50%; display: grid; place-items: center; text-align: center; color: #fff; padding: 10px; }
+  .bubble b { font-size: 24px; display: block; } .bubble span { font-size: 12px; line-height: 1.2; display: block; }
+  .b1 { width: 190px; height: 190px; background: var(--ink); } .b2 { width: 130px; height: 130px; background: var(--green); } .b3 { width: 130px; height: 130px; background: var(--navy-2); }
+  :root[data-theme="dark"] .b3, :root:not([data-theme="light"]) .b3 { color: #0f1e36; }
+  @media (prefers-color-scheme: light) { :root:not([data-theme="dark"]) .b3 { color: #fff; } }
+  .copy { border: 1.5px dashed var(--line-2); border-radius: 12px; padding: 14px 16px; margin-top: 12px; }
+  .copy .eyebrow { margin-bottom: 4px; }
+  .copy p { margin: 0; font-family: "Newsreader", serif; font-size: 20px; line-height: 1.3; }
+
+  /* callout + footer */
+  .callout { border-left: 3px solid var(--ink); padding: 6px 0 6px 18px; font-family: "Newsreader", serif; font-style: italic; font-size: 19px; line-height: 1.4; }
+  footer { border-top: 1px solid var(--line); margin-top: 48px; padding-top: 18px; color: var(--muted); font-size: 13px; }
+  .new-tbl { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .new-tbl td, .new-tbl th { padding: 8px 10px; border-bottom: 1px solid var(--line); text-align: left; vertical-align: top; }
+  .new-tbl th { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); }
+  .tag-new { color: var(--green); font-weight: 700; } .tag-old { color: var(--muted); font-weight: 700; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<div class="bar">
+  <div class="brand">Direct <span>Booking</span> Check</div>
+  <button class="toggle" onclick="document.body.classList.toggle('partner-on');this.textContent=document.body.classList.contains('partner-on')?'Hide partner view':'Show partner view'">Show partner view</button>
+</div>
+
+<div class="mock">Mock-up, 18 Oct 2026. Harborside Inn and its neighbours are fictional; every number is sample data showing how the live report presents real results.</div>
+
+<!-- HERO -->
+<section class="hero" style="margin-top:0">
+  <div class="grid g-hero">
+    <div>
+      <div class="eyebrow">Direct Booking Check · Portland, Maine</div>
+      <h1 style="margin-top:8px">Harborside Inn</h1>
+      <p class="addr">12 Commercial St, Portland, ME 04101</p>
+      <p class="lede">Guests love you. Your website and listing make them book you through Expedia anyway.</p>
+      <p class="small muted" style="margin-top:18px">Built from your Google listing, 8 recent reviews (5 Google, 3 Tripadvisor), your website loaded on a phone, and the public listings of the 5 hotels nearest you. Checked 18 Oct 2026. Eight reviews is a small sample, so this report shows patterns and counts, never percentages.</p>
+    </div>
+    <div class="card gauge-wrap">
+      <div class="eyebrow">Direct booking score</div>
+      <svg viewBox="0 0 220 125" width="260" height="148" style="margin-top:8px">
+        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="var(--well)" stroke-width="16" stroke-linecap="round"/>
+        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="var(--coral)" stroke-width="16" stroke-linecap="round" stroke-dasharray="152.7 282.7"/>
+        <line x1="110" y1="110" x2="120" y2="36" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <circle cx="110" cy="110" r="6" fill="var(--ink)"/>
+        <text x="20" y="124" font-size="10" fill="var(--muted)" font-family="Plus Jakarta Sans">0</text>
+        <text x="190" y="124" font-size="10" fill="var(--muted)" font-family="Plus Jakarta Sans">100</text>
+      </svg>
+      <div class="stat" style="margin-top:-30px">54<span class="muted" style="font-size:20px;font-weight:600">/100</span></div>
+      <div class="small muted">Weighted from the four checks below. Under 60 means guests have a reason to book elsewhere.</div>
+      <div class="rings">
+        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle cx="30" cy="30" r="22" fill="none" stroke="var(--coral)" stroke-width="7" stroke-linecap="round" stroke-dasharray="42.8 138.2" transform="rotate(-90 30 30)"/></svg><span class="v">31</span><span class="l">Website</span></div>
+        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle cx="30" cy="30" r="22" fill="none" stroke="var(--amber)" stroke-width="7" stroke-linecap="round" stroke-dasharray="85.7 138.2" transform="rotate(-90 30 30)"/></svg><span class="v">62</span><span class="l">Google listing</span></div>
+        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle cx="30" cy="30" r="22" fill="none" stroke="var(--coral)" stroke-width="7" stroke-linecap="round" stroke-dasharray="62.2 138.2" transform="rotate(-90 30 30)"/></svg><span class="v">45</span><span class="l">Guest messaging</span></div>
+        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle cx="30" cy="30" r="22" fill="none" stroke="var(--green-bright)" stroke-width="7" stroke-linecap="round" stroke-dasharray="121.6 138.2" transform="rotate(-90 30 30)"/></svg><span class="v">88</span><span class="l">Reviews</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LEAK FLOW -->
+<section>
+  <header>
+    <div class="eyebrow coral">The leak</div>
+    <h2>Where a guest who already wants you ends up booking somewhere else</h2>
+    <p>Follow one guest from searching your name to paying. Each step is a real check we ran; the red dots are where this hotel loses them.</p>
+  </header>
+  <div class="flow">
+    <div class="step">
+      <i class="dot green"></i>
+      <svg class="ic" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></svg>
+      <div class="n">STEP 1</div><div class="t">Searches your name</div>
+      <div class="s">4.5★ from 1,313 reviews. The guest is already sold on you.</div>
+    </div>
+    <div class="step">
+      <i class="dot red"></i>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M12 21s-7-6.5-7-11a7 7 0 0 1 14 0c0 4.5-7 11-7 11z"/><circle cx="12" cy="10" r="2.5"/></svg>
+      <div class="n">STEP 2</div><div class="t">Reads your Google listing</div>
+      <div class="s">No description. Expedia's result underneath has three paragraphs about you.</div>
+    </div>
+    <div class="step">
+      <i class="dot red"></i>
+      <svg class="ic" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></svg>
+      <div class="n">STEP 3</div><div class="t">Opens your website on a phone</div>
+      <div class="s">Speed 38/100, roughly 7.8 s to usable. Book button sends them to be.synxis.com.</div>
+    </div>
+    <div class="step leak">
+      <i class="dot red"></i>
+      <svg class="ic" viewBox="0 0 24 24"><path d="M3 12h12"/><path d="m11 8 4 4-4 4"/><rect x="16" y="4" width="5" height="16" rx="1"/></svg>
+      <div class="n">STEP 4</div><div class="t">Books on Expedia</div>
+      <div class="s">Faster page, familiar checkout, parking question answered by a call centre. You pay 15–25% commission.</div>
+    </div>
+  </div>
+  <div class="leak-stat">
+    <div class="card"><div class="stat" style="color:var(--coral)">2×</div><div class="small muted" style="margin-top:6px">Bookings through sites like Expedia are cancelled about twice as often as direct bookings (Cloudbeds, 2026).</div></div>
+    <div class="card"><div class="stat">3 of 4</div><div class="small muted" style="margin-top:6px">Steps where this hotel gives the guest a reason to leave. Only step 1, the reviews, works in your favour.</div></div>
+    <div class="card"><div class="stat" style="color:var(--green)">1 week</div><div class="small muted" style="margin-top:6px">Two of the three fixes below take under half an hour each. Only the website speed needs a developer.</div></div>
+  </div>
+</section>
+
+<!-- FIX FIRST -->
+<section>
+  <header>
+    <div class="eyebrow">Priorities</div>
+    <h2>Fix these first</h2>
+    <p>Ranked by how many guests it touches and how quickly it's done. Impact bars: how much of the leak this closes.</p>
+  </header>
+  <div class="grid g3">
+    <div class="card top-coral fix">
+      <div class="num">1</div>
+      <div class="eyebrow coral">Guest messaging</div>
+      <h3>Guests keep asking about parking. Your site never mentions it.</h3>
+      <div class="meta"><span class="pill neutral">20 min</span><span class="impact"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="small muted">2 of 8 reviews</span></div>
+      <p class="why">A guest with an unanswered question rings whoever picks up fastest. That's Expedia's call centre, and the booking goes with the call.</p>
+      <div class="well do small"><b>Do:</b> one paragraph on the booking page and in the confirmation email: where to park, what it costs, the garage address.</div>
+      <div class="partner">Hotelzify: AI concierge answers this on WhatsApp, chat and phone, 24/7</div>
+    </div>
+    <div class="card top-coral fix">
+      <div class="num">2</div>
+      <div class="eyebrow coral">Booking website</div>
+      <h3>Your site scores 38/100 on a phone. The 3 nearest hotels with a score average 76.</h3>
+      <div class="meta"><span class="pill neutral">Needs a developer</span><span class="impact"><i class="on"></i><i class="on"></i><i class="on"></i></span><span class="small muted">Last of 4</span></div>
+      <p class="why">Most hotel bookings happen on a phone. Every second of loading is a guest who goes back to the search results, where Expedia sits one tap away.</p>
+      <div class="well do small"><b>Do:</b> a fast mobile booking page on your own domain with a tap-to-call button, so the booking carries your name, not a vendor's.</div>
+      <div class="partner">Hotelzify: booking website</div>
+    </div>
+    <div class="card top-navy fix">
+      <div class="num">3</div>
+      <div class="eyebrow">Google profile</div>
+      <h3>Your Google listing has no description. 3 of your 5 neighbours have one.</h3>
+      <div class="meta"><span class="pill neutral">15 min</span><span class="impact"><i class="on"></i><i class="on"></i><i></i></span><span class="small muted">Behind 3 of 5</span></div>
+      <p class="why">The listing is the one page you control that Expedia can't out-rank. Empty, it hands the first impression to whoever wrote about you.</p>
+      <div class="well do small"><b>Do:</b> paste the drafted description from the "What guests love" section below. It's built from your own reviews.</div>
+      <div class="partner">Hotelzify: Google Business Profile optimisation</div>
+    </div>
+  </div>
+</section>
+
+<!-- GAP CHECK -->
+<section>
+  <header>
+    <div class="eyebrow coral">New in this report</div>
+    <h2>What guests asked that your website never answers</h2>
+    <p>We take the questions guests raise in reviews and look for the answer in your own website's text. Every unanswered question is a phone call you don't get and a booking that goes to whoever answers first.</p>
+  </header>
+  <div class="grid g2">
+    <div class="card">
+      <table class="gap">
+        <thead><tr><th>Guests asked about</th><th>In reviews (of 8)</th><th>On your site</th></tr></thead>
+        <tbody>
+          <tr class="hot"><td><b>Parking</b></td><td><span class="dots"><i class="on"></i><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i></span>2</td><td><span class="mark no">✗</span> <span class="small">not mentioned</span></td></tr>
+          <tr><td><b>Check-in time</b></td><td><span class="dots"><i class="on"></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>1</td><td><span class="mark yes">✓</span> <span class="small">4 PM, in the footer</span></td></tr>
+          <tr><td><b>Breakfast hours</b></td><td><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>0</td><td><span class="mark yes">✓</span> <span class="small">7–10 AM</span></td></tr>
+          <tr><td><b>Pets</b></td><td><span class="dots"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></span>0</td><td><span class="mark no">✗</span> <span class="small">not mentioned</span></td></tr>
+        </tbody>
+      </table>
+      <p class="small muted" style="margin:14px 0 0">Reading: parking is the live problem, asked about and unanswered. Check-in is answered but one guest still missed it, so move it next to the Book button. Pets isn't asked about yet; answering it anyway is free.</p>
+    </div>
+    <div>
+      <div class="quote"><p>wish we'd known parking was a block away in a paid garage</p><cite>Google review by B. Guest · Aug 2026 · <span class="verified">✓ verified word for word</span></cite></div>
+      <div class="quote"><p>Parking situation was confusing, no instructions anywhere before arrival</p><cite>Tripadvisor · Sep 2026 · <span class="verified">✓ verified word for word</span></cite></div>
+      <div class="callout" style="margin-top:16px">Both guests still stayed, still gave 4 stars, and still wrote this. The next guest reads it before booking.</div>
+    </div>
+  </div>
+</section>
+
+<!-- COMPARISON -->
+<section>
+  <header>
+    <div class="eyebrow coral">New in this report</div>
+    <h2>You against the 5 hotels nearest you</h2>
+    <p>A 4.5 rating means nothing on its own; it means a lot next to the hotels a guest is choosing between. Neighbours come from Google's nearby search within 1.5 km. They are counted, never named, and we read none of their reviews.</p>
+  </header>
+  <div class="grid g2">
+    <div class="card radar">
+      <svg viewBox="-40 0 380 300" aria-label="Radar chart: you versus the nearest five hotels">
+        <g fill="none" stroke="var(--line)" stroke-width="1" stroke-dasharray="3 3">
+          <polygon points="150,40 254.6,116 214.7,239 85.3,239 45.4,116"/>
+          <polygon points="150,67.5 228.5,124.5 198.5,216.8 101.5,216.8 71.5,124.5"/>
+          <polygon points="150,95 202.3,133 182.4,194.5 117.6,194.5 97.7,133"/>
+          <polygon points="150,122.5 176.2,141.5 166.2,172.3 133.8,172.3 123.8,141.5"/>
+        </g>
+        <g stroke="var(--line)" stroke-width="1">
+          <line x1="150" y1="150" x2="150" y2="40"/><line x1="150" y1="150" x2="254.6" y2="116"/><line x1="150" y1="150" x2="214.7" y2="239"/><line x1="150" y1="150" x2="85.3" y2="239"/><line x1="150" y1="150" x2="45.4" y2="116"/>
+        </g>
+        <polygon points="150,66.4 244.1,119.4 179.1,190 102.8,215 66.3,122.8" fill="var(--grey)" fill-opacity=".25" stroke="var(--grey)" stroke-width="2"/>
+        <polygon points="150,108.2 244.1,119.4 188.2,202.5 106.7,209.6 45.4,116" fill="var(--coral)" fill-opacity=".22" stroke="var(--ink)" stroke-width="2.5"/>
+        <g fill="var(--ink)"><circle cx="150" cy="108.2" r="4"/><circle cx="244.1" cy="119.4" r="4"/><circle cx="188.2" cy="202.5" r="4"/><circle cx="106.7" cy="209.6" r="4"/><circle cx="45.4" cy="116" r="4"/></g>
+        <text x="150" y="28" text-anchor="middle">Mobile speed</text>
+        <text x="262" y="110" text-anchor="start">Rating</text>
+        <text x="222" y="258" text-anchor="middle">Review count</text>
+        <text x="78" y="258" text-anchor="middle">Listing complete</text>
+        <text x="40" y="106" text-anchor="end">Contact info</text>
+        <text x="150" y="86" text-anchor="middle" fill="var(--coral)" font-weight="700">38 vs 76</text>
+      </svg>
+      <div class="legend"><span><i style="background:var(--ink)"></i>Harborside Inn</span><span><i style="background:var(--grey)"></i>Nearest 5, average</span></div>
+      <p class="small muted" style="margin:10px 0 0">Shape reading: you're level or ahead on everything guests say about you, and well inside the grey on the one thing you control most, the website.</p>
+    </div>
+    <div class="card bullets">
+      <div class="row">
+        <div class="lbl"><b>Mobile speed</b><span><span class="pill bad">last of 4</span></span></div>
+        <div class="bullet"><div class="you" style="width:38%"></div><div class="them" style="left:76%"></div></div>
+        <div class="lbl small muted" style="margin-top:6px"><span>You 38</span><span>Neighbours 76 (3 of 5 had a score)</span></div>
+      </div>
+      <div class="row">
+        <div class="lbl"><b>Google rating</b><span><span class="pill warn">4th of 6</span></span></div>
+        <div class="bullet"><div class="you" style="width:90%"></div><div class="them ok" style="left:90%"></div></div>
+        <div class="lbl small muted" style="margin-top:6px"><span>You 4.5</span><span>Neighbours 4.5</span></div>
+      </div>
+      <div class="row">
+        <div class="lbl"><b>Google reviews</b><span><span class="pill good">3rd of 6</span></span></div>
+        <div class="bullet"><div class="you" style="width:59%"></div><div class="them ok" style="left:45%"></div></div>
+        <div class="lbl small muted" style="margin-top:6px"><span>You 1,313</span><span>Neighbours 998</span></div>
+      </div>
+      <div class="legend"><span><i style="background:var(--ink)"></i>you</span><span><i style="background:var(--coral);width:4px"></i>neighbours' average</span></div>
+      <div class="flags">
+        <div class="flag"><div class="v" style="color:var(--coral)">0 vs 3</div><div class="l">listing description</div><div class="heads"><i class="you"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i><i></i></div></div>
+        <div class="flag"><div class="v" style="color:var(--green)">1 vs 4</div><div class="l">phone on listing</div><div class="heads"><i class="you on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div></div>
+        <div class="flag"><div class="v" style="color:var(--green)">1 vs 4</div><div class="l">website linked</div><div class="heads"><i class="you on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i></i></div></div>
+      </div>
+      <p class="small muted" style="margin:10px 0 0">First figure is you, second is how many of the 5 neighbours have it.</p>
+    </div>
+  </div>
+</section>
+
+<!-- PHONE -->
+<section>
+  <header>
+    <div class="eyebrow">Booking website</div>
+    <h2>Your website, the way a guest meets it on a phone</h2>
+    <p>Loaded in a real phone browser by Google's PageSpeed service. The booking engine is identified from the services the page actually calls while loading, not guessed from the design.</p>
+  </header>
+  <div class="card">
+    <div class="phone-grid">
+      <div class="phone">
+        <div class="notch"></div>
+        <div class="sk" style="top:40px;height:28px;width:60%"></div>
+        <div class="sk" style="top:80px;height:140px"></div>
+        <div class="sk" style="top:232px;height:14px;width:80%"></div>
+        <div class="sk" style="top:254px;height:14px;width:65%"></div>
+        <div class="sk" style="top:300px;height:44px;border-radius:22px"></div>
+        <div class="sk" style="top:360px;height:14px;width:70%"></div>
+        <div class="timer"><div class="spin"></div><b>7.8 s</b><span>still loading…</span></div>
+      </div>
+      <div>
+        <div class="lbl small" style="display:flex;justify-content:space-between"><b>Mobile speed, 0–100</b><span class="muted">Google calls 90+ good</span></div>
+        <div class="speed">
+          <div class="you" style="left:38%"></div><div class="tag" style="left:38%;color:var(--ink)">you 38</div>
+          <div class="them" style="left:76%"></div><div class="tag" style="left:76%;color:var(--muted)">neighbours 76</div>
+        </div>
+        <div class="checks">
+          <div class="check good"><span class="m">✓</span><div><b>"Book now" button</b><span>Found on the home page</span></div></div>
+          <div class="check bad"><span class="m">✗</span><div><b>Booking on your own domain</b><span>Runs on be.synxis.com (SynXis). Guests see a stranger's address at checkout.</span></div></div>
+          <div class="check bad"><span class="m">✗</span><div><b>Tap to call</b><span>No phone link found on the home page. On a phone, that's a number to retype.</span></div></div>
+          <div class="check good"><span class="m">✓</span><div><b>Secure (HTTPS)</b><span>Padlock shows</span></div></div>
+          <div class="check good"><span class="m">✓</span><div><b>Fits a phone screen</b><span>No sideways scrolling</span></div></div>
+          <div class="check good"><span class="m">✓</span><div><b>Check-in time on the page</b><span>4 PM, mentioned in the footer</span></div></div>
+        </div>
+        <div class="partner">Hotelzify: booking website on the hotel's own domain</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PRAISE -->
+<section>
+  <header>
+    <div class="eyebrow green">Marketing</div>
+    <h2>What guests love, in their own words, ready to use</h2>
+    <p>Bubble size is how many of the 8 reviews mention it. Every quote is checked word for word against the review it came from, so you can put it on your site without worrying.</p>
+  </header>
+  <div class="grid g2">
+    <div class="card top-green">
+      <div class="bubbles">
+        <div class="bubble b1"><div><b>4<span style="font-size:14px;opacity:.7">/8</span></b><span>Location next to<br>the Old Port</span></div></div>
+        <div class="bubble b2"><div><b>2<span style="font-size:14px;opacity:.7">/8</span></b><span>Breakfast</span></div></div>
+        <div class="bubble b3"><div><b>2<span style="font-size:14px;opacity:.7">/8</span></b><span>Friendly staff</span></div></div>
+      </div>
+      <div class="quote"><p>Steps from the Old Port and every restaurant we wanted</p><cite>Google · A. Guest · Sep 2026 · <span class="verified">✓ verified</span></cite></div>
+      <div class="quote"><p>The blueberry pancakes alone are worth the stay</p><cite>Google · D. Guest · Jul 2026 · <span class="verified">✓ verified</span></cite></div>
+      <div class="quote"><p>The staff remembered our names by day two</p><cite>Google · A. Guest · Sep 2026 · <span class="verified">✓ verified</span></cite></div>
+    </div>
+    <div>
+      <div class="card">
+        <div class="eyebrow">Ready to paste</div>
+        <div class="copy"><div class="eyebrow">Google description · website headline</div><p>Steps from the Old Port, with a breakfast guests write home about.</p></div>
+        <div class="copy"><div class="eyebrow">Ad lines</div><p>Walk to every restaurant in the Old Port.</p><p style="margin-top:6px">Blueberry pancakes worth the stay.</p></div>
+        <p class="small muted" style="margin:14px 0 0">Why this works: the words come from guests, so they match what the next guest is looking for, and nothing here is a claim you can't back up with a review.</p>
+        <div class="partner">Hotelzify: AI marketing (Google and Meta ads)</div>
+      </div>
+      <div class="callout" style="margin-top:20px">Your reviews are the strongest thing you own and the least used. Three sentences from them fill the empty Google listing today.</div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <p>Built by Deepak R. Not affiliated with any company. Review text is fetched live from Google and Tripadvisor and never stored; only verified quote fragments appear here, with the attribution Google requires. Neighbouring hotels are counted, never named. "Sites like Expedia" stands for all third-party booking sites.</p>
+  <table class="new-tbl" style="margin-top:18px">
+    <tr><th>Section</th><th>What's new here</th></tr>
+    <tr><td>Guest questions vs your website</td><td><span class="tag-new">New.</span> Crosses what guests ask with what the site says. No tool does this.</td></tr>
+    <tr><td>You vs the 5 nearest hotels</td><td><span class="tag-new">New.</span> The numbers exist, but not side by side for the hotels a guest is actually choosing between.</td></tr>
+    <tr><td>The leak flow and the score</td><td><span class="tag-new">New framing.</span> Turns six separate checks into one story an owner can repeat.</td></tr>
+    <tr><td>Website on a phone</td><td><span class="tag-old">Existing data</span> (pagespeed.web.dev), plus booking-engine detection from network calls.</td></tr>
+    <tr><td>What guests love, with verified quotes</td><td><span class="tag-new">Half new.</span> The reviews exist; the verified, pasteable copy doesn't.</td></tr>
+  </table>
+  <p class="small" style="margin-top:14px">The partner toggle at the top names the Hotelzify product under each fix. Live, that's <code>?audience=partner</code>, sent only to Hotelzify; the public page never carries the name.</p>
+</footer>
+
+</div>
+</body>
+</html>
