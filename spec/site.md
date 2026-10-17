@@ -2,9 +2,11 @@
 
 ## Goal
 
-A Next.js web tool: type a US hotel's name, pick it from a list, and get a one-page check of the public signs that guests are being pushed to booking sites like Expedia instead of booking direct, with the top 3 fixes first. Data comes live from Google Places, Tripadvisor (Terra), Google PageSpeed and the hotel's own site. An AI reads the 8 or so reviews and pulls out praise themes and questions guests had to work out; code verifies every quote against the real review and drops anything invented. Plain-words plan: `docs/plan.html`. Research: `findings.md`.
+A Next.js web tool: type a US hotel's name, pick it from a list, and get a one-page check of the public signs that guests are being pushed to booking sites like Expedia instead of booking direct, with the top 3 fixes first. Data comes live from Google Places, Google PageSpeed, the hotel's own site, and (if time remains) Tripadvisor. An AI reads the reviews and pulls out praise themes and questions guests had to work out; code verifies every quote against the real review and drops anything invented.
 
-**Out of scope:** price comparison with booking sites; competitor comparison; accounts, saved reports, database; PDF export; hotels outside the US; voice; the `claude -p` wrapper (optional, last, see step 10).
+**The two parts that are new, not a showcase of existing data:** (1) the **gap check**: questions guests raised in reviews that the hotel's own website never answers; (2) the **neighbour comparison**: every number shown against the 5 nearest hotels, so "mobile speed 38" becomes "38 against your neighbours' 76". Everything else on the page is context for those two. Plain-words plan: `docs/plan.html`. Research: `findings.md`.
+
+**Out of scope:** price comparison with booking sites; batch mode for many hotels (roadmap); accounts, saved reports, database; PDF export; hotels outside the US; voice; the `claude -p` wrapper (optional, last, see step 10).
 
 Test command: `npx vitest run`
 
@@ -16,7 +18,7 @@ Preview pages: `/, /report?placeId=ChIJexampleHarborside`
 
 ## Files the builder may create or change
 
-- `lib/**` (`quotes.ts`, `website.ts`, `safeFetch.ts`, `match.ts`, `sources/google.ts`, `sources/tripadvisor.ts`, `sources/pagespeed.ts`, `sources/fixtures.ts`, `llm.ts`, `report.ts`, `pipeline.ts`, `ratelimit.ts`, `types.ts`)
+- `lib/**` (`quotes.ts`, `website.ts`, `safeFetch.ts`, `gaps.ts`, `compare.ts`, `match.ts`, `sources/google.ts`, `sources/tripadvisor.ts`, `sources/pagespeed.ts`, `sources/fixtures.ts`, `llm.ts`, `report.ts`, `pipeline.ts`, `ratelimit.ts`, `types.ts`)
 - `app/**` (`layout.tsx`, `page.tsx`, `report/page.tsx`, `api/search/route.ts`, `api/report/route.ts`, `globals.css`)
 - `next.config.ts`, `next-env.d.ts`, `README.md`, `docs/decisions.md`, `docs/flow.md`, `docs/mental-model.md`
 - `package.json` only to add a missing dependency; never to change the scripts or remove one
@@ -41,6 +43,11 @@ export type VerifiedThemes = { praise: Theme[]; questions: Theme[]; headline: st
 export type BookingEngine = { domain: string; vendor: string | null; onOwnDomain: boolean };
 export type WebsiteChecks = { source: "lighthouse" | "html"; mobileScore: number | null; https: boolean; viewport: boolean | null; tapTargetsOk: boolean | null; bookingEngine: BookingEngine | null; bookNow: { found: boolean; text?: string; href?: string }; tapToCall: boolean };
 export type TripadvisorDetails = { locationId: number; rating: number | null; reviewCount: number | null; ranking: { rank: number; total: number; text: string } | null; url: string | null };
+export type Gap = { themeName: string; topic: string | null; count: number; mentionedOnSite: boolean | null };
+export type Neighbour = { placeId: string; name: string; rating: number | null; reviewCount: number | null; website: string | null; phoneListed: boolean; hasDescription: boolean; mobileScore?: number | null };
+export type NumberCompare = { yours: number; neighboursAvg: number; rank: number; of: number; basis: number } | null;
+export type FlagCompare = { yours: boolean; neighboursWith: number; of: number } | null;
+export type Comparison = { neighbours: number; mobileScore: NumberCompare; rating: NumberCompare; reviewCount: NumberCompare; hasDescription: FlagCompare; phoneListed: FlagCompare; websiteLinked: FlagCompare };
 export type Category = "booking-website" | "google-profile" | "marketing" | "guest-messaging";
 export type Finding = { id: string; category: Category; severity: "high" | "medium" | "low"; title: string; evidence: string; fix: string; supportCount: number; productName?: string };
 ```
@@ -65,7 +72,20 @@ export type Finding = { id: string; category: Category; severity: "high" | "medi
 - `isAllowedUrl(url): boolean`: parses; scheme must be http or https; host must not be `localhost`, end in `.local` or `.internal`, be an IP literal in 127/8, 10/8, 172.16/12, 192.168/16, 169.254/16, 0.0.0.0, or an IPv6 loopback/unique-local (`::1`, `fc00::/7`, `fe80::/10`). No DNS lookup needed for the tests; do a lookup in production if simple.
 - `safeFetch(url, { fetchImpl = fetch, timeoutMs = 8000, maxBytes = 2_000_000, maxRedirects = 3 })` → `{ body: string; finalUrl: string; status: number; truncated: boolean }`. Uses `redirect: "manual"` and an `AbortSignal`; follows 301/302/303/307/308 via `location` (resolved against the current URL), re-checking `isAllowedUrl` on every hop, throwing `SafeFetchError("blocked: …")` on a blocked hop and `SafeFetchError("too many redirects")` after `maxRedirects`. Timeout → `SafeFetchError("timed out")`. Reads at most `maxBytes` characters; `truncated` true when cut.
 
-### Step 4: sources → `tests/sources.test.ts`
+### Step 4: gap check (`lib/gaps.ts`) → `tests/gaps.test.ts`
+
+- `extractText(html): string`: drop `<script>` and `<style>` blocks and all tags; prepend the `<meta name="description">` content; collapse whitespace.
+- `TOPICS: Record<string, string[]>`: keyword lists per topic. At least: `parking` (park, parking, garage, valet), `check-in` (check-in, check in, checkin, arrival), `check-out` (check-out, check out, checkout), `pets` (pet, pets, dog, dogs, cat), `breakfast` (breakfast), `wifi` (wifi, wi-fi, internet), `airport` (airport, shuttle, transfer), `cancellation` (cancel, cancellation, refund), `accessibility` (accessible, accessibility, wheelchair, ada), `fees` (fee, fees, resort fee, surcharge).
+- `topicForTheme(name): string | null`: first topic whose keyword appears in the theme name (case-insensitive, word boundaries; "checkout" counts for check-out, "check in" for check-in). `null` when none.
+- `siteMentions(pageText, topic): boolean`: any keyword of the topic appears in the page text (case-insensitive, word boundary, hyphen and space treated the same).
+- `findGaps(questions: Theme[], pageText: string | null): Gap[]`: one entry per question theme, in order; `mentionedOnSite` is `null` when `topic` is null or `pageText` is null.
+
+### Step 5: neighbour comparison (`lib/compare.ts`) → `tests/compare.test.ts`
+
+- `nearbyHotels({ placeId, lat, lng }, opts): Promise<Neighbour[]>`: POST `https://places.googleapis.com/v1/places:searchNearby` with `{ includedTypes: ["lodging"], maxResultCount: 6, locationRestriction: { circle: { center: { latitude, longitude }, radius: 1500 } } }` and field mask `places.id,places.displayName,places.rating,places.userRatingCount,places.websiteUri,places.nationalPhoneNumber,places.editorialSummary` (**never** `reviews`: neighbours must not cost a reviews fetch or show anyone else's reviews). Drop the hotel itself. Map to `Neighbour`.
+- `benchmark(you: { rating, reviewCount, mobileScore, hasDescription, phoneListed, websiteLinked }, neighbours: Neighbour[]): Comparison-without-neighbours-count`. For each number metric: use only neighbours with a non-null value (`basis`); `neighboursAvg` rounded to the metric's precision (integer for score and review count, one decimal for rating); `rank` = 1 + number of neighbours strictly better than you (higher is better for all three); `of` = basis + 1. Null when `basis` is 0 or your own value is null. For each flag metric: `{ yours, neighboursWith, of: neighbours.length }`, null when no neighbours.
+
+### Step 6: sources → `tests/sources.test.ts`
 
 All source functions take `{ fetchImpl?: typeof fetch }` and read keys from `process.env` at call time. Missing key → throw an Error naming the variable. Non-2xx → throw an Error containing the status code. 10-second timeout each.
 
@@ -75,17 +95,18 @@ All source functions take `{ fetchImpl?: typeof fetch }` and read keys from `pro
 - `lib/sources/pagespeed.ts`: `runPageSpeed(url, opts)` → GET `https://www.googleapis.com/pagespeedonline/v5/runPagespeed?url=…&strategy=mobile&category=performance` plus `&key=` only when `PAGESPEED_API_KEY` is non-empty. Returns the raw JSON. Timeout 45 s.
 - `lib/sources/fixtures.ts`: when `SOURCES_MODE=fixture`, the same functions return the JSON in `tests/fixtures/` (search, place, nearby, reviews, details, pagespeed). Used by the preview and the API tests.
 
-### Step 5: report builder (`lib/report.ts`) → `tests/report.test.ts`
+### Step 7: report builder (`lib/report.ts`) → `tests/report.test.ts`
 
 - `CATEGORY_LABELS: Record<Category, string>` = Booking website, Google profile, Marketing, Guest messaging. `PARTNER_PRODUCTS: Record<Category, string>` = "Hotelzify booking website", "Hotelzify Google Business Profile optimisation", "Hotelzify AI marketing", "Hotelzify AI concierge".
-- `buildReport(inputs: ReportInputs): Report` where `ReportInputs = { hotel: Hotel; tripadvisor: (TripadvisorDetails & { reviews: Review[] }) | null; website: WebsiteChecks | null; themes: VerifiedThemes | null; audience: "public" | "partner"; checkedAt: string }`.
-- `Report = { hotel: { name, address, placeId }; checkedAt; sample: { googleReviews, tripadvisorReviews, total }; sections: { listing: { rating, reviewCount, websiteLinked, phoneListed, hasDescription, tripadvisorRanking: string | null }; website: WebsiteChecks & { available: boolean } | { available: false }; tripadvisor: { available: boolean; rating?; reviewCount? }; ai: { available: boolean } }; findings: Finding[]; topFixes: Finding[]; praise: (Theme & { quotes: (Quote & { source; date })[] })[]; questions: same; headline: string | null; adLines: string[]; aiDropped: Dropped[]; footnote: string }`.
-- Finding rules (id → when → category → severity): `slow-mobile` (mobileScore < 50) booking-website high, evidence includes the score; `no-https` (https false) booking-website high; `no-viewport` (viewport false) booking-website medium; `booking-off-domain` (bookingEngine && !onOwnDomain) booking-website medium, evidence names the vendor or domain; `no-book-now` (!bookNow.found) booking-website medium, evidence says "not found on the home page" (never "missing"); `no-tap-to-call` (website available && !tapToCall) booking-website low; `no-website` (hotel.website null) booking-website high; `no-description` (hotel.description null) google-profile medium, fix suggests a description built from the praise theme names; `no-phone` (hotel.phone null) google-profile medium; `question-<slug>` per question theme, guest-messaging, severity medium if count ≥ 2 else low, supportCount = count, fix: answer it on the booking page and in the chat or phone assistant; `praise-unused` (praise exists) marketing low, fix = use the headline and ad lines. `supportCount` is 0 for non-review findings. `productName` set from `PARTNER_PRODUCTS` only when `audience === "partner"`.
+- `buildReport(inputs: ReportInputs): Report` where `ReportInputs = { hotel: Hotel; tripadvisor: (TripadvisorDetails & { reviews: Review[] }) | null; website: WebsiteChecks | null; themes: VerifiedThemes | null; gaps: Gap[] | null; comparison: Comparison | null; audience: "public" | "partner"; checkedAt: string }`.
+- `Report = { hotel: { name, address, placeId }; checkedAt; sample: { googleReviews, tripadvisorReviews, total }; sections: { listing: { rating, reviewCount, websiteLinked, phoneListed, hasDescription, tripadvisorRanking: string | null }; website: WebsiteChecks & { available: boolean } | { available: false }; tripadvisor: { available: boolean; rating?; reviewCount? }; ai: { available: boolean }; comparison: ({ available: true } & Comparison) | { available: false } }; findings: Finding[]; topFixes: Finding[]; praise: (Theme & { quotes: (Quote & { source; date })[] })[]; questions: same; headline: string | null; adLines: string[]; aiDropped: Dropped[]; footnote: string }`.
+- Finding rules (id → when → category → severity): `slow-mobile` (mobileScore < 50) booking-website high, evidence includes the score; `no-https` (https false) booking-website high; `no-viewport` (viewport false) booking-website medium; `booking-off-domain` (bookingEngine && !onOwnDomain) booking-website medium, evidence names the vendor or domain; `no-book-now` (!bookNow.found) booking-website medium, evidence says "not found on the home page" (never "missing"); `no-tap-to-call` (website available && !tapToCall) booking-website low; `no-website` (hotel.website null) booking-website high; `no-description` (hotel.description null) google-profile medium, fix suggests a description built from the praise theme names; `no-phone` (hotel.phone null) google-profile medium; **gap and question findings, per question theme** (slug = topic if known, else slugified theme name): if `gaps` has an entry for the theme with `mentionedOnSite === false` → `gap-<slug>`, guest-messaging, **high**, supportCount = count, evidence "<count> of <total> reviews ask about <theme>; your website doesn't mention <topic>", fix: write the <topic> answer on the booking page and confirmation email and give it to the chat or phone assistant. If `mentionedOnSite === true` → `question-<slug>`, guest-messaging, **low**, evidence "<count> of <total> reviews ask about <theme>; your website already mentions it, so make it easier to find", same fix. If `mentionedOnSite` is null or `gaps` is null → `question-<slug>`, severity medium if count ≥ 2 else low. Never emit both `gap-` and `question-` for one theme; `praise-unused` (praise exists) marketing low, fix = use the headline and ad lines. `supportCount` is 0 for non-review findings. `productName` set from `PARTNER_PRODUCTS` only when `audience === "partner"`.
+- **Comparison in evidence:** when `comparison` is available, `slow-mobile` evidence reads "Mobile speed <yours>/100; the <basis> nearest hotels with a score average <neighboursAvg>" and `no-description` evidence reads "<neighboursWith> of <of> hotels nearest you have one". Without comparison, plain evidence.
 - `topFixes` = findings sorted by severity (high, medium, low) then `supportCount` desc then rule order; first 3.
 - Praise and question quotes are enriched with `source` and `date` from the matching review. Never include a full review text in the report, only the verified quote fragments.
 - `footnote` = "Cloudbeds' 2026 data shows bookings made through sites like Expedia are cancelled about twice as often as direct bookings." Owner-facing text never uses "OTA"; it says "booking sites like Expedia". No percentages anywhere in the report (`tests/report.test.ts` asserts no `\d+%`).
 
-### Step 6: AI layer (`lib/llm.ts`) → `tests/llm.test.ts`
+### Step 8: AI layer (`lib/llm.ts`) → `tests/llm.test.ts`
 
 - `interface LLMClient { complete(p: { system: string; user: string }): Promise<string> }`.
 - `FakeLLM(script: string[])`: returns in order; records `calls`. Throws when the script runs out.
@@ -94,29 +115,36 @@ All source functions take `{ fetchImpl?: typeof fetch }` and read keys from `pro
 - `parseThemesJson(text): ThemesOutput`: strip an optional ```json fence; `JSON.parse`; validate shape strictly (arrays of `{name: string, quotes: {reviewId: string, quote: string}[]}`, `headline` string, `adLines` string[]); throw on anything else, including leading prose.
 - `extractThemes(reviews, llm): Promise<VerifiedThemes>`: no reviews → empty result without calling the model. Else call, parse; on parse failure call once more; on second failure throw an Error containing "parse". Then `verifyThemes` on praise and questions; `headline` kept only if at least one praise theme survived, else null.
 
-### Step 7: pipeline (`lib/pipeline.ts`) → `tests/pipeline.test.ts`
+### Step 9: pipeline (`lib/pipeline.ts`) → `tests/pipeline.test.ts`
 
-- `runCheck({ placeId, audience }, { fetchImpl, llm, env, checkedAt }): Promise<Report>`. Pass `env` into source calls (they read `process.env` by default; accept an `env` override). Order: `getPlace` (fails the whole run on error). Then in parallel: Tripadvisor (`findLocation` → `getLocationDetails` + `getReviews`; any failure → null), PageSpeed (`runPageSpeed` → `analyzeLighthouse`; on failure, `safeFetch(hotel.website)` → `analyzeHtml`; on failure null; skip both if no website), AI (`extractThemes` on google + tripadvisor reviews; failure → `themes: null`, `sections.ai.available=false`). Then `buildReport`.
+- `runCheck({ placeId, audience }, { fetchImpl, llm, env, checkedAt }): Promise<Report>`. Pass `env` into source calls (they read `process.env` by default; accept an `env` override). Order: `getPlace` (fails the whole run on error). Then in parallel:
+  - **Home page:** `safeFetch(hotel.website)` → `pageText = extractText(body)`; failure → null. Always done when there is a website, because the gap check needs the text.
+  - **PageSpeed:** `runPageSpeed(hotel.website)` → `analyzeLighthouse`; on failure, `analyzeHtml` on the home-page body if it was fetched; else null.
+  - **Neighbours:** `nearbyHotels` → for each neighbour with a website, `runPageSpeed` (free; failures → `mobileScore: null`) → `benchmark` → `comparison`; any failure of the nearby search → null. Neighbours never get a reviews fetch.
+  - **Tripadvisor** (only if built): `findLocation` → `getLocationDetails` + `getReviews`; any failure → null.
+  - **AI:** `extractThemes` on google (+ tripadvisor) reviews; failure → `themes: null`, `sections.ai.available=false`.
+  Then `gaps = themes ? findGaps(themes.questions, pageText) : null`, then `buildReport`. Total wall time target under 60 s; PageSpeed calls run concurrently.
 
-### Step 8: API routes and rate limit → `tests/api.test.ts`
+### Step 10: API routes and rate limit → `tests/api.test.ts`
 
 - `lib/ratelimit.ts`: `RateLimiter({ limit, windowMs, now = Date.now })` with `hit(key): boolean` (fixed window per key). Module-level singleton for the report route, keyed by `x-forwarded-for` first IP, else `"anon"`. README must say this is best-effort on serverless and that the real guard is the Google Cloud quota.
 - `app/api/search/route.ts`: `GET ?q=` → 400 when empty; `{ results }` from `searchHotels` (fixture mode when `SOURCES_MODE=fixture`).
 - `app/api/report/route.ts`: `POST { placeId, audience?: "public"|"partner", byok?: { apiKey, model } }`. 400 without `placeId`. 429 when the limiter refuses (limit from `REPORTS_PER_VISITOR_PER_HOUR`, default 10, window 1 hour). LLM: `LLM_MODE=fake` → `FakeLLM([JSON of tests/fixtures/llm-good.json])`; `byok` present → `OpenRouterLLM` with the viewer's key (never logged, never stored, never echoed); else server `OPENROUTER_API_KEY` + `OPENROUTER_MODEL`. Returns the `Report` JSON. Response must not contain any API key or any full review text.
 
-### Step 9: pages
+### Step 11: pages
 
 - `/`: search box → results list → click → `/report?placeId=…`. Optional "use my own OpenRouter key" field whose value is kept in the browser (sessionStorage) and sent only in the POST body. Footer: "Built by Deepak R. Not affiliated with any company. Review text is fetched live and never stored." Works at phone width.
-- `/report`: shows sample line, Top 3 fixes box, listing, website, praise with quotes (source + date, Google reviews with the author attribution Google requires), questions, headline and ad lines, footnote. A `?audience=partner` query adds the product names. Loading state while the report runs (PageSpeed can take 30 s).
+- `/report`: shows sample line, Top 3 fixes box, listing, website, **the gap check** (each guest question with "answered on your site" / "not on your site"), **the neighbour comparison** (each metric as yours vs the neighbours' average, with rank; neighbours are counted, never named, and none of their reviews are shown), praise with quotes (source + date, Google reviews with the author attribution Google requires), headline and ad lines, footnote. Layout reference: `docs/report-mockup.html`. A `?audience=partner` query adds the product names. Loading state while the report runs (PageSpeed can take 30 s).
 
-### Step 10: docs and optional extras
+### Step 12: docs and optional extras
 
 - `README.md`: what it is, how to run (fixture preview and live), env vars, the security calls from `docs/plan.html` section 6, "Results" left empty for Deepak's live runs. No invented numbers.
 - `docs/decisions.md`, `docs/flow.md`, `docs/mental-model.md` per the project rules.
-- Optional, last: `lib/llm-claude-cli.ts` wrapping `claude -p` for local use (`LLM_MODE=claude-cli`). Skip if time is short.
+- Optional, in this order, only if time remains: (a) Tripadvisor source (step 6's `sources/tripadvisor.ts` and its tests already exist; wire it into the pipeline); (b) `lib/llm-claude-cli.ts` wrapping `claude -p` for local use (`LLM_MODE=claude-cli`).
+- `tests/sources.test.ts` includes Tripadvisor tests. Build the Tripadvisor client in step 6 (it is small), but wiring it into the pipeline and the page is the optional part.
 
 ## Done means
 
 - `npx vitest run` passes with no skips. `npx tsc --noEmit` passes.
-- Preview with `SOURCES_MODE=fixture LLM_MODE=fake`: `/` finds "Harborside Inn", `/report?placeId=ChIJexampleHarborside` shows 3 top fixes and the praise quotes.
+- Preview with `SOURCES_MODE=fixture LLM_MODE=fake`: `/` finds "Harborside Inn", `/report?placeId=ChIJexampleHarborside` shows 3 top fixes including the parking gap, the neighbour comparison, and the praise quotes.
 - One live run by Deepak on a real hotel succeeds with real keys.

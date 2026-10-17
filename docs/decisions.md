@@ -65,3 +65,15 @@
 ## 2026-10-18 · No outreach to hotel owners
 
 **Decided (Deepak):** evidence comes from public reviews only. Cost: the "real users" and "talk to hoteliers" lines in the post are answered with real data, not real conversations.
+
+## 2026-10-18 · Revision 3: add the gap check and the neighbour comparison; Tripadvisor becomes optional
+
+**Trigger (Deepak):** "doesn't it just get info from sites and showcase it? anything new!!" Correct: about 70% of the first design was data the owner already had.
+
+**Decided:** two new parts carry the value. (1) **Gap check:** the questions guests raise in reviews (parking, check-in, pets…) are checked against the text of the hotel's own website; a question the site never answers is a high-severity finding. (2) **Neighbour comparison:** rating, review count, mobile speed, listing description and phone are shown against the 5 nearest hotels from Google's nearby search, counted and never named, with no reviews fetched for them. The home page is now always fetched (the gap check needs its text), not only as a fallback.
+
+**Considered:** batch mode for the sales team (paste 50 hotels, get a ranked prospect list). Deferred to the day-60 roadmap: it is the most valuable form for Hotelzify but not buildable in the 2 days.
+
+**Why:** both are inferences across sources that no single site offers, so the report says something the owner didn't know.
+
+**Cost:** about half a day more. To stay inside 2 days, Tripadvisor moves to "if time remains" (its client and tests stay; the pipeline wiring is optional). 5 extra PageSpeed runs per report (free, concurrent) and one nearby search plus no per-neighbour detail calls (the nearby response already carries the fields). Keyword-based topic matching is crude: "Street noise" has no topic and gets no gap check.

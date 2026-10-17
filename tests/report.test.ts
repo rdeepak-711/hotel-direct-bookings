@@ -26,6 +26,19 @@ const base: ReportInputs = {
     adLines: ["Walk to every restaurant in the Old Port."],
     dropped: [],
   },
+  gaps: [
+    { themeName: "Parking", topic: "parking", count: 2, mentionedOnSite: false },
+    { themeName: "Check-in time", topic: "check-in", count: 1, mentionedOnSite: true },
+  ],
+  comparison: {
+    neighbours: 5,
+    mobileScore: { yours: 38, neighboursAvg: 76, rank: 4, of: 4, basis: 3 },
+    rating: { yours: 4.5, neighboursAvg: 4.5, rank: 4, of: 6, basis: 5 },
+    reviewCount: { yours: 1313, neighboursAvg: 998, rank: 3, of: 6, basis: 5 },
+    hasDescription: { yours: false, neighboursWith: 3, of: 5 },
+    phoneListed: { yours: true, neighboursWith: 4, of: 5 },
+    websiteLinked: { yours: true, neighboursWith: 4, of: 5 },
+  },
   audience: "public",
   checkedAt: "2026-10-18",
 };
@@ -40,7 +53,7 @@ describe("buildReport", () => {
   it("produces findings with a category and a fix, mapped to generic labels for the public audience", () => {
     const r = buildReport(base);
     const ids = r.findings.map((f) => f.id);
-    expect(ids).toEqual(expect.arrayContaining(["slow-mobile", "no-description", "booking-off-domain", "no-tap-to-call", "question-parking", "question-check-in-time"]));
+    expect(ids).toEqual(expect.arrayContaining(["slow-mobile", "no-description", "booking-off-domain", "no-tap-to-call", "gap-parking", "question-check-in-time"]));
     const slow = r.findings.find((f) => f.id === "slow-mobile")!;
     expect(slow.category).toBe("booking-website");
     expect(slow.severity).toBe("high");
@@ -61,8 +74,7 @@ describe("buildReport", () => {
   it("ranks the top 3 fixes: high severity first, then by how many reviews back it", () => {
     const r = buildReport(base);
     expect(r.topFixes).toHaveLength(3);
-    expect(r.topFixes[0].id).toBe("slow-mobile");
-    expect(r.topFixes.map((f) => f.id)).toContain("no-description");
+    expect(r.topFixes.map((f) => f.id).slice(0, 2)).toEqual(expect.arrayContaining(["slow-mobile", "gap-parking"]));
     expect(r.topFixes.map((f) => f.id)).not.toContain("question-check-in-time");
   });
 
@@ -89,12 +101,46 @@ describe("buildReport", () => {
   });
 
   it("marks a section unavailable instead of failing when a source is missing", () => {
-    const r = buildReport({ ...base, website: null, tripadvisor: null });
+    const r = buildReport({ ...base, website: null, tripadvisor: null, gaps: null, comparison: null });
     expect(r.sections.website.available).toBe(false);
     expect(r.sections.tripadvisor.available).toBe(false);
     expect(r.sample).toEqual({ googleReviews: 5, tripadvisorReviews: 0, total: 5 });
     expect(r.findings.some((f) => f.id === "slow-mobile")).toBe(false);
     expect(r.topFixes.length).toBeGreaterThan(0);
+  });
+
+  it("turns an unanswered guest question into a high-severity gap finding, and an answered one into a low note", () => {
+    const r = buildReport(base);
+    const gap = r.findings.find((f) => f.id === "gap-parking")!;
+    expect(gap.category).toBe("guest-messaging");
+    expect(gap.severity).toBe("high");
+    expect(gap.supportCount).toBe(2);
+    expect(gap.evidence).toMatch(/2 of 8 reviews/);
+    expect(gap.evidence.toLowerCase()).toMatch(/website (does not|doesn't) mention parking/);
+    expect(gap.fix.toLowerCase()).toContain("parking");
+    expect(r.findings.find((f) => f.id === "gap-check-in")).toBeUndefined();
+    const q = r.findings.find((f) => f.id === "question-check-in-time")!;
+    expect(q.severity).toBe("low");
+    expect(q.evidence.toLowerCase()).toMatch(/your website (already )?mentions/);
+    expect(r.topFixes.map((f) => f.id)).toContain("gap-parking");
+  });
+
+  it("uses the neighbour comparison in evidence and adds a comparison section", () => {
+    const r = buildReport(base);
+    expect(r.sections.comparison).toEqual({ available: true, neighbours: 5, ...base.comparison });
+    const slow = r.findings.find((f) => f.id === "slow-mobile")!;
+    expect(slow.evidence).toMatch(/38/);
+    expect(slow.evidence).toMatch(/76/);
+    expect(slow.evidence.toLowerCase()).toMatch(/nearest|nearby|neighbou?r/);
+    const desc = r.findings.find((f) => f.id === "no-description")!;
+    expect(desc.evidence).toMatch(/3 of 5/);
+  });
+
+  it("works without gaps or comparison data", () => {
+    const r = buildReport({ ...base, gaps: null, comparison: null });
+    expect(r.sections.comparison).toEqual({ available: false });
+    expect(r.findings.find((f) => f.id === "question-parking")!.severity).toBe("medium");
+    expect(r.findings.find((f) => f.id === "gap-parking")).toBeUndefined();
   });
 
   it("shows the Tripadvisor ranking in the listing section", () => {
