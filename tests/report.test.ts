@@ -143,6 +143,11 @@ describe("buildReport", () => {
     expect(r.findings.find((f) => f.id === "gap-parking")).toBeUndefined();
   });
 
+  it("carries the direct booking score, computed from the same inputs", () => {
+    expect(buildReport(base).score).toEqual({ website: 23, messaging: 65, listing: 60, reviews: 90, overall: 54 });
+    expect(buildReport({ ...base, website: null, gaps: null }).score).toMatchObject({ website: null, messaging: null, listing: 60, reviews: 90 });
+  });
+
   it("shows the Tripadvisor ranking in the listing section", () => {
     const r = buildReport(base);
     expect(r.sections.listing.tripadvisorRanking).toBe("#12 of 48 hotels in Portland");

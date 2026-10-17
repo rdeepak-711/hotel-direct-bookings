@@ -77,3 +77,13 @@
 **Why:** both are inferences across sources that no single site offers, so the report says something the owner didn't know.
 
 **Cost:** about half a day more. To stay inside 2 days, Tripadvisor moves to "if time remains" (its client and tests stay; the pipeline wiring is optional). 5 extra PageSpeed runs per report (free, concurrent) and one nearby search plus no per-neighbour detail calls (the nearby response already carries the fields). Keyword-based topic matching is crude: "Street noise" has no topic and gets no gap check.
+
+## 2026-10-18 · A direct booking score, defined in code
+
+**Decided:** the report leads with one number, 0–100, from four sub-scores weighted website 35, guest messaging 25, Google listing 20, reviews 20 (`lib/score.ts`, spec step 6). Website starts from the PageSpeed mobile score and deducts for http, no viewport, booking off the hotel's domain and no tap-to-call; messaging deducts 25 per guest question the site doesn't answer; listing is 40/30/30 for description, website, phone; reviews is the rating scaled, minus 10 under 50 reviews. Null sub-scores drop out and the weights renormalise.
+
+**Considered:** no score (the leak flow leads); a model-generated score.
+
+**Why:** the gauge is the one thing people remember from the page, and a formula in code is explainable to an owner line by line, which a model's number is not. Weights follow where the leak is: the website is what the owner controls and where this hotel loses most.
+
+**Cost:** the weights are a judgement, not measured against bookings; the README must say so. On the fixture the formula gives 54, and the mock-up's sub-scores were changed to match it (23/65/60/90) rather than the other way round.
