@@ -6,6 +6,7 @@
 <title>Direct Booking Check</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;0,6..72,600;1,6..72,400&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.2/anime.min.js"></script>
 <style>
   :root {
     --bg: #faf8f5; --panel: #ffffff; --well: #f4efeb; --ink: #0f1e36; --muted: #4a5568; --line: #e5e0d8; --line-2: #d8d2c5;
@@ -199,7 +200,7 @@
 <div class="mock">Mock-up, 18 Oct 2026. Harborside Inn and its neighbours are fictional; every number is sample data showing how the live report presents real results.</div>
 
 <!-- HERO -->
-<section class="hero" style="margin-top:0">
+<section class="hero" data-anim="hero" style="margin-top:0">
   <div class="grid g-hero">
     <div>
       <div class="eyebrow">Direct Booking Check · Portland, Maine</div>
@@ -212,26 +213,26 @@
       <div class="eyebrow">Direct booking score</div>
       <svg viewBox="0 0 220 125" width="260" height="148" style="margin-top:8px">
         <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="var(--well)" stroke-width="16" stroke-linecap="round"/>
-        <path d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="var(--coral)" stroke-width="16" stroke-linecap="round" stroke-dasharray="152.7 282.7"/>
-        <line x1="110" y1="110" x2="120" y2="36" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+        <path id="gaugeArc" d="M 20 110 A 90 90 0 0 1 200 110" fill="none" stroke="var(--coral)" stroke-width="16" stroke-linecap="round" stroke-dasharray="282.7" stroke-dashoffset="130"/>
+        <line id="needle" x1="110" y1="110" x2="35" y2="110" stroke="var(--ink)" stroke-width="3" stroke-linecap="round" style="transform-origin:110px 110px;transform:rotate(97.2deg)"/>
         <circle cx="110" cy="110" r="6" fill="var(--ink)"/>
         <text x="20" y="124" font-size="10" fill="var(--muted)" font-family="Plus Jakarta Sans">0</text>
         <text x="190" y="124" font-size="10" fill="var(--muted)" font-family="Plus Jakarta Sans">100</text>
       </svg>
-      <div class="stat" style="margin-top:-30px">54<span class="muted" style="font-size:20px;font-weight:600">/100</span></div>
+      <div class="stat" style="margin-top:-30px"><span class="count" data-to="54">54</span><span class="muted" style="font-size:20px;font-weight:600">/100</span></div>
       <div class="small muted">Weighted from the four checks below. Under 60 means guests have a reason to book elsewhere.</div>
       <div class="rings">
-        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle cx="30" cy="30" r="22" fill="none" stroke="var(--coral)" stroke-width="7" stroke-linecap="round" stroke-dasharray="42.8 138.2" transform="rotate(-90 30 30)"/></svg><span class="v">31</span><span class="l">Website</span></div>
-        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle cx="30" cy="30" r="22" fill="none" stroke="var(--amber)" stroke-width="7" stroke-linecap="round" stroke-dasharray="85.7 138.2" transform="rotate(-90 30 30)"/></svg><span class="v">62</span><span class="l">Google listing</span></div>
-        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle cx="30" cy="30" r="22" fill="none" stroke="var(--coral)" stroke-width="7" stroke-linecap="round" stroke-dasharray="62.2 138.2" transform="rotate(-90 30 30)"/></svg><span class="v">45</span><span class="l">Guest messaging</span></div>
-        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle cx="30" cy="30" r="22" fill="none" stroke="var(--green-bright)" stroke-width="7" stroke-linecap="round" stroke-dasharray="121.6 138.2" transform="rotate(-90 30 30)"/></svg><span class="v">88</span><span class="l">Reviews</span></div>
+        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle class="ringArc" data-len="42.8" cx="30" cy="30" r="22" fill="none" stroke="var(--coral)" stroke-width="7" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="95.4" transform="rotate(-90 30 30)"/></svg><span class="v count" data-to="31">31</span><span class="l">Website</span></div>
+        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle class="ringArc" data-len="85.7" cx="30" cy="30" r="22" fill="none" stroke="var(--amber)" stroke-width="7" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="52.5" transform="rotate(-90 30 30)"/></svg><span class="v count" data-to="62">62</span><span class="l">Google listing</span></div>
+        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle class="ringArc" data-len="62.2" cx="30" cy="30" r="22" fill="none" stroke="var(--coral)" stroke-width="7" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="76" transform="rotate(-90 30 30)"/></svg><span class="v count" data-to="45">45</span><span class="l">Guest messaging</span></div>
+        <div class="ring"><svg viewBox="0 0 60 60"><circle cx="30" cy="30" r="22" fill="none" stroke="var(--well)" stroke-width="7"/><circle class="ringArc" data-len="121.6" cx="30" cy="30" r="22" fill="none" stroke="var(--green-bright)" stroke-width="7" stroke-linecap="round" stroke-dasharray="138.2" stroke-dashoffset="16.6" transform="rotate(-90 30 30)"/></svg><span class="v count" data-to="88">88</span><span class="l">Reviews</span></div>
       </div>
     </div>
   </div>
 </section>
 
 <!-- LEAK FLOW -->
-<section>
+<section data-anim="leak">
   <header>
     <div class="eyebrow coral">The leak</div>
     <h2>Where a guest who already wants you ends up booking somewhere else</h2>
@@ -271,7 +272,7 @@
 </section>
 
 <!-- FIX FIRST -->
-<section>
+<section data-anim="fixes">
   <header>
     <div class="eyebrow">Priorities</div>
     <h2>Fix these first</h2>
@@ -309,7 +310,7 @@
 </section>
 
 <!-- GAP CHECK -->
-<section>
+<section class="gaps" data-anim="gaps">
   <header>
     <div class="eyebrow coral">New in this report</div>
     <h2>What guests asked that your website never answers</h2>
@@ -337,7 +338,7 @@
 </section>
 
 <!-- COMPARISON -->
-<section>
+<section data-anim="compare">
   <header>
     <div class="eyebrow coral">New in this report</div>
     <h2>You against the 5 hotels nearest you</h2>
@@ -355,9 +356,9 @@
         <g stroke="var(--line)" stroke-width="1">
           <line x1="150" y1="150" x2="150" y2="40"/><line x1="150" y1="150" x2="254.6" y2="116"/><line x1="150" y1="150" x2="214.7" y2="239"/><line x1="150" y1="150" x2="85.3" y2="239"/><line x1="150" y1="150" x2="45.4" y2="116"/>
         </g>
-        <polygon points="150,66.4 244.1,119.4 179.1,190 102.8,215 66.3,122.8" fill="var(--grey)" fill-opacity=".25" stroke="var(--grey)" stroke-width="2"/>
-        <polygon points="150,108.2 244.1,119.4 188.2,202.5 106.7,209.6 45.4,116" fill="var(--coral)" fill-opacity=".22" stroke="var(--ink)" stroke-width="2.5"/>
-        <g fill="var(--ink)"><circle cx="150" cy="108.2" r="4"/><circle cx="244.1" cy="119.4" r="4"/><circle cx="188.2" cy="202.5" r="4"/><circle cx="106.7" cy="209.6" r="4"/><circle cx="45.4" cy="116" r="4"/></g>
+        <polygon id="radarThem" data-points="150,66.4 244.1,119.4 179.1,190 102.8,215 66.3,122.8" points="150,66.4 244.1,119.4 179.1,190 102.8,215 66.3,122.8" fill="var(--grey)" fill-opacity=".25" stroke="var(--grey)" stroke-width="2"/>
+        <polygon id="radarYou" data-points="150,108.2 244.1,119.4 188.2,202.5 106.7,209.6 45.4,116" points="150,108.2 244.1,119.4 188.2,202.5 106.7,209.6 45.4,116" fill="var(--coral)" fill-opacity=".22" stroke="var(--ink)" stroke-width="2.5"/>
+        <g id="radarDots" fill="var(--ink)"><circle cx="150" cy="108.2" r="4"/><circle cx="244.1" cy="119.4" r="4"/><circle cx="188.2" cy="202.5" r="4"/><circle cx="106.7" cy="209.6" r="4"/><circle cx="45.4" cy="116" r="4"/></g>
         <text x="150" y="28" text-anchor="middle">Mobile speed</text>
         <text x="262" y="110" text-anchor="start">Rating</text>
         <text x="222" y="258" text-anchor="middle">Review count</text>
@@ -393,10 +394,19 @@
       <p class="small muted" style="margin:10px 0 0">First figure is you, second is how many of the 5 neighbours have it.</p>
     </div>
   </div>
+  <div class="card" id="scene3d" style="margin-top:20px;padding:0;overflow:hidden">
+    <div style="padding:20px 24px 0;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:baseline">
+      <div><div class="eyebrow">The neighbourhood, in 3D</div><h3 style="margin-top:4px">Mobile speed as height: you're the short coral one</h3></div>
+      <div class="small muted">Drag to turn · flat discs = neighbour has no website score</div>
+    </div>
+    <div id="three-mount" style="height:340px;position:relative;cursor:grab">
+      <div id="three-fallback" class="small muted" style="position:absolute;inset:0;display:grid;place-items:center">3D view loads when it scrolls into view.</div>
+    </div>
+  </div>
 </section>
 
 <!-- PHONE -->
-<section>
+<section data-anim="phone">
   <header>
     <div class="eyebrow">Booking website</div>
     <h2>Your website, the way a guest meets it on a phone</h2>
@@ -412,7 +422,7 @@
         <div class="sk" style="top:254px;height:14px;width:65%"></div>
         <div class="sk" style="top:300px;height:44px;border-radius:22px"></div>
         <div class="sk" style="top:360px;height:14px;width:70%"></div>
-        <div class="timer"><div class="spin"></div><b>7.8 s</b><span>still loading…</span></div>
+        <div class="timer"><div class="spin"></div><b><span id="timerNum">7.8</span> s</b><span>still loading…</span></div>
       </div>
       <div>
         <div class="lbl small" style="display:flex;justify-content:space-between"><b>Mobile speed, 0–100</b><span class="muted">Google calls 90+ good</span></div>
@@ -435,7 +445,7 @@
 </section>
 
 <!-- PRAISE -->
-<section>
+<section class="praise" data-anim="praise">
   <header>
     <div class="eyebrow green">Marketing</div>
     <h2>What guests love, in their own words, ready to use</h2>
@@ -479,5 +489,163 @@
 </footer>
 
 </div>
+
+<script>
+(function () {
+  var reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!reduce && window.anime) {
+    // --- initial states (only when we will animate them, so no-JS and reduced-motion show the final page) ---
+    var $ = function (s, r) { return (r || document).querySelector(s); };
+    var $$ = function (s, r) { return Array.prototype.slice.call((r || document).querySelectorAll(s)); };
+    $('#gaugeArc').setAttribute('stroke-dashoffset', '282.7');
+    $('#needle').style.transform = 'rotate(0deg)';
+    $$('.ringArc').forEach(function (c) { c.setAttribute('stroke-dashoffset', '138.2'); });
+    $$('.count').forEach(function (n) { n.textContent = '0'; });
+    $$('.step').forEach(function (s) { s.style.opacity = 0; s.style.transform = 'translateY(16px)'; });
+    $$('.leak-stat .card, .fix').forEach(function (s) { s.style.opacity = 0; s.style.transform = 'translateY(20px)'; });
+    $$('.bullet .you').forEach(function (b) { b.dataset.w = b.style.width; b.style.width = '0%'; });
+    $$('.impact i.on').forEach(function (i) { i.style.transform = 'scaleY(0)'; i.style.transformOrigin = 'bottom'; });
+    $$('.dots i.on, .heads i').forEach(function (d) { d.style.transform = 'scale(0)'; });
+    $$('.bubble').forEach(function (b) { b.style.transform = 'scale(0)'; });
+    $$('.check').forEach(function (c) { c.style.opacity = 0; c.style.transform = 'translateX(14px)'; });
+    $$('.quote').forEach(function (q) { q.style.opacity = 0; q.style.transform = 'translateY(10px)'; });
+    var cx = 150, cy = 150;
+    ['#radarYou', '#radarThem'].forEach(function (id) { var p = $(id); p.setAttribute('points', p.dataset.points.split(' ').map(function () { return cx + ',' + cy; }).join(' ')); });
+    $$('#radarDots circle').forEach(function (c) { c.setAttribute('r', '0'); });
+    $('#timerNum').textContent = '0.0';
+
+    var countUp = function (el, to, dur, dec) {
+      var o = { v: 0 };
+      anime({ targets: o, v: to, duration: dur || 1400, easing: 'easeOutCubic', update: function () { el.textContent = dec ? o.v.toFixed(dec) : Math.round(o.v).toLocaleString(); } });
+    };
+
+    var runners = {
+      hero: function (sec) {
+        anime({ targets: '#gaugeArc', strokeDashoffset: 130, duration: 1600, easing: 'easeInOutCubic' });
+        anime({ targets: '#needle', rotate: 97.2, duration: 1600, easing: 'easeInOutCubic' });
+        $$('.ringArc').forEach(function (c, i) { anime({ targets: c, strokeDashoffset: 138.2 - parseFloat(c.dataset.len), duration: 1200, delay: 500 + i * 150, easing: 'easeOutCubic' }); });
+        $$('.count', sec).forEach(function (n, i) { setTimeout(function () { countUp(n, +n.dataset.to, 1300); }, i ? 500 + (i - 1) * 150 : 200); });
+      },
+      leak: function () {
+        anime({ targets: '.step', opacity: 1, translateY: 0, delay: anime.stagger(220), duration: 600, easing: 'easeOutCubic' });
+        anime({ targets: '.leak-stat .card', opacity: 1, translateY: 0, delay: anime.stagger(150, { start: 900 }), duration: 600, easing: 'easeOutCubic' });
+      },
+      fixes: function () {
+        anime({ targets: '.fix', opacity: 1, translateY: 0, delay: anime.stagger(180), duration: 600, easing: 'easeOutCubic' });
+        anime({ targets: '.impact i.on', scaleY: 1, delay: anime.stagger(60, { start: 600 }), duration: 400, easing: 'easeOutBack' });
+      },
+      gaps: function () {
+        anime({ targets: '.gap .dots i.on', scale: 1, delay: anime.stagger(90), duration: 400, easing: 'easeOutBack' });
+        anime({ targets: '.gaps .quote', opacity: 1, translateY: 0, delay: anime.stagger(250, { start: 300 }), duration: 600, easing: 'easeOutCubic' });
+      },
+      compare: function () {
+        anime({ targets: '#radarThem', points: $('#radarThem').dataset.points, duration: 1200, easing: 'easeOutCubic' });
+        anime({ targets: '#radarYou', points: $('#radarYou').dataset.points, duration: 1400, delay: 200, easing: 'easeOutCubic' });
+        anime({ targets: '#radarDots circle', r: 4, delay: anime.stagger(80, { start: 1200 }), duration: 300, easing: 'easeOutBack' });
+        $$('.bullet .you').forEach(function (b, i) { anime({ targets: b, width: b.dataset.w, duration: 1100, delay: 300 + i * 200, easing: 'easeOutCubic' }); });
+        anime({ targets: '.heads i', scale: 1, delay: anime.stagger(40, { start: 900 }), duration: 350, easing: 'easeOutBack' });
+      },
+      phone: function () {
+        countUp($('#timerNum'), 7.8, 2600, 1);
+        anime({ targets: '.check', opacity: 1, translateX: 0, delay: anime.stagger(120, { start: 300 }), duration: 500, easing: 'easeOutCubic' });
+      },
+      praise: function () {
+        anime({ targets: '.bubble', scale: 1, delay: anime.stagger(150), duration: 700, easing: 'easeOutElastic(1, .6)' });
+        anime({ targets: '.praise .quote', opacity: 1, translateY: 0, delay: anime.stagger(200, { start: 500 }), duration: 600, easing: 'easeOutCubic' });
+      }
+    };
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (!e.isIntersecting) return;
+        var k = e.target.dataset.anim; io.unobserve(e.target);
+        if (runners[k]) runners[k](e.target);
+      });
+    }, { threshold: 0.25 });
+    $$('[data-anim]').forEach(function (s) { io.observe(s); });
+  }
+
+  // --- three.js: lazy, only when the comparison section is near the viewport ---
+  var mount = document.getElementById('three-mount');
+  var three = new IntersectionObserver(function (entries) {
+    if (!entries.some(function (e) { return e.isIntersecting; })) return;
+    three.disconnect();
+    var s = document.createElement('script');
+    s.src = 'https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js';
+    s.onload = buildScene; s.onerror = function () { document.getElementById('three-fallback').textContent = '3D view unavailable (script blocked). The radar above shows the same data.'; };
+    document.head.appendChild(s);
+  }, { rootMargin: '300px' });
+  three.observe(mount);
+
+  function buildScene() {
+    var THREE = window.THREE;
+    var fb = document.getElementById('three-fallback'); fb.remove();
+    var css = getComputedStyle(document.documentElement);
+    var col = function (v) { return new THREE.Color(css.getPropertyValue(v).trim()); };
+    var W = mount.clientWidth, H = mount.clientHeight;
+    var renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); renderer.setSize(W, H);
+    mount.appendChild(renderer.domElement);
+    var scene = new THREE.Scene();
+    var camera = new THREE.PerspectiveCamera(38, W / H, 0.1, 100); camera.position.set(0, 5.2, 8.5); camera.lookAt(0, 0.8, 0);
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x8899aa, 1.1));
+    var sun = new THREE.DirectionalLight(0xffffff, .7); sun.position.set(4, 8, 5); scene.add(sun);
+
+    var group = new THREE.Group(); scene.add(group);
+    var ground = new THREE.Mesh(new THREE.CircleGeometry(4.2, 64), new THREE.MeshStandardMaterial({ color: col('--well'), roughness: 1 }));
+    ground.rotation.x = -Math.PI / 2; group.add(ground);
+    var grid = new THREE.PolarGridHelper(4.2, 8, 4, 64, col('--line-2').getHex(), col('--line-2').getHex()); grid.position.y = 0.002; group.add(grid);
+
+    // data: you + 5 neighbours (mobile score; null = no website score). Positions are illustrative angles, not real coordinates.
+    var hotels = [
+      { name: 'Harborside Inn (you)', score: 38, you: true, r: 0, a: 0 },
+      { name: 'Neighbour', score: 72, r: 2.6, a: 0.4 }, { name: 'Neighbour', score: 65, r: 3.1, a: 1.7 },
+      { name: 'Neighbour', score: 90, r: 2.3, a: 2.9 }, { name: 'Neighbour', score: null, r: 3.3, a: 4.1 }, { name: 'Neighbour', score: null, r: 2.7, a: 5.3 }
+    ];
+    var label = function (text, color) {
+      var c = document.createElement('canvas'); c.width = 256; c.height = 96; var g = c.getContext('2d');
+      g.font = '700 44px "Plus Jakarta Sans", sans-serif'; g.textAlign = 'center'; g.fillStyle = color; g.fillText(text, 128, 62);
+      var sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(c), transparent: true })); sp.scale.set(1.3, 0.49, 1); return sp;
+    };
+    var ink = '#' + col('--ink').getHexString(), coral = '#' + col('--coral').getHexString();
+    hotels.forEach(function (h) {
+      var x = Math.cos(h.a) * h.r, z = Math.sin(h.a) * h.r;
+      if (h.score == null) {
+        var disc = new THREE.Mesh(new THREE.CylinderGeometry(.42, .42, .06, 32), new THREE.MeshStandardMaterial({ color: col('--grey'), transparent: true, opacity: .45 }));
+        disc.position.set(x, .03, z); group.add(disc);
+        var l0 = label('no score', '#' + col('--muted').getHexString()); l0.position.set(x, .5, z); group.add(l0); return;
+      }
+      var hgt = h.score / 22;
+      var m = new THREE.Mesh(new THREE.CylinderGeometry(h.you ? .5 : .4, h.you ? .5 : .4, hgt, 40), new THREE.MeshStandardMaterial({ color: h.you ? col('--coral') : col('--navy-2'), roughness: .55, metalness: .05 }));
+      m.position.set(x, hgt / 2, z); m.userData.h = hgt; m.scale.y = 0.001; group.add(m);
+      var l = label(String(h.score), h.you ? coral : ink); l.position.set(x, hgt + .45, z); group.add(l);
+      if (h.you) { var ring = new THREE.Mesh(new THREE.RingGeometry(.62, .72, 48), new THREE.MeshBasicMaterial({ color: col('--coral'), side: THREE.DoubleSide })); ring.rotation.x = -Math.PI / 2; ring.position.y = .01; group.add(ring); }
+    });
+    // average marker: translucent ring at the neighbours' average height (76)
+    var avgH = 76 / 22;
+    var avg = new THREE.Mesh(new THREE.RingGeometry(4.0, 4.2, 96), new THREE.MeshBasicMaterial({ color: col('--coral'), transparent: true, opacity: .35, side: THREE.DoubleSide }));
+    avg.rotation.x = -Math.PI / 2; avg.position.y = avgH; group.add(avg);
+    var avgL = label('neighbours avg 76', coral); avgL.position.set(0, avgH + .35, -4.0); avgL.scale.set(2.2, .83, 1); group.add(avgL);
+
+    // grow pillars
+    var t0 = performance.now(), pillars = group.children.filter(function (o) { return o.userData.h; });
+    var rotY = 0.6, tilt = 0, dragging = false, lx = 0, ly = 0, reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    mount.addEventListener('pointerdown', function (e) { dragging = true; lx = e.clientX; ly = e.clientY; mount.style.cursor = 'grabbing'; });
+    window.addEventListener('pointerup', function () { dragging = false; mount.style.cursor = 'grab'; });
+    window.addEventListener('pointermove', function (e) { if (!dragging) return; rotY += (e.clientX - lx) * .008; tilt = Math.max(-.3, Math.min(.5, tilt + (e.clientY - ly) * .004)); lx = e.clientX; ly = e.clientY; });
+    var visible = true;
+    new IntersectionObserver(function (en) { visible = en[0].isIntersecting; }).observe(mount);
+    window.addEventListener('resize', function () { W = mount.clientWidth; H = mount.clientHeight; camera.aspect = W / H; camera.updateProjectionMatrix(); renderer.setSize(W, H); });
+    (function frame(now) {
+      requestAnimationFrame(frame);
+      if (!visible) return;
+      var p = Math.min(1, (now - t0) / 1400), ease = 1 - Math.pow(1 - p, 3);
+      pillars.forEach(function (m, i) { var pp = Math.min(1, Math.max(0, (p * 1.4) - i * .08)); var e2 = 1 - Math.pow(1 - pp, 3); m.scale.y = Math.max(.001, e2); m.position.y = m.userData.h * e2 / 2; });
+      if (!dragging && !reduceMotion) rotY += .0025;
+      group.rotation.y = rotY; group.rotation.x = tilt;
+      renderer.render(scene, camera);
+    })(t0);
+  }
+})();
+</script>
 </body>
 </html>
