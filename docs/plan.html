@@ -73,7 +73,7 @@
 <main>
 
 <h1>Direct Booking Check: the plan</h1>
-<p class="sub">Final version, 18 Oct 2026, before any code. Repo: <code>/Volumes/asus/projects/hotel-direct-bookings</code>. Research: <code>/Volumes/asus/career-ops/research/hotelzify/</code> and <code>findings.md</code>. Sections marked with a green bar changed in this revision.</p>
+<p class="sub">Revision 3, 18 Oct 2026, before any code. Repo: <code>/Volumes/asus/projects/hotel-direct-bookings</code>. Research: <code>/Volumes/asus/career-ops/research/hotelzify/</code> and <code>findings.md</code>. Sections marked with a green bar changed in this revision.</p>
 
 <div class="card tldr">
   <div class="label">In one paragraph</div>
@@ -81,15 +81,13 @@
 </div>
 
 <div class="card changed">
-  <div class="label">Decisions taken in this revision</div>
+  <div class="label">Decisions taken in revision 3 (18 Oct, evening)</div>
   <ul style="margin:6px 0">
-    <li><b>Name:</b> "Direct Booking Check". The word "leakage" overpromised: we see signs, not bookings. It stays in the explanation, not the title.</li>
-    <li><b>Stack:</b> Next.js + TypeScript on Vercel, tests with Vitest. One project, one-command deploy, your web stack.</li>
-    <li><b>Builder:</b> the usual <code>handoff</code>: Claude writes the spec and failing tests, Codex builds, Claude reviews.</li>
-    <li><b>Two faces, one codebase:</b> the public site names generic fix categories; the version sent to the founder adds Hotelzify's product names. Switched by one flag.</li>
-    <li><b>PageSpeed is the main website source</b>, not a plain page fetch. It loads the site in a real browser, so it sees JavaScript-built pages too.</li>
-    <li><b>Hotel matching by coordinates</b>, not name text.</li>
-    <li><b>Top 3 fixes</b> at the top of every report.</li>
+    <li><b>Two genuinely new parts</b>, after the challenge "doesn't it just show data from other sites?": the <b>gap check</b> (questions guests raise in reviews, checked against the hotel's own website text) and the <b>neighbour comparison</b> (you against the 5 nearest hotels, counted, never named). Both are inferences no single site offers.</li>
+    <li><b>A direct booking score</b>, 0–100, defined in code with stated weights, so it can be explained line by line. It is the thing people remember from the page.</li>
+    <li><b>Tripadvisor becomes optional</b> to keep the two days: its client and tests stay, the pipeline wiring is "if time remains".</li>
+    <li><b>Report layout</b> is now <code>docs/report-infographic.html</code>: score gauge, the "leak" flow, fix cards, gap table, radar comparison, phone-frame website check, praise with verified quotes.</li>
+    <li>Earlier revisions (kept): name "Direct Booking Check"; Next.js + TypeScript + Vitest on Vercel; <code>handoff</code> build; two audiences, one codebase; PageSpeed as the main website source; hotel matching by coordinates; top 3 fixes first.</li>
   </ul>
 </div>
 
@@ -98,7 +96,7 @@
   <ol>
     <li><a href="#why">Why this, for this job</a></li>
     <li><a href="#see">What a hotel owner sees</a></li>
-    <li><a href="#flow">How a report gets made</a></li>
+    <li><a href="#flow">System architecture: how a report gets made</a></li>
     <li><a href="#data">Where the data comes from, and its limits</a></li>
     <li><a href="#ai">The AI part, and how it is kept honest</a></li>
     <li><a href="#security">Security and reliability calls</a></li>
@@ -133,71 +131,96 @@
 </ul>
 
 <h2 id="see" class="changed" style="padding-left:10px">2. What a hotel owner sees</h2>
-<p>A mock-up with a fictional hotel. The real report fills every number from live data. Written for an owner: no jargon, "booking sites like Expedia" instead of "OTA".</p>
-<div class="report">
-  <div class="label">Direct Booking Check</div>
-  <h3 style="margin:4px 0">Harborside Inn · Portland, ME</h3>
-  <p style="color:var(--muted);font-size:.85rem;margin:0">From your Google listing, 5 Google reviews, 3 Tripadvisor reviews and your website, checked 18 Oct 2026. Small sample: we show patterns, not percentages.</p>
+<p>The full mock-up is <code>docs/report-infographic.html</code> (open it next to this page). A fictional hotel, every number sample data; the live page fills them from real sources. Written for an owner: no jargon, no percentages, "booking sites like Expedia" instead of "OTA".</p>
+<div class="tablewrap"><table>
+  <tr><th>Section, in order</th><th>What it answers</th><th>New or existing data</th></tr>
+  <tr><td><b>Direct booking score</b>, gauge 0–100 with four sub-scores</td><td>"How bad is it?" in one number: website 35, guest messaging 25, Google listing 20, reviews 20</td><td>New framing, formula in code (section 3c)</td></tr>
+  <tr><td><b>The leak</b>: four steps from "searches your name" to "books on Expedia"</td><td>"Where exactly do I lose them?"</td><td>New framing of the checks</td></tr>
+  <tr><td><b>Fix these first</b>: three cards with time estimate and impact</td><td>"What do I do Monday morning?"</td><td>Ranking is ours</td></tr>
+  <tr><td><b>Gap check</b>: what guests asked that your website never answers</td><td>"Which questions send guests to Expedia's call centre?"</td><td><b>New.</b> Crosses review questions with the site's own text</td></tr>
+  <tr><td><b>You vs the 5 nearest hotels</b>: radar + bars for speed, rating, reviews, description, phone</td><td>"Is 4.5 good <i>here</i>?"</td><td><b>New.</b> Numbers exist, never side by side for the hotels a guest chooses between</td></tr>
+  <tr><td><b>Your website on a phone</b>: speed, Book button, booking domain, tap-to-call, HTTPS</td><td>"What does a guest actually meet?"</td><td>Existing data (PageSpeed), plus booking-engine detection from network calls</td></tr>
+  <tr><td><b>What guests love</b>, with verified quotes and pasteable copy</td><td>"What do I put in the empty Google description today?"</td><td>Half new: reviews exist, verified usable copy doesn't</td></tr>
+</table></div>
+<p><b>The founder's version</b> (<code>?audience=partner</code>) adds one line under each fix naming the Hotelzify product. Same report, one flag; the public page never carries the name.</p>
 
-  <div class="top3">
-    <b>Fix these first</b>
-    <ol>
-      <li>Your website scores 38/100 on mobile speed. Most guests book on a phone; slow sites send them to Expedia.</li>
-      <li>Your Google listing has no description. Guests see Expedia's text about you before yours.</li>
-      <li>Two of eight recent reviews mention confusion about parking. Put it on the booking page.</li>
-    </ol>
-  </div>
+<h2 id="flow" class="changed" style="padding-left:10px">3. System architecture: how a report gets made</h2>
+<p>Two pictures. The first is <b>where things run</b>: what lives in the visitor's browser, what runs on our server, and which outside services we call. The second is <b>the order of work</b> inside one report. Then the score formula, so it can be explained line by line.</p>
 
-  <h4>1. Google listing</h4>
-  <p><span class="score ok">4.5★</span> from 1,313 reviews · website linked <span class="score ok">yes</span> · phone <span class="score ok">yes</span> · description <span class="score no">missing</span> · Tripadvisor rank <span class="score meh">#12 of 48 hotels in Portland</span></p>
-  <p class="fix">→ Fix: a description built from what guests praise (section 3). Category: Google profile.</p>
-
-  <h4>2. Website (as loaded on a phone)</h4>
-  <p>Mobile speed <span class="score no">38/100</span> · "Book now" <span class="score ok">found</span> · booking runs on <span class="score meh">another company's domain (synxis.com)</span> · tap-to-call <span class="score no">not found</span> · secure (HTTPS) <span class="score ok">yes</span></p>
-  <p class="fix">→ Fix: a faster mobile booking page on your own domain, with a tap-to-call button. Category: booking website.</p>
-
-  <h4>3. What guests love (use this in ads and on your website)</h4>
-  <p><b>Location next to the Old Port</b> · 4 of 8 reviews</p>
-  <div class="quote">"steps from the Old Port and every restaurant we wanted" (Google, Sep 2026)</div>
-  <p><b>Breakfast</b> · 3 of 8 reviews</p>
-  <div class="quote">"the blueberry pancakes alone are worth the stay" (Tripadvisor, Oct 2026)</div>
-  <p class="fix">→ Draft headline: "Steps from the Old Port, with a breakfast guests write home about." Category: marketing.</p>
-
-  <h4>4. What guests had to work out for themselves</h4>
-  <p><b>Parking</b> · 2 of 8 reviews</p>
-  <div class="quote">"wish we'd known parking was a block away" (Google, Aug 2026)</div>
-  <p class="fix">→ Fix: answer this on the booking page and in your chat or phone assistant. Category: guest messaging.</p>
-
-  <p style="font-size:.85rem;color:var(--muted);margin-top:14px">Why it matters: bookings made through sites like Expedia are cancelled about twice as often as direct ones (21.8% vs 10.6%, Cloudbeds 2026), and guests say they get sent back and forth between the site and the hotel when something goes wrong.</p>
-</div>
-<p><b>The founder's version</b> adds one line under each category: "Category: Google profile → Hotelzify Google Business Profile optimisation", and so on. Same report, one flag.</p>
-
-<h2 id="flow">3. How a report gets made</h2>
+<h3>3a. Where things run</h3>
 <div class="card">
-<svg viewBox="0 0 820 470" role="img" aria-label="Report pipeline">
+<svg viewBox="0 0 860 520" role="img" aria-label="System architecture">
   <defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" style="fill: var(--muted)"/></marker></defs>
-  <rect class="box" x="290" y="10" width="240" height="44" rx="8"/><text x="410" y="37" text-anchor="middle">Owner types "Harborside Inn Portland"</text>
-  <path class="arrow" d="M410 54 V80"/>
-  <rect class="boxa" x="290" y="82" width="240" height="44" rx="8"/><text x="410" y="109" text-anchor="middle">Pick the right hotel from a list</text>
-  <path class="arrow" d="M410 126 V150"/>
-  <rect class="box" x="10" y="152" width="190" height="62" rx="8"/><text x="105" y="176" text-anchor="middle">Google Places</text><text class="small" x="105" y="196" text-anchor="middle">listing + 5 reviews + location</text>
-  <rect class="box" x="215" y="152" width="190" height="62" rx="8"/><text x="310" y="176" text-anchor="middle">Tripadvisor (Terra)</text><text class="small" x="310" y="196" text-anchor="middle">match by coordinates · 3 reviews · rank</text>
-  <rect class="box" x="420" y="152" width="190" height="62" rx="8"/><text x="515" y="176" text-anchor="middle">PageSpeed</text><text class="small" x="515" y="196" text-anchor="middle">real-browser load of the site</text>
-  <rect class="box" x="625" y="152" width="185" height="62" rx="8"/><text x="717" y="176" text-anchor="middle">Plain page fetch</text><text class="small" x="717" y="196" text-anchor="middle">fallback only</text>
-  <text class="small" x="410" y="236" text-anchor="middle">all run at the same time; any one can fail and the report still comes out, that section marked "not available"</text>
-  <path class="arrow" d="M105 214 V280 H250"/><path class="arrow" d="M310 214 V270"/>
-  <rect class="boxa" x="200" y="272" width="220" height="56" rx="8"/><text x="310" y="294" text-anchor="middle">AI reads the 8 reviews</text><text class="small" x="310" y="312" text-anchor="middle">praise + questions, each with a quote</text>
-  <path class="arrow" d="M310 328 V352"/>
-  <rect class="boxg" x="200" y="354" width="220" height="56" rx="8"/><text x="310" y="376" text-anchor="middle">Quote check (code)</text><text class="small" x="310" y="394" text-anchor="middle">quote not in a real review → dropped</text>
-  <path class="arrow" d="M515 214 V300 H560"/><path class="arrow" d="M717 214 V300 H700"/>
-  <rect class="boxg" x="560" y="272" width="140" height="56" rx="8"/><text x="630" y="294" text-anchor="middle">Website checks</text><text class="small" x="630" y="312" text-anchor="middle">plain code, no AI</text>
-  <path class="arrow" d="M420 382 H520"/><path class="arrow" d="M630 328 V370 H600"/>
-  <rect class="boxw" x="520" y="354" width="200" height="56" rx="8"/><text x="620" y="376" text-anchor="middle">Report builder (code)</text><text class="small" x="620" y="394" text-anchor="middle">findings → fixes → top 3</text>
-  <path class="arrow" d="M620 410 V440 H420"/>
-  <rect class="box" x="230" y="420" width="190" height="40" rx="8"/><text x="325" y="445" text-anchor="middle">Report page</text>
+  <rect x="10" y="10" width="250" height="500" rx="12" style="fill:none;stroke:var(--line);stroke-dasharray:5 4"/>
+  <text class="small" x="135" y="30" text-anchor="middle">VISITOR'S BROWSER</text>
+  <rect class="box" x="30" y="50" width="210" height="60" rx="8"/><text x="135" y="74" text-anchor="middle">/  search page</text><text class="small" x="135" y="94" text-anchor="middle">type a hotel name, pick from a list</text>
+  <rect class="box" x="30" y="130" width="210" height="60" rx="8"/><text x="135" y="154" text-anchor="middle">/report  page</text><text class="small" x="135" y="174" text-anchor="middle">renders the Report JSON</text>
+  <rect class="boxw" x="30" y="420" width="210" height="70" rx="8"/><text x="135" y="444" text-anchor="middle">Viewer's own OpenRouter key</text><text class="small" x="135" y="462" text-anchor="middle">sessionStorage only; sent in the POST</text><text class="small" x="135" y="478" text-anchor="middle">body, never stored, never logged</text>
+  <rect x="290" y="10" width="290" height="500" rx="12" style="fill:none;stroke:var(--accent);stroke-dasharray:5 4"/>
+  <text class="small" x="435" y="30" text-anchor="middle">OUR SERVER (Vercel, Next.js API routes)</text>
+  <rect class="boxa" x="310" y="50" width="250" height="60" rx="8"/><text x="435" y="74" text-anchor="middle">GET /api/search?q=</text><text class="small" x="435" y="94" text-anchor="middle">searchHotels → list of {placeId, name}</text>
+  <rect class="boxa" x="310" y="130" width="250" height="78" rx="8"/><text x="435" y="152" text-anchor="middle">POST /api/report</text><text class="small" x="435" y="170" text-anchor="middle">{placeId, audience, byok?} → rate limit → runCheck()</text><text class="small" x="435" y="188" text-anchor="middle">LLM: fake / viewer's key / server key</text>
+  <rect class="boxg" x="310" y="230" width="250" height="150" rx="8"/><text x="435" y="254" text-anchor="middle">lib/  (plain TypeScript, all tested)</text>
+  <text class="small" x="325" y="278">pipeline.ts  orders the work (3b)</text>
+  <text class="small" x="325" y="296">sources/  google · pagespeed · tripadvisor</text>
+  <text class="small" x="325" y="314">website.ts · gaps.ts · compare.ts · score.ts</text>
+  <text class="small" x="325" y="332">quotes.ts  the quote check</text>
+  <text class="small" x="325" y="350">llm.ts  prompt, parse, OpenRouter client</text>
+  <text class="small" x="325" y="368">report.ts  findings → fixes → top 3 → JSON</text>
+  <rect class="boxw" x="310" y="420" width="250" height="70" rx="8"/><text x="435" y="444" text-anchor="middle">Server env: API keys</text><text class="small" x="435" y="462" text-anchor="middle">Google · Tripadvisor · PageSpeed · OpenRouter</text><text class="small" x="435" y="478" text-anchor="middle">never sent to the browser</text>
+  <rect x="610" y="10" width="240" height="500" rx="12" style="fill:none;stroke:var(--line);stroke-dasharray:5 4"/>
+  <text class="small" x="730" y="30" text-anchor="middle">OUTSIDE SERVICES</text>
+  <rect class="box" x="630" y="50" width="200" height="56" rx="8"/><text x="730" y="72" text-anchor="middle">Google Places API</text><text class="small" x="730" y="92" text-anchor="middle">search · details + 5 reviews · nearby</text>
+  <rect class="box" x="630" y="124" width="200" height="56" rx="8"/><text x="730" y="146" text-anchor="middle">Google PageSpeed API</text><text class="small" x="730" y="166" text-anchor="middle">loads a site in a real phone browser</text>
+  <rect class="box" x="630" y="198" width="200" height="56" rx="8"/><text x="730" y="220" text-anchor="middle">The hotel's own website</text><text class="small" x="730" y="240" text-anchor="middle">home page text, via safeFetch</text>
+  <rect class="box" x="630" y="272" width="200" height="56" rx="8"/><text x="730" y="294" text-anchor="middle">Tripadvisor Terra API</text><text class="small" x="730" y="314" text-anchor="middle">optional · 3 reviews · city rank</text>
+  <rect class="box" x="630" y="346" width="200" height="56" rx="8"/><text x="730" y="368" text-anchor="middle">OpenRouter</text><text class="small" x="730" y="388" text-anchor="middle">the one AI call, any model</text>
+  <path class="arrow" d="M240 80 H310"/><path class="arrow" d="M240 160 H310"/>
+  <path class="arrow" d="M560 78 H630"/>
+  <path class="arrow" d="M560 280 L630 78"/><path class="arrow" d="M560 290 L630 152"/><path class="arrow" d="M560 300 H630"/><path class="arrow" d="M560 310 L630 226"/><path class="arrow" d="M560 320 L630 372"/>
+  <path class="arrow" d="M435 208 V230"/>
+  <path class="arrow" d="M435 380 V420"/>
+  <path class="arrow" d="M135 420 V190" style="stroke-dasharray:3 3"/>
 </svg>
-<p style="color:var(--muted);font-size:.85rem">Green = plain code decides. Blue = AI involved. Only one step uses AI; everything that can be a rule is a rule.</p>
+<p style="color:var(--muted);font-size:.85rem">Boundaries, left to right: <b>browser → server</b> is HTTPS to our own API routes; nothing in the browser holds a server key. <b>Server → outside</b> is the only place keys are used. Green = plain code that decides; blue = request handling; amber = secrets. There is no database: a report is computed and returned, and review text is never written anywhere (Google's terms, and nothing to leak).</p>
 </div>
+
+<h3>3b. The order of work inside one report</h3>
+<div class="card">
+<svg viewBox="0 0 860 600" role="img" aria-label="Report pipeline">
+  <rect class="boxa" x="300" y="10" width="260" height="44" rx="8"/><text x="430" y="37" text-anchor="middle">1. getPlace(placeId): must succeed</text>
+  <text class="small" x="430" y="72" text-anchor="middle">listing, phone, website, description, coordinates, 5 reviews. If Google fails, the run fails: nothing to stand on.</text>
+  <path class="arrow" d="M430 54 V96"/>
+  <text class="small" x="430" y="112" text-anchor="middle">2. five jobs at the same time; each may fail on its own, and its section is then marked "not available"</text>
+  <rect class="box" x="10" y="124" width="160" height="78" rx="8"/><text x="90" y="146" text-anchor="middle">Home page</text><text class="small" x="90" y="164" text-anchor="middle">safeFetch(website)</text><text class="small" x="90" y="180" text-anchor="middle">→ extractText → pageText</text>
+  <rect class="box" x="180" y="124" width="160" height="78" rx="8"/><text x="260" y="146" text-anchor="middle">PageSpeed</text><text class="small" x="260" y="164" text-anchor="middle">runPageSpeed(website)</text><text class="small" x="260" y="180" text-anchor="middle">→ analyzeLighthouse</text><text class="small" x="260" y="196" text-anchor="middle">fail → analyzeHtml(home)</text>
+  <rect class="box" x="350" y="124" width="160" height="78" rx="8"/><text x="430" y="146" text-anchor="middle">Neighbours</text><text class="small" x="430" y="164" text-anchor="middle">nearbyHotels (no reviews)</text><text class="small" x="430" y="180" text-anchor="middle">→ PageSpeed ×5 → benchmark</text>
+  <rect class="box" x="520" y="124" width="160" height="78" rx="8"/><text x="600" y="146" text-anchor="middle">Tripadvisor (optional)</text><text class="small" x="600" y="164" text-anchor="middle">findLocation by coordinates</text><text class="small" x="600" y="180" text-anchor="middle">→ details + 3 reviews</text>
+  <rect class="boxa" x="690" y="124" width="160" height="78" rx="8"/><text x="770" y="146" text-anchor="middle">AI</text><text class="small" x="770" y="164" text-anchor="middle">extractThemes(reviews)</text><text class="small" x="770" y="180" text-anchor="middle">praise, questions, headline</text>
+  <path class="arrow" d="M770 202 V236"/>
+  <rect class="boxg" x="690" y="238" width="160" height="60" rx="8"/><text x="770" y="260" text-anchor="middle">Quote check (code)</text><text class="small" x="770" y="280" text-anchor="middle">quote not in a review → dropped</text>
+  <path class="arrow" d="M770 298 V332 H520"/><path class="arrow" d="M90 202 V332 H420"/>
+  <rect class="boxg" x="420" y="312" width="100" height="40" rx="8"/><text x="470" y="337" text-anchor="middle">3. findGaps</text>
+  <text class="small" x="470" y="372" text-anchor="middle">each guest question × "does pageText mention it?"</text>
+  <path class="arrow" d="M470 352 V396"/><path class="arrow" d="M260 202 V418 H410"/>
+  <rect class="boxg" x="410" y="398" width="120" height="40" rx="8"/><text x="470" y="423" text-anchor="middle">4. computeScore</text>
+  <path class="arrow" d="M470 438 V470"/><path class="arrow" d="M430 202 V222 H345 V496 H400"/><path class="arrow" d="M600 202 V496 H540"/>
+  <rect class="boxw" x="400" y="472" width="140" height="48" rx="8"/><text x="470" y="492" text-anchor="middle">5. buildReport</text><text class="small" x="470" y="510" text-anchor="middle">findings → top 3 → JSON</text>
+  <path class="arrow" d="M470 520 V552"/>
+  <rect class="box" x="380" y="554" width="180" height="40" rx="8"/><text x="470" y="579" text-anchor="middle">Report page</text>
+</svg>
+<p style="color:var(--muted);font-size:.85rem">Only one step uses AI, and its output passes through the quote check before anything downstream sees it. Everything that can be a rule is a rule. Wall time is bounded by PageSpeed (10–45 s), which is why the five jobs run together.</p>
+</div>
+
+<h3>3c. The score, so it can be explained line by line</h3>
+<div class="tablewrap"><table>
+  <tr><th>Sub-score</th><th>Weight</th><th>How it is computed</th><th>Null when</th></tr>
+  <tr><td>Website</td><td>35</td><td>PageSpeed mobile score (50 if only the html fallback ran), minus 15 for http, 10 for no viewport, 10 for booking on another company's domain, 5 for no tap-to-call. No website at all = 0.</td><td>site exists but could not be loaded</td></tr>
+  <tr><td>Guest messaging</td><td>25</td><td>100, minus 25 per guest question the site doesn't answer, 10 per one it does answer or we couldn't check.</td><td>the AI step failed</td></tr>
+  <tr><td>Google listing</td><td>20</td><td>40 for a description, 30 for a website link, 30 for a phone.</td><td>never</td></tr>
+  <tr><td>Reviews</td><td>20</td><td>rating ÷ 5 × 100, minus 10 under 50 reviews.</td><td>no rating</td></tr>
+</table></div>
+<p>Null sub-scores drop out and the weights are re-spread over the rest. The weights are a judgement about where the leak is, not a number measured against bookings; the README says so. On the test fixture the formula gives 54.</p>
 
 <h2 id="data" class="changed" style="padding-left:10px">4. Where the data comes from, and its limits</h2>
 <div class="tablewrap"><table>
@@ -250,24 +273,27 @@
 </table></div>
 
 <h2 id="days" class="changed" style="padding-left:10px">8. The 2-day build</h2>
-<p>Bottom up: each layer is tested before the next starts. Codex builds via <code>handoff</code>; the spec and failing tests come first.</p>
+<p>Bottom up: each layer is tested before the next starts. Codex builds via <code>handoff</code>; <code>spec/site.md</code> and the failing tests (11 files) are committed first. Step numbers match the spec.</p>
 <h3>Day 1: data and logic, no UI</h3>
 <ol class="steps">
   <li><b>Quote check</b> <span class="pill">pure logic</span><br>Verify quotes against reviews; recompute counts; log drops.</li>
-  <li><b>Website checks from Lighthouse data</b> <span class="pill">pure logic</span><br>Speed score, HTTPS, viewport, booking engine domain from the network requests, "Book now" and tap-to-call. Tested on saved PageSpeed responses.</li>
-  <li><b>Safe fallback fetcher</b><br>The locked-down URL fetch, plus the same checks on raw HTML.</li>
-  <li><b>Google, Tripadvisor, PageSpeed clients</b><br>Tested against recorded sample responses, plus one live smoke test you run. Tripadvisor matched by coordinates + name similarity.</li>
-  <li><b>Report builder</b><br>Joins everything, maps each finding to a fix and a category, ranks the top 3, handles missing sections. Flag for the founder's version.</li>
+  <li><b>Website checks from Lighthouse data</b> <span class="pill">pure logic</span><br>Speed, HTTPS, viewport, booking engine from network requests, "Book now", tap-to-call.</li>
+  <li><b>Safe fetch</b><br>The locked-down URL fetch (private networks blocked, redirects re-checked, size and time caps).</li>
+  <li><b>Gap check</b> <span class="pill">pure logic</span><br>Page text extraction, topic keywords, "does the site mention it".</li>
+  <li><b>Neighbour comparison</b><br>Nearby search without reviews; averages and ranks.</li>
+  <li><b>Score</b> <span class="pill">pure logic</span><br>The four sub-scores and the weighted total (3c).</li>
+  <li><b>Sources</b><br>Google, PageSpeed, Tripadvisor clients and the fixture mode, tested on recorded responses.</li>
 </ol>
-<h3>Day 2: AI, page, ship</h3>
-<ol class="steps" start="6">
-  <li><b>AI layer</b><br>One interface, strict JSON output, OpenRouter + fake first.</li>
-  <li><b>Pages</b><br>Search → pick hotel → report. Works on a phone.</li>
-  <li><b>Quotas</b><br>Google Cloud hard cap set; best-effort per-visitor limit in the app.</li>
-  <li><b>Deploy</b> to Vercel with the demo model.</li>
-  <li><b>Run it on 10 real US independent hotels</b>; write up what it found and where the AI went wrong. Then <code>claude -p</code> wrapper if time remains.</li>
+<h3>Day 2: joining, AI, page, ship</h3>
+<ol class="steps" start="8">
+  <li><b>Report builder</b><br>Findings, fixes, top 3, score, missing sections, the partner flag.</li>
+  <li><b>AI layer</b><br>One interface, strict JSON, fake + OpenRouter clients.</li>
+  <li><b>Pipeline</b><br>The order in 3b, with every failure contained.</li>
+  <li><b>API routes and rate limit.</b></li>
+  <li><b>Pages</b><br>Search → pick → report, laid out like the infographic mock-up.</li>
+  <li><b>Docs and optional extras</b><br>README; then Tripadvisor wiring, then the <code>claude -p</code> wrapper, only if time remains. Then you run it on real hotels.</li>
 </ol>
-<div class="card warn"><b>If day 2 slips, cut in this order:</b> Tripadvisor source → viewer's-own-key mode → <code>claude -p</code> wrapper. Never cut the quote check or PageSpeed.</div>
+<div class="card warn"><b>If day 2 slips, cut in this order:</b> Tripadvisor wiring → viewer's-own-key mode → <code>claude -p</code> wrapper. Never cut the quote check, the gap check or PageSpeed.</div>
 
 <h2 id="out">9. What is deliberately left out</h2>
 <div class="tablewrap"><table>
@@ -277,7 +303,8 @@
   <tr><td>"What do ChatGPT and Google's AI say about this hotel"</td><td>Good v2; doubles the AI cost and is hard to check.</td></tr>
   <tr><td>Accounts, saved reports, database</td><td>Not needed to prove the idea; storing reviews is against Google's terms anyway.</td></tr>
   <tr><td>PDF export</td><td>The page is the report.</td></tr>
-  <tr><td>Competitor comparison (5 nearby hotels)</td><td>6× the API calls per report. v2.</td></tr>
+  <tr><td>Naming or reviewing the neighbouring hotels</td><td>The comparison counts them and reads none of their reviews. Naming them turns a check into a public ranking of other businesses.</td></tr>
+  <tr><td>Batch mode for a sales team (paste 50 hotels, get a ranked prospect list)</td><td>The most valuable form for Hotelzify, not buildable in 2 days. Day-60 roadmap item.</td></tr>
   <tr><td>Hotels outside the US</td><td>The job is the US business.</td></tr>
 </table></div>
 
@@ -307,7 +334,7 @@
 
 <h2 id="next">12. Next step</h2>
 <div class="card">
-  <p>All decisions are taken. Next: <code>spec/site.md</code> and the failing tests (Vitest), committed on <code>main</code>, then <code>handoff</code>. The spec will also ask for <code>docs/decisions.md</code>, <code>docs/flow.md</code> and <code>docs/mental-model.md</code>, written one at a time after the build.</p>
+  <p>Spec, 11 failing test files and this plan are committed on <code>main</code>. Next: run <code>handoff</code>. After the build: your live runs with real keys, then <code>docs/flow.md</code> traced against the real code, then the README with results and the write-up for Hotelzify. <code>docs/mental-model.md</code> explains the whole system in plain words and is written already.</p>
   <p class="sub" style="margin:8px 0 0">Time: about 12–14 hours over 2 days. Feeds Tier 1 (the job). Moves phase 1.</p>
 </div>
 
