@@ -87,3 +87,21 @@
 **Why:** the gauge is the one thing people remember from the page, and a formula in code is explainable to an owner line by line, which a model's number is not. Weights follow where the leak is: the website is what the owner controls and where this hotel loses most.
 
 **Cost:** the weights are a judgement, not measured against bookings; the README must say so. On the fixture the formula gives 54, and the mock-up's sub-scores were changed to match it (23/65/60/90) rather than the other way round.
+
+## 2026-10-18 · No visitor analytics at launch; measure with a per-run log line and a hand eval
+
+**Decided:** the public page carries no tracking script, cookie or database. Measurement is three layers (plan section 14): one structured log line per report run (sections available, website source, quotes dropped / offered, wall time, neighbours found; never a key, a review text or an IP), a hand eval of the findings on 10 real hotels recorded in the README, and the founder's response. The log line and two "not a real website" rules (social-media URLs count as no website; under 200 characters of page text counts as "could not check") are proposed spec additions awaiting Deepak's decision before `handoff`.
+
+**Considered:** Vercel Analytics or Umami on the page; a database of past runs.
+
+**Why:** the page handles other people's reviews and sometimes a viewer's own API key; every third party on it is one more thing to explain and one more place for data to go. Visitor counts also answer nothing the job needs; "how often does the AI invent quotes" does.
+
+**Cost:** no idea how many people open a shared link. Acceptable for a demo; revisit if it becomes a product.
+
+## 2026-10-18 · Correction: the viewer's own key does pass through the server
+
+**Decided:** plan section 6 said the viewer's OpenRouter key "never touches our server". The spec (step 11) and the architecture diagram say the key is sent in the POST body, used once on the server, never stored, logged or echoed. The plan line was wrong and is corrected; the spec stands.
+
+**Why:** a browser-direct call to OpenRouter would expose the prompt and the request shape, and would need CORS handling on a third party we don't control. Holding the key for one request and writing it nowhere is the simpler, testable rule, and `tests/api.test.ts` asserts the response never echoes it.
+
+**Cost:** the server does see the key in memory for the length of one request. The README must say so plainly.
