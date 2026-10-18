@@ -78,3 +78,11 @@ describe("computeScore", () => {
     expect(s).toEqual({ website: null, messaging: null, listing: 30, reviews: null, overall: 30 });
   });
 });
+
+describe("social-media or booking-site link as the website", () => {
+  it("scores the website 0, as if there were none, but keeps the listing credit for having a link", () => {
+    const s = computeScore({ hotel: { ...hotel, website: "https://www.facebook.com/HarborsideInn" }, website: null, gaps });
+    expect(s.website).toBe(0);
+    expect(s.listing).toBe(60);
+  });
+});

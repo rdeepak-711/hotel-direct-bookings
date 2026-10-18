@@ -394,7 +394,7 @@
   <tr><td>Wall time</td><td>Whether the page is tolerable</td><td>Under 60 s</td></tr>
   <tr><td>Neighbours found</td><td>Whether the comparison has a basis</td><td>3 or more in a town, 5 in a city</td></tr>
 </table></div>
-<p class="sub">This log line is <b>not in the spec yet</b>. It is a 20-minute addition to <code>pipeline.ts</code>; the decision is whether to add it to the spec before <code>handoff</code> or as a day-3 item. My recommendation: add it to the spec now, as part of step 10, because it costs nothing and it is the only way to answer "how often does the AI invent quotes" with a number in the interview.</p>
+<p class="sub">This log line is <b>in the spec since 19 Oct</b> (step 10, "Run log", with tests in <code>tests/pipeline.test.ts</code>). It is the only way to answer "how often does the AI invent quotes" with a number in the interview.</p>
 <h3>14b. Is the report right? (hand check on real hotels)</h3>
 <p>Tests prove the code does what the spec says; they cannot prove the spec is right about hotels. So after the build, you run it on 10 real US independent hotels of different sizes and check each finding by hand, the way you did the 15-case eval for escalation-gate:</p>
 <div class="tablewrap"><table>
@@ -416,8 +416,8 @@
 <div class="tablewrap"><table>
   <tr><th>Situation</th><th>What happens</th><th>Status</th></tr>
   <tr><td>Hotel has no website on Google</td><td>Website score 0, a high-severity "no website" finding. Gap check cannot run, so each guest question is "unknown" and costs 10 points, not 25.</td><td>Spec + tests</td></tr>
-  <tr><td>Hotel's "website" is a Facebook page</td><td>PageSpeed runs on facebook.com, the text fetch meets a login wall, the gap check says nothing is mentioned. Common for small motels.</td><td><b>Known weakness.</b> Proposed rule: treat facebook.com, instagram.com and booking-site hosts as "no real website" (score 0, finding). Not in the spec yet.</td></tr>
-  <tr><td>Website is built entirely with JavaScript</td><td>The raw page has almost no text, so the gap check could wrongly say "not on your site".</td><td><b>Known weakness.</b> Proposed rule: under 200 characters of page text counts as "could not check" (unknown), never "not mentioned". Not in the spec yet.</td></tr>
+  <tr><td>Hotel's "website" is a Facebook page</td><td>PageSpeed runs on facebook.com, the text fetch meets a login wall, the gap check says nothing is mentioned. Common for small motels.</td><td><b>Known weakness.</b> Proposed rule: treat facebook.com, instagram.com and booking-site hosts as "no real website" (score 0, finding). <b>In the spec since 19 Oct</b> (<code>isRealWebsite</code>, step 2), with tests.</td></tr>
+  <tr><td>Website is built entirely with JavaScript</td><td>The raw page has almost no text, so the gap check could wrongly say "not on your site".</td><td><b>Known weakness.</b> Proposed rule: under 200 characters of page text counts as "could not check" (unknown), never "not mentioned". <b>In the spec since 19 Oct</b> (<code>isReadableText</code>, step 4, plus a "could not read your site" finding), with tests.</td></tr>
   <tr><td>PageSpeed times out (it can take 45 s)</td><td>Fallback to checks on the raw page: no speed score, base of 50 for the website score, the report says the source was the page not Lighthouse.</td><td>Spec + tests</td></tr>
   <tr><td>Google returns fewer than 5 reviews, or none</td><td>The sample line says how many. With none, the AI is not called and praise and gaps are empty, not invented.</td><td>Spec + tests</td></tr>
   <tr><td>The AI answers with prose or broken JSON</td><td>One retry; then the AI section is "not available" and the report still comes out. Messaging score drops out, weights re-spread.</td><td>Spec + tests</td></tr>
@@ -437,7 +437,7 @@
   <tr><td>Google's terms on sending review text to a third-party AI</td><td>Unclear. Check before the public link goes out; if it is a problem, the public demo runs the AI on Tripadvisor reviews only.</td><td>Open question, section 11</td></tr>
   <tr><td>Hotelzify's own hotels book on bookmystay.io</td><td>The "booking on another company's domain" finding fires on their customers too.</td><td>Raise on the CEO call as an insight, not in public</td></tr>
 </table></div>
-<div class="card warn"><b>Two decisions for you before handoff</b>, both small spec additions: (1) the per-run log line in 14a; (2) the two "not a real website" rules above (social-media URLs count as no website; under 200 characters of page text counts as "could not check"). My recommendation is yes to all three, because each removes a way the report could be confidently wrong about a real hotel.</div>
+<div class="card good"><b>Decided 19 Oct: all three added</b> to the spec with failing tests: the per-run log line (14a), social-media and booking-site links count as no website, and under 200 characters of page text counts as "could not check". Each removes a way the report could be confidently wrong about a real hotel.</div>
 
 <h2 id="next">16. Next step</h2>
 <div class="card">

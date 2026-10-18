@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { TOPICS, extractText, findGaps, siteMentions, topicForTheme } from "@/lib/gaps";
+import { MIN_PAGE_TEXT, TOPICS, extractText, findGaps, isReadableText, siteMentions, topicForTheme } from "@/lib/gaps";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -69,5 +69,20 @@ describe("findGaps", () => {
   it("returns null for every mention when there is no page text", () => {
     const gaps = findGaps(questions, null);
     expect(gaps.every((g) => g.mentionedOnSite === null)).toBe(true);
+  });
+});
+
+describe("unreadable pages", () => {
+  const questions = [{ name: "Parking", count: 2, reviewIds: ["g-2"], quotes: [] }];
+  it("treats under 200 characters of page text as could not check, never as not mentioned", () => {
+    expect(MIN_PAGE_TEXT).toBe(200);
+    const jsShell = extractText("<html><body><div id=\"root\"></div><script>render()</script><noscript>Enable JavaScript</noscript></body></html>");
+    expect(isReadableText(jsShell)).toBe(false);
+    expect(findGaps(questions, jsShell)).toEqual([{ themeName: "Parking", topic: "parking", count: 2, mentionedOnSite: null }]);
+  });
+  it("counts whitespace-only padding as no text", () => {
+    expect(isReadableText(" ".repeat(500))).toBe(false);
+    expect(isReadableText(null)).toBe(false);
+    expect(isReadableText("a".repeat(200))).toBe(true);
   });
 });

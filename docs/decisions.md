@@ -105,3 +105,13 @@
 **Why:** a browser-direct call to OpenRouter would expose the prompt and the request shape, and would need CORS handling on a third party we don't control. Holding the key for one request and writing it nowhere is the simpler, testable rule, and `tests/api.test.ts` asserts the response never echoes it.
 
 **Cost:** the server does see the key in memory for the length of one request. The README must say so plainly.
+
+## 2026-10-19 · Three spec additions before handoff: run log, "not a real website", "could not read the site"
+
+**Decided (Deepak):** add all three to `spec/site.md` with failing tests before `handoff`. (1) `runCheck` writes one structured log line per run (sections available, PageSpeed fallback, quotes offered and dropped, neighbours, wall time), never a key, review text, hotel name, place id or IP. (2) `isRealWebsite`: a Facebook, Instagram, booking-site or link-page URL counts as no website: no fetch, no PageSpeed, website score 0, a `no-website` finding naming the host. (3) `isReadableText`: under 200 characters of home-page text means the gap check says "unknown", never "not mentioned", and the report adds a `site-unreadable` finding.
+
+**Considered:** leaving all three as known weaknesses in the README, or adding the log line on day 3.
+
+**Why:** each one removes a way the report could be confidently wrong about a real hotel, which is the failure that would hurt most in front of Hotelzify or on X. The log line is the only source for "how often does the AI invent quotes" as a number.
+
+**Cost:** about 1 extra hour of build time, and the 200-character limit is a guess: a short but real page could be called unreadable. The hand check on 10 hotels (plan 14b) is where that gets tested.

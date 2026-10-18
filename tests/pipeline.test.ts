@@ -13,6 +13,7 @@ import path from "node:path";
 const home = readFileSync(path.join(__dirname, "fixtures/home.html"), "utf8");
 const html = (body: string) => new Response(body, { status: 200, headers: { "content-type": "text/html" } });
 import good from "./fixtures/llm-good.json";
+import bad from "./fixtures/llm-hallucinated.json";
 
 const json = (body: unknown, status = 200) => new Response(JSON.stringify(body), { status, headers: { "content-type": "application/json" } });
 
@@ -98,5 +99,78 @@ describe("runCheck", () => {
     expect(report.sections.ai.available).toBe(false);
     expect(report.praise).toEqual([]);
     expect(report.topFixes.length).toBeGreaterThan(0);
+  });
+
+  it("does not fetch or grade a Facebook page as the hotel's website", async () => {
+    const seen: string[] = [];
+    const base = router({ "places.googleapis.com/v1/places/": () => json({ ...placeFx, websiteUri: "https://www.facebook.com/HarborsideInn" }) });
+    const fetchImpl = async (url: string) => { seen.push(url); return base(url); };
+    const report = await runCheck({ placeId: "ChIJexampleHarborside", audience: "public" }, { fetchImpl, llm: new FakeLLM([JSON.stringify(good)]), env, checkedAt: "2026-10-18" });
+    expect(seen.some((u) => u.includes("facebook.com") && !u.includes("pagespeedonline"))).toBe(false);
+    expect(seen.some((u) => u.includes("pagespeedonline") && u.includes("facebook"))).toBe(false);
+    expect(report.score.website).toBe(0);
+    expect(report.findings.find((f) => f.id === "no-website")).toBeDefined();
+    expect(report.sections.gapCheck).toEqual({ siteText: "no website" });
+  });
+
+  it("calls a page with almost no text unreadable and makes no 'not on your site' claims", async () => {
+    const shell = "<html><body><div id=\"root\"></div><script>render()</script></body></html>";
+    const fetchImpl = router({ "https://www.harborside-inn-example.com": () => html(shell) });
+    const report = await runCheck({ placeId: "ChIJexampleHarborside", audience: "public" }, { fetchImpl, llm: new FakeLLM([JSON.stringify(good)]), env, checkedAt: "2026-10-18" });
+    expect(report.sections.gapCheck).toEqual({ siteText: "unreadable" });
+    expect(report.findings.some((f) => f.id.startsWith("gap-"))).toBe(false);
+    expect(report.findings.find((f) => f.id === "site-unreadable")).toBeDefined();
+    expect(report.findings.find((f) => f.id === "question-parking")).toBeDefined();
+  });
+});
+
+describe("run log", () => {
+  const secretEnv = { GOOGLE_PLACES_API_KEY: "g-secret-key-123", TRIPADVISOR_API_KEY: "t-secret-key-456", PAGESPEED_API_KEY: "" };
+  const reviewTexts = (placeFx as { reviews: { text: { text: string } | string }[] }).reviews.map((r) => (typeof r.text === "string" ? r.text : r.text.text));
+
+  it("writes exactly one line per successful run, with numbers only", async () => {
+    const lines: unknown[] = [];
+    await runCheck({ placeId: "ChIJexampleHarborside", audience: "public" }, { fetchImpl: router(), llm: new FakeLLM([JSON.stringify(good)]), env: secretEnv, checkedAt: "2026-10-18", log: (e) => lines.push(e) });
+    expect(lines).toHaveLength(1);
+    const entry = lines[0] as Record<string, unknown>;
+    expect(entry).toMatchObject({
+      event: "report_run", ok: true, failedAt: null,
+      sections: { website: true, comparison: true, ai: true, tripadvisor: true },
+      websiteSource: "lighthouse", siteText: "read", quotesOffered: 11, quotesDropped: 0, neighbours: 5,
+    });
+    expect(typeof entry.wallMs).toBe("number");
+    expect(entry.wallMs as number).toBeGreaterThanOrEqual(0);
+    expect(Object.keys(entry).sort()).toEqual(["event", "failedAt", "neighbours", "ok", "quotesDropped", "quotesOffered", "sections", "siteText", "wallMs", "websiteSource"]);
+    const text = JSON.stringify(entry);
+    expect(text).not.toContain("secret-key");
+    expect(text).not.toContain("Harborside");
+    expect(text).not.toContain("ChIJ");
+    for (const t of reviewTexts) expect(text).not.toContain(t.slice(0, 30));
+  });
+
+  it("counts invented quotes when the model makes things up", async () => {
+    const lines: { quotesOffered: number; quotesDropped: number }[] = [];
+    await runCheck({ placeId: "ChIJexampleHarborside", audience: "public" }, { fetchImpl: router(), llm: new FakeLLM([JSON.stringify(bad)]), env, checkedAt: "2026-10-18", log: (e) => lines.push(e as never) });
+    expect(lines[0].quotesOffered).toBe(6);
+    expect(lines[0].quotesDropped).toBeGreaterThan(0);
+  });
+
+  it("records the AI as unavailable with null quote counts when the model fails twice", async () => {
+    const lines: Record<string, unknown>[] = [];
+    await runCheck({ placeId: "ChIJexampleHarborside", audience: "public" }, { fetchImpl: router(), llm: new FakeLLM(["nope", "nope"]), env, checkedAt: "2026-10-18", log: (e) => lines.push(e as never) });
+    expect(lines[0]).toMatchObject({ ok: true, quotesOffered: null, sections: { ai: false } });
+  });
+
+  it("still logs once when Google fails, then rethrows", async () => {
+    const lines: Record<string, unknown>[] = [];
+    const fetchImpl = router({ "places.googleapis.com": () => json({ error: "x" }, 500) });
+    await expect(runCheck({ placeId: "bad", audience: "public" }, { fetchImpl, llm: new FakeLLM([]), env, checkedAt: "2026-10-18", log: (e) => lines.push(e as never) })).rejects.toThrow();
+    expect(lines).toHaveLength(1);
+    expect(lines[0]).toMatchObject({ event: "report_run", ok: false, failedAt: "google", sections: null, quotesOffered: null, neighbours: null });
+  });
+
+  it("never lets a broken logger break the report", async () => {
+    const report = await runCheck({ placeId: "ChIJexampleHarborside", audience: "public" }, { fetchImpl: router(), llm: new FakeLLM([JSON.stringify(good)]), env, checkedAt: "2026-10-18", log: () => { throw new Error("log sink down"); } });
+    expect(report.hotel.name).toBe("Harborside Inn");
   });
 });

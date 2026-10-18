@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { analyzeHtml, analyzeLighthouse, detectBookingEngine, BOOKING_VENDORS } from "@/lib/website";
+import { analyzeHtml, analyzeLighthouse, detectBookingEngine, BOOKING_VENDORS, isRealWebsite, NOT_A_WEBSITE_HOSTS } from "@/lib/website";
 import psi from "./fixtures/pagespeed.json";
 import psiNoBooking from "./fixtures/pagespeed-no-booking.json";
 import { readFileSync } from "node:fs";
@@ -70,5 +70,25 @@ describe("analyzeHtml (fallback)", () => {
     expect(checks.bookNow).toEqual({ found: true, text: "Book Now", href: "https://be.synxis.com/?hotel=12345" });
     expect(checks.bookingEngine).toEqual({ domain: "be.synxis.com", vendor: "SynXis", onOwnDomain: false });
     expect(checks.tapToCall).toBe(true);
+  });
+});
+
+describe("isRealWebsite", () => {
+  it.each([
+    ["https://www.harborside-inn-example.com/", true],
+    ["http://seasideinn.us", true],
+    ["https://www.facebook.com/SeasideMotel", false],
+    ["https://m.facebook.com/pages/x", false],
+    ["https://instagram.com/seaside", false],
+    ["https://www.booking.com/hotel/us/seaside.html", false],
+    ["https://www.expedia.com/Seaside-Hotel.h123", false],
+    ["https://linktr.ee/seaside", false],
+    ["not a url", false],
+    [null, false],
+  ])("%s → %s", (url, real) => expect(isRealWebsite(url as string | null)).toBe(real));
+
+  it("does not treat a hotel whose own domain merely contains a blocked word as fake", () => {
+    expect(isRealWebsite("https://www.bookingsfacebookinn.com/")).toBe(true);
+    expect(NOT_A_WEBSITE_HOSTS).toContain("facebook.com");
   });
 });

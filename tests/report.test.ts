@@ -158,4 +158,30 @@ describe("buildReport", () => {
     expect(text).not.toMatch(/\bOTA/);
     expect(text).toMatch(/Expedia/);
   });
+
+  it("treats a Facebook link as no website of its own", () => {
+    const r = buildReport({ ...base, hotel: { ...base.hotel, website: "https://www.facebook.com/HarborsideInn" }, website: null, siteText: "no website" });
+    const f = r.findings.find((x) => x.id === "no-website")!;
+    expect(f.severity).toBe("high");
+    expect(f.evidence).toMatch(/facebook\.com/);
+    expect(f.evidence.toLowerCase()).toMatch(/not a website of your own/);
+    expect(r.findings.some((x) => ["slow-mobile", "no-book-now", "no-tap-to-call"].includes(x.id))).toBe(false);
+    expect(r.score.website).toBe(0);
+    expect(r.sections.gapCheck).toEqual({ siteText: "no website" });
+  });
+
+  it("says the site could not be read instead of claiming it is silent", () => {
+    const r = buildReport({ ...base, siteText: "unreadable", gaps: [{ themeName: "Parking", topic: "parking", count: 2, mentionedOnSite: null }, { themeName: "Check-in time", topic: "check-in", count: 1, mentionedOnSite: null }] });
+    const f = r.findings.find((x) => x.id === "site-unreadable")!;
+    expect(f.severity).toBe("medium");
+    expect(f.evidence.toLowerCase()).toMatch(/could not read/);
+    expect(r.findings.find((x) => x.id === "gap-parking")).toBeUndefined();
+    expect(r.sections.gapCheck).toEqual({ siteText: "unreadable" });
+  });
+
+  it("defaults siteText from the inputs and adds no unreadable finding for a readable site", () => {
+    const r = buildReport(base);
+    expect(r.sections.gapCheck).toEqual({ siteText: "read" });
+    expect(r.findings.find((x) => x.id === "site-unreadable")).toBeUndefined();
+  });
 });
