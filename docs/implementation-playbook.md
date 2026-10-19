@@ -77,7 +77,7 @@ Arrows point from the module that imports to the module it depends on. The spec'
 ### [x] ENG-002 Decide and apply DEC-1: complete `.env.example`
 **Owner:** Deepak. **Prerequisites:** DEC-1 approved.
 **Steps:** list all nine variables with empty values, except `OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free`, `LLM_MODE=openrouter`, `SOURCES_MODE=live`, `REPORTS_PER_VISITOR_PER_HOUR=10`. Add a one-line comment per key saying where to get it. Commit.
-**Verification:** `grep -c '=' .env.example` → 9. **Learning note:** `.env.example` is the contract between the code and whoever deploys it; a missing name there is a silent production failure (the spec's own words about `PAGESPEED_API_KEY`). **Evidence:** the commit.
+**Verification:** `grep -c '^[A-Z_]*=' .env.example` → 9 (the looser `grep -c '='` also counts the comment on line 10 and gives 10). **Learning note:** `.env.example` is the contract between the code and whoever deploys it; a missing name there is a silent production failure (the spec's own words about `PAGESPEED_API_KEY`). **Evidence:** the commit.
 
 ### [ ] ENG-003 Decide and apply DEC-2: minimal CI
 **Owner:** Deepak or Claude. **Prerequisites:** DEC-2 approved, ENG-004.
