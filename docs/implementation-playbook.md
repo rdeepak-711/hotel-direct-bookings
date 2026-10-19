@@ -60,7 +60,7 @@ Arrows point from the module that imports to the module it depends on. The spec'
 ### [x] ENG-000 Repository assessment
 **Purpose:** know what exists before planning. **Completion evidence:** the table above. Done 19 Oct; updated the same evening after the reset to docs-only.
 
-### [ ] ENG-001 Confirm the local toolchain
+### [x] ENG-001 Confirm the local toolchain
 **Purpose:** know the Node and npm versions every later command assumes. **Prerequisites:** none. **Files:** none changed.
 **Verification:** `node -v && npm -v` → saved to `docs/evidence/ENG-001.txt` (create `docs/evidence/`). **Acceptance:** Node 20 or newer. **Evidence:** the file.
 
@@ -74,7 +74,7 @@ Arrows point from the module that imports to the module it depends on. The spec'
 ### [ ] ENG-005 Fixtures, written as each step needs them
 **Owner:** Deepak with Claude. **Purpose:** deterministic inputs so no test ever makes a network call. **Files:** `tests/fixtures/`. Written per step, not up front: `pagespeed.json` and `pagespeed-no-booking.json` (ENG-011), `home.html` (ENG-012), `llm-good.json` and `llm-hallucinated.json` (ENG-010/ENG-041), `google-search.json`, `google-place.json`, `google-nearby.json` (ENG-030/ENG-040), `tripadvisor-nearby.json`, `tripadvisor-details.json`, `tripadvisor-reviews.json` (ENG-032), `reviews.json` (ENG-010). Shapes follow the real API responses; review text in fixtures is invented, never copied from a real review. **Learning note:** a fixture is a frozen example of what the outside world sends. It is the only way to test an adapter without paying for the call, and the only way a test can be run on stage.
 
-### [ ] ENG-002 Decide and apply DEC-1: complete `.env.example`
+### [x] ENG-002 Decide and apply DEC-1: complete `.env.example`
 **Owner:** Deepak. **Prerequisites:** DEC-1 approved.
 **Steps:** list all nine variables with empty values, except `OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free`, `LLM_MODE=openrouter`, `SOURCES_MODE=live`, `REPORTS_PER_VISITOR_PER_HOUR=10`. Add a one-line comment per key saying where to get it. Commit.
 **Verification:** `grep -c '=' .env.example` → 9. **Learning note:** `.env.example` is the contract between the code and whoever deploys it; a missing name there is a silent production failure (the spec's own words about `PAGESPEED_API_KEY`). **Evidence:** the commit.

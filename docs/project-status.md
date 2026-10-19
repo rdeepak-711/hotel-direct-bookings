@@ -12,9 +12,7 @@ Phase 0. Documents only: spec, decisions, mental model, system design, the three
 
 | Track | Task | Owner | Blocked by |
 |---|---|---|---|
-| Engineering | ENG-001 confirm toolchain | Deepak | nothing |
 | Engineering | ENG-004 scaffold by hand (package.json, tsconfig, vitest config) | Deepak types, Claude dictates | ENG-001 |
-| Engineering | ENG-002 complete `.env.example` | Deepak | DEC-1 approval |
 | Engineering | ENG-003 minimal CI | Deepak or Claude | DEC-2 approval, ENG-004 |
 | Engineering | ENG-010 quote check: test file first, then `lib/types.ts`, `lib/quotes.ts` | tests: Deepak with Claude; code: Codex | ENG-004 |
 | Marketing | MKT-001 positioning sheet | Claude drafts, Deepak approves | nothing |
@@ -30,17 +28,18 @@ Phase 0. Documents only: spec, decisions, mental model, system design, the three
 | 19 Oct | Decision: v2 in TypeScript, v1 first | `88afeda` |
 | 19 Oct | System design doc; decision "detect, never drive" | `ee503e1` |
 | 19 Oct | ENG-000 repository assessment; playbooks and status tracker | `ecdc4e2` |
-| 19 Oct | Reset to documents only: tests, fixtures, scaffold removed (Deepak) | the commit after `ecdc4e2` |
+| 19 Oct | Reset to documents only: tests, fixtures, scaffold removed (Deepak) | `17199a8` |
+| 19 Oct | DEC-1 to DEC-4 decided per recommendation (Deepak); ENG-001 toolchain; ENG-002 `.env.example` complete (9 vars) | `docs/evidence/ENG-001.txt`, `.env.example` |
 
 ## Open decisions (need Deepak)
 
 | ID | Decision | Recommendation |
 |---|---|---|
-| DEC-1 | `.env.example` lists 2 of 9 variables and is on the do-not-change list | Deepak updates it to all nine (ENG-002) |
-| DEC-2 | No CI exists | One GitHub Actions workflow: tsc + vitest (ENG-003) |
-| DEC-3 | Lint and format | Defer to Phase 9; tsc is the gate |
-| DEC-4 | DNS check in safeFetch | After v1 is green (ENG-021) |
-| DEC-5 | Test count | Moot after the reset; counted per step |
+| DEC-1 | `.env.example` | **Decided 19 Oct:** all nine, done (ENG-002) |
+| DEC-2 | CI | **Decided 19 Oct:** yes, one workflow (ENG-003, after ENG-004) |
+| DEC-3 | Lint and format | **Decided 19 Oct:** defer to Phase 9 |
+| DEC-4 | DNS check in safeFetch | **Decided 19 Oct:** after v1 is green (ENG-021) |
+| DEC-5 | Test count | Moot |
 
 ## Blocked tasks
 
