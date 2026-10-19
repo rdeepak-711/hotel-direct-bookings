@@ -62,7 +62,7 @@ Not deployed. No Vercel project linked. Google Cloud quota on the Places key: no
 
 ## Public content awaiting approval
 
-Two drafts in `docs/x-queue.md`, awaiting Deepak: MKT-DEC6 (prompt-injection guard, needs the DEC-6 screenshot) and MKT-ENG010 ("the model proposes, code verifies", needs the passing-tests screenshot).
+Two drafts in `docs/x-queue.md`, awaiting Deepak: MKT-DEC6 (prompt-injection guard, needs the DEC-6 screenshot) and MKT-ENG010 published 20 Oct: https://x.com/rDeepak_ACEz/status/2112254944627810622
 
 ## Known limitations (carried from `docs/system-design.html` §13)
 

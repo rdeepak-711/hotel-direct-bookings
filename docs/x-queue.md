@@ -31,7 +31,7 @@ Lengths: post 1 = 275 chars, post 2 = 217 chars (em-dash counts as 1 on X).
 Note: no MKT item for this in docs/public-build-playbook.md and docs/claims.md does not exist yet (MKT-003 idea); claims checked against docs/decisions.md directly.
 
 ## MKT-ENG010 · ENG-010 · drafted 2026-10-20 00:14 IST
-Status: awaiting approval
+Status: published 2026-10-20 https://x.com/rDeepak_ACEz/status/2112254944627810622 (posted by Deepak as a 3-post thread with docs/evidence/ENG-010-tests.png)
 Audience: developers (LLM output verification); secondary: recruiters, hotel-tech founders
 Template: named rule, "The model proposes, code verifies" (findings.md, "Research, 19 Oct 2026"). Post 2 in the series; MKT-DEC6 covered the tools-off guard, this one covers quote verification only.
 Post:
