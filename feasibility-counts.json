@@ -2,51 +2,51 @@
  "date": "2026-10-18",
  "hotels": [
   [
-   "The Press Hotel, Autograph Collection",
+   "hotel-01",
    5
   ],
   [
-   "The Francis Hotel",
+   "hotel-02",
    5
   ],
   [
-   "Blind Tiger Portland \u2013 Danforth Street",
+   "hotel-03",
    5
   ],
   [
-   "Blind Tiger Portland \u2013 Carleton Street",
+   "hotel-04",
    5
   ],
   [
-   "Inn at Portland",
+   "hotel-05",
    5
   ],
   [
-   "Portland Harbor Hotel",
+   "hotel-06",
    5
   ],
   [
-   "Hilton Garden Inn Portland Downtown Waterfront",
+   "hotel-07",
    5
   ],
   [
-   "Inn at St John",
+   "hotel-08",
    5
   ],
   [
-   "Portland Regency Hotel & Spa",
+   "hotel-09",
    5
   ],
   [
-   "Hyatt Place Portland Downtown-Old Port Square",
+   "hotel-10",
    5
   ],
   [
-   "Cambria Hotel Portland Downtown Old Port",
+   "hotel-11",
    5
   ],
   [
-   "Holiday Inn Portland-By The Bay",
+   "hotel-12",
    5
   ]
  ],
@@ -79,5 +79,6 @@
   "parking": 3,
   "fees/price": 3,
   "clean": 7
- }
+ },
+ "note": "Hotel names replaced with ids on 2026-10-20 before the repo went public; Google's terms allow storing place ids only."
 }
