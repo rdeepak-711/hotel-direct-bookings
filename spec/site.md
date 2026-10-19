@@ -8,7 +8,7 @@ A Next.js web tool: type a US hotel's name, pick it from a list, and get a one-p
 
 **The two parts that are new, not a showcase of existing data:** (1) the **gap check**: questions guests raised in reviews that the hotel's own website never answers; (2) the **neighbour comparison**: every number shown against the 5 nearest hotels, so "mobile speed 38" becomes "38 against your neighbours' 76". Everything else on the page is context for those two. Plain-words plan: `docs/plan.html`. Research: `findings.md`.
 
-**Out of scope:** price comparison with booking sites; batch mode for many hotels (roadmap); accounts, saved reports, database; PDF export; hotels outside the US; voice; the `claude -p` wrapper (optional, last, see step 10).
+**Out of scope:** price comparison with booking sites; batch mode for many hotels (roadmap); accounts, saved reports, database; PDF export; hotels outside the US; voice.
 
 Test command: `npx vitest run`
 
@@ -29,7 +29,7 @@ Do not change (once written): `tests/**`, `spec/**`, `docs/plan.html`, `docs/sys
 
 ## Environment variables
 
-`GOOGLE_PLACES_API_KEY`, `TRIPADVISOR_API_KEY`, `PAGESPEED_API_KEY` (required in live mode since 19 Oct: without a key the API is heavily throttled and the website section silently degrades), `PARTNER_TOKEN` (optional; when empty the partner audience is disabled), `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` (demo model, default `meta-llama/llama-3.3-70b-instruct:free`), `LLM_MODE` (`openrouter` default | `fake`), `SOURCES_MODE` (`live` default | `fixture`), `REPORTS_PER_VISITOR_PER_HOUR` (default 10). Keys are read only on the server. Never send any of them to the browser.
+`GOOGLE_PLACES_API_KEY`, `TRIPADVISOR_API_KEY`, `PAGESPEED_API_KEY` (required in live mode since 19 Oct: without a key the API is heavily throttled and the website section silently degrades), `PARTNER_TOKEN` (optional; when empty the partner audience is disabled), `OPENROUTER_API_KEY` and `OPENROUTER_MODEL` (demo model, default `meta-llama/llama-3.3-70b-instruct:free`), `LLM_MODE` (`openrouter` default | `fake` | `claude-cli`, local only, DEC-6), `SOURCES_MODE` (`live` default | `fixture`), `REPORTS_PER_VISITOR_PER_HOUR` (default 10). Keys are read only on the server. Never send any of them to the browser.
 
 ## Shared types (`lib/types.ts`)
 
@@ -165,7 +165,7 @@ All source functions take `{ fetchImpl?: typeof fetch }` and read keys from `pro
 
 - `README.md`: what it is, how to run (fixture preview and live), env vars, the security calls from `docs/plan.html` section 6, "Results" left empty for Deepak's live runs. No invented numbers.
 - `docs/decisions.md`, `docs/flow.md`, `docs/mental-model.md` per the project rules.
-- Optional, in this order, only if time remains: (a) Tripadvisor source (step 7's `sources/tripadvisor.ts` and its tests already exist; wire it into the pipeline); (b) `lib/llm-claude-cli.ts` wrapping `claude -p` for local use (`LLM_MODE=claude-cli`).
+- Optional, only if time remains: the Tripadvisor source (step 7's `sources/tripadvisor.ts` and its tests already exist; wire it into the pipeline). The `claude -p` wrapper moved to step 9 on 19 Oct (DEC-6).
 - `tests/sources.test.ts` includes Tripadvisor tests. Build the Tripadvisor client in step 7 (it is small), but wiring it into the pipeline and the page is the optional part.
 
 ## Done means

@@ -177,7 +177,7 @@ npx tsc --noEmit
 
 ### [ ] ENG-041 Step 9: `lib/llm.ts`
 **Prerequisites:** ENG-010. **Tests:** `tests/llm.test.ts`, written first from the step. **Spec:** step 9.
-**Steps:** `LLMClient`, `FakeLLM`, `OpenRouterLLM` (errors never contain the key), `buildThemesPrompt` (review text is data, not instructions), `parseThemesJson` (strict; strip one fence), `extractThemes` (one retry, then throw containing "parse"; verify; headline only if praise survived).
+**Steps:** `LLMClient`, `FakeLLM`, `OpenRouterLLM` (errors never contain the key), `ClaudeCliLLM` in `lib/llm-claude-cli.ts` (DEC-6: spawns `claude -p --tools "" --strict-mcp-config --output-format json`, prompt on stdin, throws if `process.env.VERCEL` is set; tested with a fake spawner, never the real CLI), `buildThemesPrompt` (review text is data, not instructions), `parseThemesJson` (strict; strip one fence), `extractThemes` (one retry, then throw containing "parse"; verify; headline only if praise survived).
 **Verification:** `npx vitest run tests/llm.test.ts && npx tsc --noEmit`.
 **Risks:** the hallucinated fixture must produce drops, not errors. **Learning note:** temperature 0 and a strict parser are the two cheapest reliability wins with any model. Retrying once on a parse failure is the third. Everything beyond that (judge models, multi-agent) was considered and rejected for v1 in `decisions.md`.
 **Public-build:** MKT-006 pairs with this one.

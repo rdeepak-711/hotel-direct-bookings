@@ -60,6 +60,8 @@
 
 ## 2026-10-18 · Model access: OpenRouter demo key, viewer's own key, fake for tests; `claude -p` local-only and optional
 
+**⚠️ Partly reversed 2026-10-19 (DEC-6, below):** `claude -p` is no longer optional and last; it is the first real model used, for local testing and demos. OpenRouter, BYOK and the fake are unchanged.
+
 **Why (Deepak):** build locally on the Claude subscription, ship BYOK via OpenRouter, demo on free models. Cost: free models cap at 50 requests a day (1,000 after a one-time $10); the quote check matters more with weaker models. The viewer's key never touches the server.
 
 ## 2026-10-18 · No outreach to hotel owners
@@ -145,3 +147,14 @@
 **Why:** driving a third party's reservation system with a bot is the same category of problem as scraping Google or Tripadvisor (see "Real APIs only"), it adds 30–60 s per run, and the question the report answers is "is there a direct path" rather than "how good is the path". Grading the flow is a day-60 feature done with the hotel's consent, alongside the Google Business Profile connection.
 
 **Cost:** a hotel with a Book Now button that leads to a broken or empty engine gets no finding for it. The line for the CEO call: "I detect the engine, I don't drive it."
+
+## 2026-10-19 · DEC-6: `claude -p` first for local work, OpenRouter for anything public
+
+**Decided (Deepak):** three stages for the model. (1) Local testing and the clips shown on X run on `claude -p` through Deepak's Claude Code subscription (`LLM_MODE=claude-cli`). (2) Before publishing, the same report is run once on the OpenRouter free model, so the public version is checked on the model it will actually use. (3) The public site runs on OpenRouter (server demo key or the viewer's own key). `FakeLLM` stays the only model in tests. `lib/llm-claude-cli.ts` moves from spec step 13b ("optional, last") into ENG-041, built alongside `OpenRouterLLM` behind the same `LLMClient` interface.
+
+**Considered:** the 18 Oct order (OpenRouter first, `claude -p` optional at the end); OpenRouter only.
+
+**Why:** the subscription is already paid for, so building on it costs nothing extra and avoids the free tier's 50 requests a day while iterating. A stronger model also makes early demos readable.
+
+**Cost:** (a) A demo filmed on `claude -p` cannot be reproduced by anyone who clones the repo, and the free OpenRouter model is weaker, so its themes will differ and more quotes may be dropped. Any post that shows output must say which model produced it. (b) `claude-cli` must never run on Vercel: the client refuses to start when `process.env.VERCEL` is set, and the route never chooses it on its own. (c) Review text is untrusted input going into an agentic CLI, so the call runs with every tool off and no MCP servers (`claude -p --tools "" --strict-mcp-config --output-format json`); without that, a review that says "run this command" is a prompt-injection path into Deepak's machine. (d) The fixture preview and CI are unaffected, because they use `LLM_MODE=fake`.
+

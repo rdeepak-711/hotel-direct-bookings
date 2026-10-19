@@ -30,6 +30,7 @@ Phase 0. Documents only: spec, decisions, mental model, system design, the three
 | 19 Oct | ENG-000 repository assessment; playbooks and status tracker | `ecdc4e2` |
 | 19 Oct | Reset to documents only: tests, fixtures, scaffold removed (Deepak) | `17199a8` |
 | 19 Oct | DEC-1 to DEC-4 decided per recommendation (Deepak); ENG-001 toolchain; ENG-002 `.env.example` complete (9 vars) | `docs/evidence/ENG-001.txt`, `.env.example` |
+| 19 Oct | DEC-6 recorded: `claude -p` first locally, with tools off and refused on Vercel | `docs/decisions.md` |
 
 ## Open decisions (need Deepak)
 
@@ -40,6 +41,7 @@ Phase 0. Documents only: spec, decisions, mental model, system design, the three
 | DEC-3 | Lint and format | **Decided 19 Oct:** defer to Phase 9 |
 | DEC-4 | DNS check in safeFetch | **Decided 19 Oct:** after v1 is green (ENG-021) |
 | DEC-5 | Test count | Moot |
+| DEC-6 | Model order | **Decided 19 Oct:** `claude -p` locally first, OpenRouter free model before publishing, OpenRouter public; wrapper moves into ENG-041 |
 
 ## Blocked tasks
 
