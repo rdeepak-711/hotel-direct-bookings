@@ -1,0 +1,360 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direct Booking Check: system design</title>
+<meta name="description" content="System design of Direct Booking Check v1: requirements, architecture, request flow, API contracts, security, reliability, scale, and what is answered versus open.">
+<style>
+  :root {
+    --bg: #faf9f6; --fg: #1d1d1b; --muted: #5f5e59; --line: #e2dfd7; --card: #ffffff;
+    --accent: #0b5fff; --good: #1f7a4d; --warn: #b06400; --bad: #c0392b; --code: #f1efe9;
+    --maxw: 980px;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #141413; --fg: #ecebe6; --muted: #a39f95; --line: #2d2c29; --card: #1d1d1b;
+      --accent: #7aa7ff; --good: #5fcf8f; --warn: #f0a63a; --bad: #ff7b6b; --code: #23221f;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #141413; --fg: #ecebe6; --muted: #a39f95; --line: #2d2c29; --card: #1d1d1b;
+    --accent: #7aa7ff; --good: #5fcf8f; --warn: #f0a63a; --bad: #ff7b6b; --code: #23221f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--fg); font: 16px/1.55 -apple-system, "Segoe UI", Inter, Roboto, sans-serif; }
+  main { max-width: var(--maxw); margin: 0 auto; padding: 32px 16px 80px; }
+  h1 { font-size: 2rem; line-height: 1.15; margin: 0 0 6px; letter-spacing: -0.01em; }
+  h2 { font-size: 1.35rem; margin: 44px 0 12px; padding-top: 16px; border-top: 1px solid var(--line); }
+  h3 { font-size: 1.05rem; margin: 22px 0 8px; }
+  p, li { max-width: 72ch; }
+  .lede { color: var(--muted); margin: 0 0 20px; }
+  .meta { font-size: 0.85rem; color: var(--muted); }
+  code, pre { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.86em; }
+  code { background: var(--code); padding: 1px 5px; border-radius: 4px; }
+  pre { background: var(--code); padding: 12px 14px; border-radius: 8px; overflow-x: auto; }
+  table { border-collapse: collapse; width: 100%; margin: 12px 0 8px; font-size: 0.92rem; }
+  th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+  th { font-weight: 600; color: var(--muted); font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.04em; }
+  .wrap { overflow-x: auto; }
+  .tag { display: inline-block; font-size: 0.74rem; font-weight: 600; padding: 1px 7px; border-radius: 999px; border: 1px solid; }
+  .ok { color: var(--good); border-color: var(--good); }
+  .gap { color: var(--bad); border-color: var(--bad); }
+  .part { color: var(--warn); border-color: var(--warn); }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 12px; }
+  nav.toc { font-size: 0.9rem; columns: 2; column-gap: 24px; margin: 14px 0 0; }
+  nav.toc a { color: var(--accent); text-decoration: none; display: block; padding: 2px 0; }
+  figure { margin: 16px 0; }
+  figure svg { width: 100%; height: auto; display: block; }
+  figcaption { font-size: 0.85rem; color: var(--muted); margin-top: 6px; }
+  .svg-box { fill: var(--card); stroke: var(--line); }
+  .svg-ext { fill: var(--code); stroke: var(--line); }
+  .svg-t { fill: var(--fg); font: 13px -apple-system, "Segoe UI", sans-serif; }
+  .svg-s { fill: var(--muted); font: 11px -apple-system, "Segoe UI", sans-serif; }
+  .svg-l { stroke: var(--muted); fill: none; stroke-width: 1.4; marker-end: url(#arr); }
+  .svg-a { fill: var(--muted); }
+  .q { font-weight: 600; }
+  @media (max-width: 600px) { nav.toc { columns: 1; } h1 { font-size: 1.6rem; } }
+</style>
+</head>
+<body>
+<main>
+<h1>Direct Booking Check: system design</h1>
+<p class="lede">The v1 design, written the way a system design interview asks for it: requirements, the boxes and the arrows, the request path, the contracts, and the calls on security, failure and scale. Each section ends with what is answered and what is not.</p>
+<p class="meta">Written 19 Oct 2026 from <code>spec/site.md</code>, <code>docs/decisions.md</code> and <code>docs/mental-model.md</code>, before the code exists. Status tags: <span class="tag ok">answered</span> has a decision and a test or a written rule; <span class="tag part">partial</span> has a decision but no proof yet; <span class="tag gap">open</span> has no answer in v1.</p>
+
+<nav class="toc">
+  <a href="#req">1. Requirements</a>
+  <a href="#arch">2. Architecture</a>
+  <a href="#flow">3. One report, end to end</a>
+  <a href="#backend">4. Backend components</a>
+  <a href="#api">5. API contracts</a>
+  <a href="#data">6. Data: stored, cached, passed through</a>
+  <a href="#security">7. Security</a>
+  <a href="#reliability">8. Reliability and failure</a>
+  <a href="#scale">9. Scale and cost</a>
+  <a href="#observe">10. Observability</a>
+  <a href="#frontend">11. Frontend</a>
+  <a href="#interview">12. The interview sheet</a>
+  <a href="#gaps">13. Open gaps, in one place</a>
+</nav>
+
+<h2 id="req">1. Requirements</h2>
+<h3>Functional</h3>
+<div class="wrap"><table>
+<tr><th>#</th><th>Requirement</th><th>Where it is proven</th><th></th></tr>
+<tr><td>F1</td><td>Search a US hotel by name and pick one from a list.</td><td>Step 7 <code>searchHotels</code>, <code>regionCode: "US"</code>, address must end in USA; <code>tests/sources.test.ts</code>, <code>tests/api.test.ts</code></td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>F2</td><td>Produce one report page with a 0–100 score, three sub-scores, and the top 3 fixes first.</td><td>Steps 6 and 8; <code>tests/score.test.ts</code>, <code>tests/report.test.ts</code> (fixture gives 47)</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>F3</td><td>Gap check: questions guests ask in reviews that the hotel's own site never answers.</td><td>Step 4 plus home page and up to 4 internal pages; <code>tests/gaps.test.ts</code></td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>F4</td><td>Neighbour comparison against the 5 nearest hotels, counted and never named, no neighbour reviews fetched.</td><td>Step 5; <code>tests/compare.test.ts</code> (field mask excludes reviews)</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>F5</td><td>AI reads reviews for praise, questions, a headline and ad lines; every quote verified in code, invented quotes dropped and counted.</td><td>Steps 1 and 9; <code>tests/quotes.test.ts</code>, <code>tests/llm.test.ts</code></td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>F6</td><td>Two audiences: public (generic categories) and partner (Hotelzify product names), server-gated by a token.</td><td>Step 11 partner gate; <code>tests/api.test.ts</code> asserts public JSON never says Hotelzify</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>F7</td><td>Viewer may bring their own OpenRouter key.</td><td>Step 11 <code>byok</code>; response never echoes the key</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>F8</td><td>Tripadvisor rating, rank and 3 reviews.</td><td>Client and tests exist (step 7); pipeline wiring is optional (step 13)</td><td><span class="tag part">partial</span></td></tr>
+<tr><td>F9</td><td>Batch mode: paste 50 hotels, get a ranked prospect list.</td><td>Out of scope, day-60 roadmap</td><td><span class="tag gap">open</span></td></tr>
+</table></div>
+
+<h3>Non-functional</h3>
+<div class="wrap"><table>
+<tr><th>#</th><th>Requirement</th><th>Target and mechanism</th><th></th></tr>
+<tr><td>N1</td><td>Latency</td><td>Under 60 s wall time per report. Everything after the place lookup runs in parallel; neighbour PageSpeed budget 50 s; extra pages budget 20 s; route <code>maxDuration = 120</code>.</td><td><span class="tag part">partial</span> (no latency test; the run log measures it)</td></tr>
+<tr><td>N2</td><td>Graceful degradation</td><td>Only the Google place lookup is fatal. Every other source fails alone and its section says "not available".</td><td><span class="tag ok">answered</span> (<code>tests/pipeline.test.ts</code>)</td></tr>
+<tr><td>N3</td><td>Correctness of AI output</td><td>No quote reaches the page unless it is a substring of the cited review. Counts are recomputed in code.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>N4</td><td>Privacy and terms</td><td>Review text never stored; Google attribution and link on every quote; neighbours never named.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>N5</td><td>Cost ceiling</td><td>Hard daily quota on the Google key in Google Cloud. App limiter 10 reports per visitor per hour, best effort. 10-minute cache on PageSpeed and nearby.</td><td><span class="tag ok">answered</span> (quota is configured outside the repo)</td></tr>
+<tr><td>N6</td><td>Security of outbound fetches</td><td><code>safeFetch</code>: http/https only, private ranges blocked, every redirect hop re-checked, 3 redirects, 8 s, 2 MB.</td><td><span class="tag ok">answered</span> (<code>tests/safeFetch.test.ts</code>)</td></tr>
+<tr><td>N7</td><td>Availability / uptime SLO</td><td>None stated. Vercel's platform availability is inherited. No health check, no alerting.</td><td><span class="tag gap">open</span></td></tr>
+<tr><td>N8</td><td>Testability</td><td><code>SOURCES_MODE=fixture</code> and <code>LLM_MODE=fake</code> make every run deterministic and offline. 11 test files, ~145 tests.</td><td><span class="tag ok">answered</span></td></tr>
+</table></div>
+
+<h2 id="arch">2. Architecture</h2>
+<p>Three zones: the visitor's browser, our server (Vercel functions), and the outside services. The server is the only thing that talks to the outside. There is no database.</p>
+<figure>
+<svg viewBox="0 0 960 420" role="img" aria-label="Architecture: browser calls two Vercel routes; the report route runs the pipeline which calls Google Places, PageSpeed, the hotel site, Tripadvisor and OpenRouter; a 10-minute in-memory cache sits beside the pipeline">
+  <defs><marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0,0 L10,5 L0,10 z" class="svg-a"/></marker></defs>
+  <!-- browser -->
+  <rect x="20" y="40" width="200" height="120" rx="10" class="svg-box"/>
+  <text x="120" y="66" text-anchor="middle" class="svg-t" font-weight="600">Visitor's browser</text>
+  <text x="120" y="90" text-anchor="middle" class="svg-s">/ search page</text>
+  <text x="120" y="108" text-anchor="middle" class="svg-s">/report?placeId= page</text>
+  <text x="120" y="130" text-anchor="middle" class="svg-s">sessionStorage: viewer's own key (optional)</text>
+  <!-- server -->
+  <rect x="290" y="20" width="360" height="380" rx="12" class="svg-box"/>
+  <text x="470" y="44" text-anchor="middle" class="svg-t" font-weight="600">Our server: Vercel functions (Next.js)</text>
+  <rect x="310" y="60" width="150" height="46" rx="8" class="svg-box"/>
+  <text x="385" y="79" text-anchor="middle" class="svg-t">GET /api/search</text>
+  <text x="385" y="96" text-anchor="middle" class="svg-s">?q= → searchHotels</text>
+  <rect x="480" y="60" width="150" height="46" rx="8" class="svg-box"/>
+  <text x="555" y="79" text-anchor="middle" class="svg-t">POST /api/report</text>
+  <text x="555" y="96" text-anchor="middle" class="svg-s">rate limit → partner gate → LLM pick</text>
+  <rect x="310" y="130" width="320" height="150" rx="8" class="svg-box"/>
+  <text x="470" y="150" text-anchor="middle" class="svg-t">lib/pipeline.ts · runCheck()</text>
+  <text x="470" y="172" text-anchor="middle" class="svg-s">getPlace (fatal) → 5 jobs in parallel</text>
+  <text x="470" y="192" text-anchor="middle" class="svg-s">website · safeFetch pages · neighbours+PSI · tripadvisor · AI+verify</text>
+  <text x="470" y="214" text-anchor="middle" class="svg-s">→ findGaps → computeScore → buildReport</text>
+  <text x="470" y="240" text-anchor="middle" class="svg-s">pure modules: quotes · website · gaps · compare · score · report</text>
+  <text x="470" y="258" text-anchor="middle" class="svg-s">IO modules: sources/* · safeFetch · llm · cache · ratelimit</text>
+  <rect x="310" y="300" width="150" height="40" rx="8" class="svg-box"/>
+  <text x="385" y="317" text-anchor="middle" class="svg-t">TtlCache (10 min)</text>
+  <text x="385" y="332" text-anchor="middle" class="svg-s">psi:&lt;url&gt; · nearby:&lt;placeId&gt;</text>
+  <rect x="480" y="300" width="150" height="40" rx="8" class="svg-box"/>
+  <text x="555" y="317" text-anchor="middle" class="svg-t">RateLimiter</text>
+  <text x="555" y="332" text-anchor="middle" class="svg-s">per x-forwarded-for, 10/hour</text>
+  <text x="470" y="372" text-anchor="middle" class="svg-s">env: Google, PageSpeed, Tripadvisor, OpenRouter keys · PARTNER_TOKEN · never to the browser</text>
+  <!-- external -->
+  <g>
+    <rect x="730" y="30" width="200" height="40" rx="8" class="svg-ext"/><text x="830" y="48" text-anchor="middle" class="svg-t">Google Places API (New)</text><text x="830" y="62" text-anchor="middle" class="svg-s">searchText · place · searchNearby</text>
+    <rect x="730" y="90" width="200" height="40" rx="8" class="svg-ext"/><text x="830" y="108" text-anchor="middle" class="svg-t">Google PageSpeed API</text><text x="830" y="122" text-anchor="middle" class="svg-s">mobile · 10–45 s · needs key</text>
+    <rect x="730" y="150" width="200" height="40" rx="8" class="svg-ext"/><text x="830" y="168" text-anchor="middle" class="svg-t">Hotel's own website</text><text x="830" y="182" text-anchor="middle" class="svg-s">home + up to 4 pages, via safeFetch</text>
+    <rect x="730" y="210" width="200" height="40" rx="8" class="svg-ext"/><text x="830" y="228" text-anchor="middle" class="svg-t">Tripadvisor Terra API</text><text x="830" y="242" text-anchor="middle" class="svg-s">optional in v1</text>
+    <rect x="730" y="270" width="200" height="40" rx="8" class="svg-ext"/><text x="830" y="288" text-anchor="middle" class="svg-t">OpenRouter</text><text x="830" y="302" text-anchor="middle" class="svg-s">demo key or viewer's key · temp 0</text>
+  </g>
+  <!-- arrows -->
+  <path d="M220,80 L310,80" class="svg-l"/>
+  <path d="M220,100 C260,100 260,83 480,83" class="svg-l"/>
+  <path d="M555,106 L555,130" class="svg-l"/>
+  <path d="M385,106 C385,120 700,40 730,50" class="svg-l"/>
+  <path d="M630,160 L730,52" class="svg-l"/>
+  <path d="M630,180 L730,110" class="svg-l"/>
+  <path d="M630,200 L730,170" class="svg-l"/>
+  <path d="M630,220 L730,230" class="svg-l"/>
+  <path d="M630,240 L730,290" class="svg-l"/>
+</svg>
+<figcaption>No database. A report is computed, returned, and gone. The cache holds only our own derived numbers and place ids, which Google's terms allow.</figcaption>
+</figure>
+
+<div class="card">
+<p class="q">Why serverless and no database, said once.</p>
+<p>Google's policy forbids storing review text, the report is a point-in-time check, and a store of guest-written text would be one more thing to leak. The cost is that nothing is remembered between runs beyond ten minutes, and the in-memory limiter and cache reset whenever Vercel spins a new instance. That is why the real cost guard is the Google Cloud quota, not app code.</p>
+</div>
+
+<h2 id="flow">3. One report, end to end</h2>
+<p>The path a single <code>POST /api/report</code> takes, with the budget each stage gets. Times are the spec's limits, not measurements.</p>
+<div class="wrap"><table>
+<tr><th>Stage</th><th>What happens</th><th>Budget</th><th>On failure</th></tr>
+<tr><td>0. Route</td><td>400 without <code>placeId</code>. Rate limit by first <code>x-forwarded-for</code> IP. Partner audience only if <code>partnerToken</code> matches <code>PARTNER_TOKEN</code>. Pick LLM: fake, viewer's key, or demo key.</td><td>ms</td><td>429 when the limiter refuses</td></tr>
+<tr><td>1. Place</td><td><code>getPlace(placeId)</code>: listing, coordinates, 5 reviews.</td><td>10 s</td><td><strong>Fatal.</strong> Log line with <code>failedAt: "google"</code>, then rethrow.</td></tr>
+<tr><td>2a. Pages</td><td>If the website is real: <code>safeFetch</code> home → <code>extractInternalLinks</code> (FAQ, policies, rooms…) → fetch up to 4 concurrently.</td><td>8 s each; 20 s for extras</td><td><code>pageText = null</code>, <code>siteText = "unreadable"</code></td></tr>
+<tr><td>2b. PageSpeed</td><td><code>runPageSpeed(website)</code> → <code>analyzeLighthouse</code>. Cached 10 min by URL.</td><td>45 s</td><td>Fall back to <code>analyzeHtml</code> on the home page, else website null</td></tr>
+<tr><td>2c. Neighbours</td><td><code>nearbyHotels</code> (cached 10 min by placeId) → PageSpeed on each neighbour with a site → <code>benchmark</code>.</td><td>50 s for all neighbour PSI runs</td><td>Late neighbours get <code>mobileScore: null</code>; nearby failure → comparison null</td></tr>
+<tr><td>2d. Tripadvisor</td><td>Optional: <code>findLocation</code> by coordinates + name similarity → details + reviews.</td><td>10 s each</td><td>null</td></tr>
+<tr><td>2e. AI</td><td><code>buildThemesPrompt</code> → one call at temperature 0 → <code>parseThemesJson</code> (one retry) → <code>verifyThemes</code>.</td><td>one retry</td><td><code>themes = null</code>, AI section unavailable</td></tr>
+<tr><td>3. Gaps</td><td><code>findGaps(themes.questions, pageText)</code>. Under 200 characters of text → "unknown", never "not mentioned".</td><td>ms</td><td>null when no themes</td></tr>
+<tr><td>4. Score</td><td><code>computeScore</code>: website 40, messaging 30, listing 30, weights renormalised over non-null sub-scores.</td><td>ms</td><td>null overall only when all three are null</td></tr>
+<tr><td>5. Report</td><td><code>buildReport</code>: findings → top 3 by severity, support count, rule order; quotes enriched with author, date, Google Maps link. One JSON object.</td><td>ms</td><td></td></tr>
+<tr><td>6. Log</td><td>Exactly one <code>RunLog</code> line per run: sections, website source, quotes offered and dropped, neighbours, wall time. Never a key, a review, a name, an id or an IP.</td><td>ms</td><td>A throwing logger must not break the run</td></tr>
+</table></div>
+<p>Stages 2a to 2e run concurrently, so the wall time is set by the slowest, which is PageSpeed. The page shows a loading state because of it.</p>
+
+<h2 id="backend">4. Backend components</h2>
+<p>Pure modules take data and return data, with no network, so they are the easiest to test and the first to build. IO modules wrap one outside thing each.</p>
+<div class="wrap"><table>
+<tr><th>Module</th><th>Kind</th><th>Responsibility</th><th>Test file</th></tr>
+<tr><td><code>lib/quotes.ts</code></td><td>pure</td><td>Normalise and substring-check every AI quote against its review; recompute theme counts; record drops.</td><td>quotes</td></tr>
+<tr><td><code>lib/website.ts</code></td><td>pure</td><td>From a PageSpeed result or raw HTML: mobile score, HTTPS, viewport, tap targets, booking engine vendor and domain, Book Now, tap-to-call, "is this a real website".</td><td>website</td></tr>
+<tr><td><code>lib/safeFetch.ts</code></td><td>IO</td><td>The locked-down outbound fetch (SSRF guard, redirects, timeout, size cap).</td><td>safeFetch</td></tr>
+<tr><td><code>lib/gaps.ts</code></td><td>pure</td><td>Page text extraction, topic keywords with excludes, internal link picking, readability threshold, gap verdicts.</td><td>gaps</td></tr>
+<tr><td><code>lib/compare.ts</code></td><td>IO + pure</td><td>Nearby search without reviews; averages, ranks and flag counts against neighbours.</td><td>compare</td></tr>
+<tr><td><code>lib/score.ts</code></td><td>pure</td><td>Three sub-scores and the weighted total.</td><td>score</td></tr>
+<tr><td><code>lib/match.ts</code></td><td>pure</td><td>Name similarity (token Jaccard with a subset bonus) for Tripadvisor matching.</td><td>sources</td></tr>
+<tr><td><code>lib/sources/*.ts</code></td><td>IO</td><td>Google Places, PageSpeed, Tripadvisor clients; fixture versions of all of them.</td><td>sources</td></tr>
+<tr><td><code>lib/llm.ts</code></td><td>IO + pure</td><td>LLM client interface, fake and OpenRouter implementations, prompt builder, strict JSON parser, extract-then-verify.</td><td>llm</td></tr>
+<tr><td><code>lib/report.ts</code></td><td>pure</td><td>Finding rules, top fixes, quote enrichment, audience labels, notices and footnote.</td><td>report</td></tr>
+<tr><td><code>lib/pipeline.ts</code></td><td>orchestration</td><td><code>runCheck</code>: the order, the parallelism, the budgets, the cache, the log line.</td><td>pipeline</td></tr>
+<tr><td><code>lib/cache.ts</code></td><td>pure</td><td>TTL cache with max entries and oldest-first eviction.</td><td>pipeline</td></tr>
+<tr><td><code>lib/ratelimit.ts</code></td><td>pure</td><td>Fixed-window counter per key.</td><td>api</td></tr>
+<tr><td><code>app/api/*/route.ts</code></td><td>edge of the server</td><td>Validation, rate limit, partner gate, LLM selection, run the pipeline, return JSON.</td><td>api</td></tr>
+</table></div>
+
+<h2 id="api">5. API contracts</h2>
+<h3>Internal routes</h3>
+<pre>GET /api/search?q=harborside
+→ 200 { results: [{ placeId, name, address, rating, reviewCount }] }
+→ 400 when q is empty
+
+POST /api/report
+body: { placeId: string, audience?: "public" | "partner",
+        partnerToken?: string, byok?: { apiKey: string, model: string } }
+→ 200 Report (JSON; never contains an API key or a full review text)
+→ 400 without placeId
+→ 429 when the visitor exceeds REPORTS_PER_VISITOR_PER_HOUR (default 10)
+→ 5xx when the Google place lookup fails
+maxDuration = 120</pre>
+<p>There is no authentication on either route. The public tool is meant to be open; the partner view is the only gated thing, and the gate is a shared secret compared on the server.</p>
+
+<h3>Outbound calls</h3>
+<div class="wrap"><table>
+<tr><th>Service</th><th>Call</th><th>Fields asked for</th><th>Timeout</th><th>Cached</th><th>Cost note</th></tr>
+<tr><td>Google Places</td><td>POST <code>places:searchText</code></td><td>id, displayName, formattedAddress, rating, userRatingCount; <code>regionCode: "US"</code>, max 8</td><td>10 s</td><td>no</td><td>per search</td></tr>
+<tr><td>Google Places</td><td>GET <code>places/{id}</code></td><td>listing fields + location + reviews (5)</td><td>10 s</td><td>no (policy)</td><td>the one reviews fetch per report</td></tr>
+<tr><td>Google Places</td><td>POST <code>places:searchNearby</code></td><td>lodging, 1.5 km, max 6; <strong>never</strong> reviews</td><td>10 s</td><td>10 min</td><td>one per report</td></tr>
+<tr><td>Google PageSpeed</td><td>GET <code>runPagespeed</code></td><td>mobile, performance category</td><td>45 s</td><td>10 min by URL</td><td>1 + up to 5 neighbours; free tier, key required</td></tr>
+<tr><td>Hotel website</td><td><code>safeFetch</code></td><td>home + up to 4 internal pages</td><td>8 s each, 20 s budget</td><td>no</td><td>free</td></tr>
+<tr><td>Tripadvisor</td><td>GET nearby, details, reviews</td><td>by coordinates; 3 reviews</td><td>10 s</td><td>no</td><td>optional</td></tr>
+<tr><td>OpenRouter</td><td>POST <code>chat/completions</code></td><td>one system + one user message, temperature 0</td><td>one retry on bad JSON</td><td>no</td><td>free models cap at 50/day on the demo key</td></tr>
+</table></div>
+
+<h2 id="data">6. Data: stored, cached, passed through</h2>
+<div class="grid">
+<div class="card"><p class="q">Stored</p><p>Nothing. No database, no file writes, no analytics. The only persistent output is the one-line run log in the platform's log stream, and it carries no identifiers.</p></div>
+<div class="card"><p class="q">Cached, 10 minutes, in memory</p><p>PageSpeed raw results keyed by URL and the nearby list keyed by place id. Both are our derived numbers plus place ids, which Google allows. Never place details, reviews or AI output.</p></div>
+<div class="card"><p class="q">Passed through and dropped</p><p>Review text (used for one prompt and one quote check), the viewer's own API key (one request, never logged), full page HTML (reduced to text, then dropped).</p></div>
+</div>
+<p>The shared types in <code>lib/types.ts</code> are the data model: <code>Hotel</code> and <code>Review</code> in, <code>WebsiteChecks</code>, <code>Gap</code>, <code>Comparison</code>, <code>VerifiedThemes</code> and <code>Score</code> in the middle, one <code>Report</code> out. The <code>Report</code> is the whole contract with the page; the page computes nothing.</p>
+
+<h2 id="security">7. Security</h2>
+<div class="wrap"><table>
+<tr><th>Threat</th><th>Control</th><th>Where</th><th></th></tr>
+<tr><td>SSRF: a Google listing points the server at an internal address</td><td>http/https only; localhost, <code>.local</code>, <code>.internal</code>, 127/8, 10/8, 172.16/12, 192.168/16, 169.254/16, IPv6 loopback and unique-local blocked; re-checked on every redirect hop; 3 hops; 8 s; 2 MB.</td><td><code>lib/safeFetch.ts</code>, <code>tests/safeFetch.test.ts</code></td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>DNS rebinding (host resolves to a private IP after the check)</td><td>Spec says "do a lookup in production if simple". Not tested.</td><td>safeFetch</td><td><span class="tag part">partial</span></td></tr>
+<tr><td>Prompt injection via review text</td><td>System prompt states review text is data; strict JSON schema; code-level quote verification means an injected review can at most quote itself.</td><td><code>lib/llm.ts</code>, <code>lib/quotes.ts</code></td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Server key leakage</td><td>Keys read only on the server; never in responses; error messages never contain a key.</td><td>sources, llm, api tests</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Viewer's key leakage</td><td>Lives in sessionStorage; sent only in the POST body; used once; never logged, stored or echoed. Test asserts no echo.</td><td><code>app/api/report</code>, <code>tests/api.test.ts</code></td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Partner view exposed to the public</td><td>Server compares <code>partnerToken</code> to <code>PARTNER_TOKEN</code>; disabled when the env var is empty; token never echoed.</td><td><code>app/api/report</code></td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Cost abuse: a shared link runs up the Google bill</td><td>Hard daily quota on the Google key (Google Cloud). App limiter 10/hour per IP, best effort.</td><td>Google Cloud console; <code>lib/ratelimit.ts</code></td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Abuse of the demo OpenRouter key</td><td>Free-model daily cap on the account; the same per-visitor limiter.</td><td>OpenRouter account</td><td><span class="tag part">partial</span> (no separate budget alert)</td></tr>
+<tr><td>Scraping or terms violations</td><td>Real APIs only; Google attribution and link on every quote; review text never stored; neighbours never named; booking engine detected, never driven.</td><td>decisions.md</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Input validation on the routes</td><td><code>placeId</code> required; <code>q</code> required. No schema validation of <code>byok</code> shape or string lengths.</td><td>api routes</td><td><span class="tag part">partial</span></td></tr>
+<tr><td>Transport</td><td>HTTPS by the platform (Vercel). No custom headers (CSP, HSTS) specified.</td><td>platform</td><td><span class="tag part">partial</span></td></tr>
+<tr><td>Dependency and supply chain</td><td>Four runtime and dev dependencies pinned. No audit step.</td><td>package.json</td><td><span class="tag gap">open</span></td></tr>
+</table></div>
+
+<h2 id="reliability">8. Reliability and failure</h2>
+<div class="wrap"><table>
+<tr><th>Failure</th><th>Behaviour</th><th>Visible as</th></tr>
+<tr><td>Google place lookup fails</td><td>The run fails. Log line, rethrow, 5xx.</td><td>Error page</td></tr>
+<tr><td>PageSpeed times out or throttles</td><td>Fall back to raw-HTML checks on the home page (mobile score null, website sub-score starts at 50).</td><td><code>websiteSource: "html"</code> in the log; "no data" on speed</td></tr>
+<tr><td>Hotel site unreachable</td><td><code>pageText = null</code>; gap check answers "unknown"; <code>site-unreadable</code> finding.</td><td>Report says it could not read the site</td></tr>
+<tr><td>Hotel site is JavaScript-only</td><td>Under 200 characters of text → treated as unreadable, never "not mentioned".</td><td>Same</td></tr>
+<tr><td>Listing's website is Facebook or a booking site</td><td>No fetch, no PageSpeed, website sub-score 0, <code>no-website</code> finding naming the host.</td><td>High finding</td></tr>
+<tr><td>Nearby search fails</td><td>Comparison null; findings use plain evidence without neighbour numbers.</td><td>Section "not available"</td></tr>
+<tr><td>A neighbour's PageSpeed is slow</td><td>Dropped at the 50 s budget; <code>mobileScore: null</code> for that one; basis shrinks.</td><td>Smaller "of" count</td></tr>
+<tr><td>AI returns bad JSON</td><td>One retry; then <code>themes = null</code>; praise, questions and gap sections unavailable; score renormalises over website and listing.</td><td>AI section "not available"</td></tr>
+<tr><td>AI invents a quote</td><td>Dropped, counted in <code>aiDropped</code> and the run log.</td><td><code>quotesDropped</code></td></tr>
+<tr><td>Vercel instance recycles</td><td>Cache and limiter reset. Only cost, not correctness, is affected.</td><td>Nothing</td></tr>
+<tr><td>Run exceeds 120 s</td><td>Platform kills it. Budgets are set to keep the sum under 60 s.</td><td>504</td></tr>
+</table></div>
+<p><span class="tag gap">open</span> No retries with backoff on the Google calls, no circuit breaker, no health endpoint, no alert when the fallback rate rises. The run log makes those rates measurable, which is the first step, but nobody is paged.</p>
+
+<h2 id="scale">9. Scale and cost</h2>
+<h3>What it is built for</h3>
+<p>Tens of reports a day from a shared link, plus a handful of runs for the Hotelzify challenge. At that volume the design is right: serverless scales to zero, the cache saves the repeat lookups, and the quota caps the bill.</p>
+<h3>Cost per report, today</h3>
+<div class="wrap"><table>
+<tr><th>Item</th><th>Per report</th><th>Note</th></tr>
+<tr><td>Google Places</td><td>1 text search (on the search page) + 1 place details with reviews + 1 nearby</td><td>Place details with reviews is the priced call. The daily quota bounds it.</td></tr>
+<tr><td>PageSpeed</td><td>1 + up to 5</td><td>Free with a key; throttled hard without one.</td></tr>
+<tr><td>OpenRouter</td><td>1 completion (2 on retry)</td><td>Free model on the demo key; the viewer's key otherwise.</td></tr>
+<tr><td>Compute</td><td>One function invocation up to ~60 s</td><td>Mostly waiting on the network.</td></tr>
+</table></div>
+<h3>What breaks first, and the fix at each step</h3>
+<div class="wrap"><table>
+<tr><th>At</th><th>What breaks</th><th>Change</th></tr>
+<tr><td>~50 reports/day on the demo key</td><td>OpenRouter free-model cap.</td><td>One-time $10 credit raises it to 1,000; or push viewers to BYOK.</td></tr>
+<tr><td>Many instances</td><td>In-memory limiter and cache are per instance, so limits are leaky and cache hits drop.</td><td>Move both to a shared store (Vercel KV or Upstash Redis): same interfaces, <code>TtlCache</code> and <code>RateLimiter</code> get a backing store.</td></tr>
+<tr><td>Long runs</td><td>A 60 s synchronous request is fragile: client timeouts, no progress, no retry.</td><td>Make the report asynchronous: POST returns a job id, work runs in a queue (Vercel Queues or a worker), the page polls or streams sections as they finish. The pipeline's per-section independence already fits this.</td></tr>
+<tr><td>Batch mode (50 hotels)</td><td>300 PageSpeed runs and 50 reviews fetches at once.</td><td>Queue with concurrency limits per external service; results persisted as derived numbers and place ids only, never review text.</td></tr>
+<tr><td>Google quota</td><td>The hard quota rejects the fiftieth-plus details call of the day.</td><td>Raise with billing alerts; cache the derived listing fields (not reviews) per place id for a day.</td></tr>
+</table></div>
+<p><span class="tag gap">open</span> None of the above is built. The honest answer in an interview: "v1 is synchronous and in-memory on purpose, and here is the path to async and shared state when volume asks for it."</p>
+
+<h2 id="observe">10. Observability</h2>
+<p>One structured log line per run, written by <code>runCheck</code> exactly once, success or failure:</p>
+<pre>{ "event": "report_run", "ok": true, "failedAt": null, "wallMs": 41230,
+  "sections": { "website": true, "comparison": true, "ai": true, "tripadvisor": false },
+  "websiteSource": "lighthouse", "siteText": "read", "pagesRead": 3,
+  "quotesOffered": 11, "quotesDropped": 1, "neighbours": 5 }</pre>
+<p>It answers the three questions that matter for the job: how often does PageSpeed fall back, how often does the AI invent a quote, how long does a run take. It deliberately omits keys, review text, the hotel name, the place id and the IP, so the log can be shared.</p>
+<p><span class="tag gap">open</span> No metrics dashboard, no tracing across the five parallel jobs, no alerting. Vercel's log stream is the only consumer. A hand check on 10 real hotels, recorded in the README, is the planned quality measurement.</p>
+
+<h2 id="frontend">11. Frontend</h2>
+<p>Two Next.js pages, both rendering what the server returns.</p>
+<ul>
+  <li><strong>/</strong>: search box → <code>GET /api/search</code> → results list → click → <code>/report?placeId=…</code>. Optional field for the viewer's own OpenRouter key, kept in sessionStorage, sent only in the report POST body. Footer states the tool is unaffiliated and stores no review text. Works at phone width.</li>
+  <li><strong>/report</strong>: loading state (PageSpeed can take 30 s) → half-ring gauge with three sub-scores → top 3 fixes → listing → website → gap check → neighbour comparison → praise with attributed quotes and Google Maps links → headline and ad lines → footnote. <code>?partner=&lt;token&gt;</code> is forwarded as <code>partnerToken</code>; the server decides. Layout reference is <code>docs/report-infographic.html</code>.</li>
+</ul>
+<p>No state management library, no client-side computation of the score, no tracking script. <span class="tag part">partial</span> No streaming: the page waits for the whole JSON.</p>
+
+<h2 id="interview">12. The interview sheet</h2>
+<p>The questions a system design round would ask about this, and the answer v1 has. Say the open ones as open.</p>
+<div class="wrap"><table>
+<tr><th>Question</th><th>Answer</th><th></th></tr>
+<tr><td>Walk me through a request.</td><td>Section 3. Place lookup is the only fatal step, five jobs in parallel, then gaps, score, report, one log line.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Where is the database?</td><td>There isn't one, by policy and by choice. Ten-minute cache of derived numbers only.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>How do you stop the model from making things up?</td><td>Code verifies every quote as a substring of the cited review and recomputes counts; the model never writes a finding or a score.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>What is genuinely new, not a dashboard?</td><td>Two cross-source inferences: the gap check and the neighbour comparison.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>How do you handle rate limiting on serverless?</td><td>Best-effort in-memory limiter, acknowledged as leaky; the real guard is the Google Cloud quota. Next step is a shared store.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>What about SSRF, you fetch arbitrary URLs?</td><td>safeFetch: scheme, private ranges, every redirect hop, 3 hops, 8 s, 2 MB. DNS rebinding is the known partial.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Why is the response 40 seconds?</td><td>PageSpeed. Everything else is parallel. The async-with-polling design is the next step and the pipeline is already section-independent.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>What happens when PageSpeed is down?</td><td>HTML fallback with a neutral starting score; logged as <code>websiteSource: "html"</code>.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>How do you keep the Google bill bounded?</td><td>Quota, limiter, cache, and never fetching neighbour reviews.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Why those score weights?</td><td>Judgement, in code, explainable line by line; not measured against bookings, and the README says so.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>How do you test it?</td><td>Fixture sources and a fake LLM make every run deterministic; 11 test files written before the code.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>Why detect the booking engine instead of testing the booking flow?</td><td>Driving a third party's engine is the scraping problem again, adds a minute, and the question is "is there a direct path". Day-60 feature with consent.</td><td><span class="tag ok">answered</span></td></tr>
+<tr><td>How would you scale to 50 hotels per request?</td><td>Queue, per-service concurrency limits, derived-only persistence. Designed, not built.</td><td><span class="tag part">partial</span></td></tr>
+<tr><td>Authentication and multi-tenancy?</td><td>None. Public tool; one shared partner token. A product would need accounts and per-tenant quotas.</td><td><span class="tag gap">open</span></td></tr>
+<tr><td>Monitoring and alerting?</td><td>One log line per run. No dashboard, no alerts, no SLO.</td><td><span class="tag gap">open</span></td></tr>
+<tr><td>CI/CD?</td><td>Vercel deploy on push. No CI running the tests before deploy is specified.</td><td><span class="tag gap">open</span></td></tr>
+<tr><td>Idempotency and retries?</td><td>Reports are idempotent by nature (same input, same report within the cache window). No retry with backoff on outbound calls.</td><td><span class="tag part">partial</span></td></tr>
+<tr><td>How accurate is the gap check?</td><td>Keyword topics with excludes; "street noise" gets no topic; the 200-character threshold is a guess. The 10-hotel hand check is where it gets measured.</td><td><span class="tag part">partial</span></td></tr>
+</table></div>
+
+<h2 id="gaps">13. Open gaps, in one place</h2>
+<ul>
+  <li>No authentication, no accounts, no per-tenant quotas.</li>
+  <li>No CI step that runs the tests before a deploy.</li>
+  <li>No alerting, no dashboard, no SLO. The log line exists; nobody reads it automatically.</li>
+  <li>No retries with backoff or circuit breaker on outbound calls.</li>
+  <li>No DNS-level check in safeFetch (rebinding).</li>
+  <li>No request schema validation beyond the two required fields.</li>
+  <li>No security headers specified (CSP, HSTS beyond the platform default).</li>
+  <li>Limiter and cache are per instance; a shared store is the next step.</li>
+  <li>Synchronous 60-second request; async job with polling or streaming is the next step.</li>
+  <li>Batch mode designed, not built.</li>
+  <li>Dependency audit not part of the build.</li>
+</ul>
+<p class="meta">Kept in the repo at <code>docs/system-design.html</code>. Re-read against the real code after the build, like the mental model, and correct where the code differs.</p>
+</main>
+</body>
+</html>

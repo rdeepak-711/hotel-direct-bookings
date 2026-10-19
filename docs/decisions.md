@@ -135,3 +135,13 @@
 **Why:** his choice of language to learn the stack in; the front end is already TypeScript and one language keeps the repo whole.
 
 **Cost:** the learning plan (`~/Desktop/my-work/learning/PLAN.md`) is written in Python from Stage 1 on, and the CV lists Python and FastAPI as the backend. Both need reconciling at the 31 Oct gate, not now.
+
+## 2026-10-19 · The booking engine is detected, never driven
+
+**Decided:** the tool identifies which booking engine a hotel uses (from the network requests PageSpeed records and from link hosts) and whether it sits on the hotel's own domain. It never opens the engine, never searches availability, never starts a reservation.
+
+**Considered:** a Playwright step that walks the booking flow (pick dates, reach the rate page) and grades it.
+
+**Why:** driving a third party's reservation system with a bot is the same category of problem as scraping Google or Tripadvisor (see "Real APIs only"), it adds 30–60 s per run, and the question the report answers is "is there a direct path" rather than "how good is the path". Grading the flow is a day-60 feature done with the hotel's consent, alongside the Google Business Profile connection.
+
+**Cost:** a hotel with a Book Now button that leads to a broken or empty engine gets no finding for it. The line for the CEO call: "I detect the engine, I don't drive it."
