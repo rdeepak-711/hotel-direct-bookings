@@ -1,5 +1,7 @@
 # Direct Booking Check: spec
 
+> **19 Oct 2026, evening (Deepak):** the test files, fixtures and project scaffolding were removed so the build starts from the documents only. Every `tests/<name>.test.ts` named below is now **written first, as part of its step**, from the behaviour in that step, and must fail on a missing module before the implementation is written. The spec is unchanged as the behaviour contract.
+
 ## Goal
 
 A Next.js web tool: type a US hotel's name, pick it from a list, and get a one-page check of the public signs that guests are being pushed to booking sites like Expedia instead of booking direct, with the top 3 fixes first. Data comes live from Google Places, Google PageSpeed, the hotel's own site, and (if time remains) Tripadvisor. An AI reads the reviews and pulls out praise themes and questions guests had to work out; code verifies every quote against the real review and drops anything invented.
@@ -23,7 +25,7 @@ Preview pages: `/, /report?placeId=ChIJexampleHarborside`
 - `next.config.ts`, `next-env.d.ts`, `README.md`, `docs/decisions.md`, `docs/flow.md`, `docs/mental-model.md`
 - `package.json` only to add a missing dependency; never to change the scripts or remove one
 
-Do not change: `tests/**`, `spec/**`, `docs/plan.html`, `docs/system-design.html`, `docs/implementation-playbook.md`, `docs/public-build-playbook.md`, `docs/project-status.md`, `findings.md`, `.gitignore`, `.env.example`.
+Do not change (once written): `tests/**`, `spec/**`, `docs/plan.html`, `docs/system-design.html`, `docs/implementation-playbook.md`, `docs/public-build-playbook.md`, `docs/project-status.md`, `findings.md`, `.gitignore`, `.env.example`.
 
 ## Environment variables
 

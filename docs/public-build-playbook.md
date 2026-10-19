@@ -32,7 +32,7 @@ Status values: idea · draft · awaiting verification · approved · published.
 **Depends on:** MKT-001. **Content:** four audiences and what each one wants from a post. Developers (the verification pattern, the safe fetcher, the test-first build). Founders and hotel-tech teams (the two inferences, the report, the partner mode). Hotel owners (one plain finding they can check on their own site). Recruiters and hiring managers (shipped, tested, deployed, documented, honest about limits). Each post below names its audience. **Status:** idea.
 
 ### [ ] MKT-003 Claim register
-**Depends on:** MKT-001. **Files:** `docs/claims.md`. A table of every factual claim the content may use, the evidence file, and the date verified. Starts with: 120 tests written before code; 11 test files; five data sources; weights 40/30/30; quotes verified in code; no database; the SSRF controls. Grows only from ticked ENG tasks. **Status:** idea.
+**Depends on:** MKT-001. **Files:** `docs/claims.md`. A table of every factual claim the content may use, the evidence file, and the date verified. Starts with: five data sources; weights 40/30/30; quotes verified in code; no database; the SSRF controls. Grows only from ticked ENG tasks. **Status:** idea.
 
 ---
 
@@ -40,8 +40,8 @@ Status values: idea · draft · awaiting verification · approved · published.
 
 Each item is one X post (or short thread) unless marked LinkedIn. Draft text is a starting point for Deepak's voice (`~/claude-work-me/my-voice.md` before any final draft). Visual is named. Claim checklist lists what must be true and where the proof is.
 
-### [ ] MKT-004 "120 failing tests, zero lines of code"
-**Depends on:** ENG-001. **Audience:** developers. **Idea:** the spec and the tests are the contract; the builder is a different agent; whatever the discussion left out gets guessed. **Draft:** "Building Direct Booking Check: a tool that reads a US hotel's public signals and says why guests might be booking through Expedia instead. Day 0: 11 test files, 120 tests, all red. No implementation yet. The spec plus the tests are the contract the coding agent builds against." **Visual:** the vitest output screenshot, 11 failed files. **Claims:** 120 `it` blocks (`docs/evidence/ENG-001.txt`). **CTA:** none. **Link:** repo URL once public, else the portfolio. **Status:** idea.
+### [ ] MKT-004 "I deleted the tests and the scaffold to start from the documents"
+**Depends on:** ENG-004 and ENG-010. **Audience:** developers. **Idea:** a spec, a mental model, a design doc and a decision log existed; the tests and scaffold were generated and I couldn't explain them, so I removed them and I'm writing each test file by hand before its module, from the spec. **Draft:** "Building Direct Booking Check: a tool that reads a US hotel's public signals and says why guests might be booking through Expedia instead. I had 120 generated tests. I deleted them. I'm writing each test file first, by hand, from the spec, because I want to be able to explain every one in an interview." **Visual:** the first failing run of `tests/quotes.test.ts` ("Cannot find module '@/lib/quotes'"). **Claims:** the git log showing the removal; the first red run (`docs/evidence/ENG-010-red.txt`). **CTA:** none. **Link:** repo URL once public, else the portfolio. **Status:** idea.
 
 ### [ ] MKT-005 CI goes from red to green
 **Depends on:** ENG-003 (red) and ENG-060 (green). Two-part. **Audience:** developers, recruiters. **Visual:** the two workflow runs side by side. **Claims:** workflow run URLs. **Status:** idea.

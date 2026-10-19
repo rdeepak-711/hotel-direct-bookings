@@ -1,7 +1,0 @@
-{
-  "data": [
-    { "location": { "id": 555001, "geo": "Portland", "names": [ { "language": "en", "value": "Harbor View Suites Portland", "primary": true } ], "distance": 0.21 } },
-    { "location": { "id": 555002, "geo": "Portland", "names": [ { "language": "en", "value": "harborside inn portland maine", "primary": false }, { "language": "en", "value": "The Harborside Inn", "primary": true } ], "distance": 0.04 } },
-    { "location": { "id": 555003, "geo": "Portland", "names": [ { "language": "en", "value": "Old Port Bistro", "primary": true } ], "distance": 0.02 } }
-  ]
-}
