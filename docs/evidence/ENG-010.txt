@@ -1,0 +1,22 @@
+ENG-010 evidence, 2026-10-20 00:12 IST
+
+$ npx vitest run tests/quotes.test.ts
+ ✓ tests/quotes.test.ts > quoteAppearsIn > 1. matches an exact substring 1ms
+ ✓ tests/quotes.test.ts > quoteAppearsIn > 2. ignores letter case 0ms
+ ✓ tests/quotes.test.ts > quoteAppearsIn > 3. treats curly quotes and apostrophes as straight ones 0ms
+ ✓ tests/quotes.test.ts > quoteAppearsIn > 4. collapses runs of whitespace, including line breaks 0ms
+ ✓ tests/quotes.test.ts > quoteAppearsIn > 5. ignores spaces around the quote 0ms
+ ✓ tests/quotes.test.ts > quoteAppearsIn > 6. never matches an empty or blank quote 0ms
+ ✓ tests/quotes.test.ts > quoteAppearsIn > 7. fails when a single word is changed 0ms
+ ✓ tests/quotes.test.ts > verifyThemes > 8. drops a quote whose review id does not exist 0ms
+ ✓ tests/quotes.test.ts > verifyThemes > 9. drops an invented quote and keeps the theme's real ones 0ms
+ ✓ tests/quotes.test.ts > verifyThemes > 10. removes a theme whose quotes all fail, but still records the drops 0ms
+ ✓ tests/quotes.test.ts > verifyThemes > 11. counts two quotes from the same review as one review 0ms
+ ✓ tests/quotes.test.ts > verifyThemes > 12. lists review ids in the order they first appear 0ms
+ ✓ tests/quotes.test.ts > verifyThemes > 13. sorts themes by count, highest first, keeping ties in their original order 0ms
+      Tests  13 passed (13)
+
+$ npx tsc --noEmit
+exit 0
+
+Mutation check: quoteAppearsIn changed to always return true -> tests 7, 9, 10 failed; restored -> 13 passed.

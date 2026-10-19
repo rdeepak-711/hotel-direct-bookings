@@ -93,7 +93,7 @@ Arrows point from the module that imports to the module it depends on. The spec'
 
 Each task here is a spec step. The spec already contains the behaviour and the edge cases, so each task points at it instead of restating it. The TDD loop is the same for all of them: **write the test file from the step's behaviour and edge cases → run it and see it fail on the missing module → implement the smallest thing → run → green → refactor → run the full suite.** Who writes the tests: Deepak with Claude (Claude proposes the cases from the spec, Deepak types them and can explain each one). Codex never edits `tests/`.
 
-### [ ] ENG-010 Step 1: quote check, `lib/quotes.ts`
+### [x] ENG-010 Step 1: quote check, `lib/quotes.ts`
 **Purpose:** the single idea the whole product rests on. The model proposes, code verifies. **Prerequisites:** ENG-004. **Files:** `lib/types.ts` (from the spec's block, verbatim), `lib/quotes.ts`. **Tests:** `tests/quotes.test.ts`, written first: normalisation cases (case, curly quotes, whitespace runs, empty quote), unknown review id, quote not in review, theme with no surviving quotes removed, counts and order, stable sort.
 **Steps:** create `lib/types.ts` by pasting the spec's "Shared types" block; implement `quoteAppearsIn` and `verifyThemes` to spec step 1.
 **Verification:**

@@ -12,7 +12,7 @@ Phase 0, scaffold done (ENG-004). Before that, documents only: spec, decisions, 
 
 | Track | Task | Owner | Blocked by |
 |---|---|---|---|
-| Engineering | ENG-010 quote check: test file first, then `lib/types.ts`, `lib/quotes.ts` | tests: Deepak with Claude; code: Codex | ENG-004 |
+| Engineering | ENG-011 website checks: test file first, then `lib/website.ts` | Claude after Deepak's go | ENG-010 |
 | Marketing | MKT-001 positioning sheet | Claude drafts, Deepak approves | nothing |
 | Marketing | MKT-003 claim register | Claude | nothing |
 | Marketing | MKT-004 "I deleted the tests" post draft | Claude drafts | ENG-010 red run |
@@ -28,6 +28,7 @@ Phase 0, scaffold done (ENG-004). Before that, documents only: spec, decisions, 
 | 19 Oct | ENG-000 repository assessment; playbooks and status tracker | `ecdc4e2` |
 | 19 Oct | Reset to documents only: tests, fixtures, scaffold removed (Deepak) | `17199a8` |
 | 19 Oct | DEC-1 to DEC-4 decided per recommendation (Deepak); ENG-001 toolchain; ENG-002 `.env.example` complete (9 vars) | `docs/evidence/ENG-001.txt`, `.env.example` |
+| 20 Oct | ENG-010 quote check: 13 tests green, tsc clean; mutation check shows tests 7, 9, 10 catch a match-everything bug | `docs/evidence/ENG-010.txt` |
 | 19 Oct | Repo pushed to GitHub (private); ENG-003 CI green | https://github.com/rdeepak-711/hotel-direct-bookings/actions/runs/39279152782 |
 | 19 Oct | ENG-004 scaffold: next 16.3.8, react 19.3.0, typescript 6.0.3, vitest 5.0.3; tsc exit 0, vitest finds no tests; needs npm 11 | `docs/evidence/ENG-004.txt` |
 | 19 Oct | DEC-6 recorded: `claude -p` first locally, with tools off and refused on Vercel | `docs/decisions.md` |
@@ -51,7 +52,7 @@ None. Hotelzify's 48-hour challenge invite has not arrived; if it does before EN
 
 | Check | Status | Evidence |
 |---|---|---|
-| `npx vitest run` | runs, no test files yet | `docs/evidence/ENG-004.txt` |
+| `npx vitest run` | 13 passed (quotes) | `docs/evidence/ENG-010.txt` |
 | `npx tsc --noEmit` | exit 0 | `docs/evidence/ENG-004.txt` |
 | CI | green on `main`: typecheck + tests, 26 s of steps (runner queue adds minutes) | https://github.com/rdeepak-711/hotel-direct-bookings/actions/runs/39279152782 |
 

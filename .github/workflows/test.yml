@@ -21,5 +21,4 @@ jobs:
       - run: npm install -g npm@11.21.0
       - run: npm ci --no-audit --no-fund
       - run: npx tsc --noEmit
-      # Drop --passWithNoTests once ENG-010 adds the first test file.
-      - run: npx vitest run --passWithNoTests
+      - run: npx vitest run
