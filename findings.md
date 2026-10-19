@@ -81,3 +81,12 @@ Error: `npm error Cannot read properties of null (reading 'edgesOut')`, stack in
 - Buffer 2025 (second-hand report): median engagement 3.56% for text vs 3.40% for images. Format barely matters; content does.
 - No controlled evidence on reply-to-big-accounts strategy or on teasers. Anecdotes only.
 - Templates in use: failure or security screenshot; named rule ("LLM proposes, code verifies") with a diagram; counter-intuitive story ("deleted my own tests"); showing the paperwork (spec, decisions log); replying with a point and a screenshot under big accounts' prompt-injection posts, without dropping a link in their thread.
+
+## Issue, 20 Oct 2026: spec step 2 reads audits that do not do what it assumes (open, DEC-7)
+
+Checked against Lighthouse source on GitHub (`GoogleChrome/lighthouse`, main, v13.5.0):
+- `core/audits/seo/link-text.js` only lists links whose text is on a non-descriptive blocklist ("click here", "more"...). A "Book Now" link never appears in it, so `bookNow` from `link-text` would always be `{ found: false }`.
+- `core/audits/seo/tap-targets.js` no longer exists; `core/audits/accessibility/target-size.js` exists instead.
+- The old `viewport` audit path returns 404; `accessibility/meta-viewport.js` exists but checks zoom, not a mobile viewport. Not resolved; needs a real response.
+
+A live check was not possible: the keyless PageSpeed quota was exhausted ("Quota exceeded … Queries per day"), and the project's `GOOGLE_PLACES_API_KEY` is restricted so PageSpeed is blocked ("Requests to this API … RunPagespeed are blocked"). PageSpeed needs enabling on the key (or its own key) before ENG-034, and before a real PageSpeed fixture can be captured.
