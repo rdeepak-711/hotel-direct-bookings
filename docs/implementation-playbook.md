@@ -79,10 +79,10 @@ Arrows point from the module that imports to the module it depends on. The spec'
 **Steps:** list all nine variables with empty values, except `OPENROUTER_MODEL=meta-llama/llama-3.3-70b-instruct:free`, `LLM_MODE=openrouter`, `SOURCES_MODE=live`, `REPORTS_PER_VISITOR_PER_HOUR=10`. Add a one-line comment per key saying where to get it. Commit.
 **Verification:** `grep -c '^[A-Z_]*=' .env.example` → 9 (the looser `grep -c '='` also counts the comment on line 10 and gives 10). **Learning note:** `.env.example` is the contract between the code and whoever deploys it; a missing name there is a silent production failure (the spec's own words about `PAGESPEED_API_KEY`). **Evidence:** the commit.
 
-### [ ] ENG-003 Decide and apply DEC-2: minimal CI
+### [x] ENG-003 Decide and apply DEC-2: minimal CI
 **Owner:** Deepak or Claude. **Prerequisites:** DEC-2 approved, ENG-004.
 **Files:** `.github/workflows/test.yml` (new).
-**Steps:** on push and pull request: checkout, `actions/setup-node@v4` with Node 22 and npm cache, `npm install -g npm@11.21.0` (npm 10 crashes on vitest's peer set, see findings.md), `npm ci`, `npx tsc --noEmit`, `npx vitest run --passWithNoTests` (drop the flag once ENG-010 lands). No secrets; tests must stay offline (fixtures and FakeLLM).
+**Steps:** on push and pull request: checkout, `actions/setup-node@v7` with Node 22 and npm cache, `npm install -g npm@11.21.0` (npm 10 crashes on vitest's peer set, see findings.md), `npm ci`, `npx tsc --noEmit`, `npx vitest run --passWithNoTests` (drop the flag once ENG-010 lands). No secrets; tests must stay offline (fixtures and FakeLLM).
 **Verification:** push; the Actions tab shows a green run on the empty scaffold.
 **Risks:** `npm ci` needs `package-lock.json` committed (ENG-004 does that). **Learning note:** CI is "someone else's machine runs your verification commands on every push". Its value is not catching bugs you'd catch locally; it's that a green badge is evidence a reviewer or recruiter can trust without cloning.
 **Public-build:** MKT-005. **Evidence:** a workflow run URL in `docs/project-status.md`.
