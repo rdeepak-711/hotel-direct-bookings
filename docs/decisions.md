@@ -125,3 +125,13 @@
 **Why:** (1) and (2) were the two that could embarrass the tool in front of Hotelzify; the rest each remove a silent failure (throttled PageSpeed, a 504, a non-US hotel) or a question with no answer on the CEO call.
 
 **Cost:** about an hour more build time; the mock-up's fourth gauge segment is gone; the 200-character and 20-second limits are guesses to be checked in the 10-hotel hand check. The Google terms question is closed on the policies page only; the broader Service Terms were not re-read.
+
+## 2026-10-19 · v2 (the AI-engineer rebuild) will be TypeScript, typed by Deepak; v1 goes first
+
+**Decided (Deepak):** "I do wanna learn it in typescript, so no need to switch to python. will begin v1 first." v1 is the Codex build of the current spec. v2 is the hand-typed rebuild that adds retrieval for the gap check (embeddings over the hotel's pages, pgvector), a site-reader agent (by hand, then LangGraph.js), retrieved fixes with citations, a labelled eval set with a regression gate in CI, streaming, tracing, an MCP server and batch mode. Not multi-agent, not a knowledge graph. The mapping of each skill to a place in the product is in the chat of 19 Oct and will be written into the plan at the Stage 1 gate.
+
+**Considered:** Python/FastAPI, which is what the learning plan's stages and the CV's backend line say.
+
+**Why:** his choice of language to learn the stack in; the front end is already TypeScript and one language keeps the repo whole.
+
+**Cost:** the learning plan (`~/Desktop/my-work/learning/PLAN.md`) is written in Python from Stage 1 on, and the CV lists Python and FastAPI as the backend. Both need reconciling at the 31 Oct gate, not now.
