@@ -1,10 +1,60 @@
 [
-  {"id": "g-1", "source": "google", "rating": 5, "date": "2026-09-14", "text": "Steps from the Old Port and every restaurant we wanted. The staff remembered our names by day two."},
-  {"id": "g-2", "source": "google", "rating": 4, "date": "2026-08-30", "text": "Great location, wish we'd known parking was a block away in a paid garage. Rooms were spotless."},
-  {"id": "g-3", "source": "google", "rating": 2, "date": "2026-08-02", "text": "Booked through Expedia and the hotel had no record of us at check-in. Took 40 minutes to sort out. Location is good though."},
-  {"id": "g-4", "source": "google", "rating": 5, "date": "2026-07-19", "text": "The blueberry pancakes alone are worth the stay. Walkable to everything in the Old Port."},
-  {"id": "g-5", "source": "google", "rating": 4, "date": "2026-06-05", "text": "Comfortable beds, friendly front desk. Check-in isn't until 4 PM which we didn't realise, so we waited in the lobby with bags."},
-  {"id": "ta-101", "source": "tripadvisor", "rating": 5, "date": "2026-10-01", "text": "Breakfast was excellent, the pancakes especially. Perfect base for exploring the Old Port on foot."},
-  {"id": "ta-102", "source": "tripadvisor", "rating": 3, "date": "2026-09-20", "text": "Decent stay. Parking situation was confusing, no instructions anywhere before arrival."},
-  {"id": "ta-103", "source": "tripadvisor", "rating": 4, "date": "2026-09-10", "text": "Staff were lovely and the location can't be beaten."}
+  {
+    "id": "g-1",
+    "source": "google",
+    "rating": 5,
+    "date": "2026-09-14",
+    "text": "Steps from the Old Port and every restaurant we wanted. The staff remembered our names by day two.",
+    "author": "A. Guest",
+    "url": "https://www.google.com/maps/reviews/example-g-1"
+  },
+  {
+    "id": "g-2",
+    "source": "google",
+    "rating": 4,
+    "date": "2026-08-30",
+    "text": "Great location, wish we'd known parking was a block away in a paid garage. Rooms were spotless."
+  },
+  {
+    "id": "g-3",
+    "source": "google",
+    "rating": 2,
+    "date": "2026-08-02",
+    "text": "Booked through Expedia and the hotel had no record of us at check-in. Took 40 minutes to sort out. Location is good though."
+  },
+  {
+    "id": "g-4",
+    "source": "google",
+    "rating": 5,
+    "date": "2026-07-19",
+    "text": "The blueberry pancakes alone are worth the stay. Walkable to everything in the Old Port."
+  },
+  {
+    "id": "g-5",
+    "source": "google",
+    "rating": 4,
+    "date": "2026-06-05",
+    "text": "Comfortable beds, friendly front desk. Check-in isn't until 4 PM which we didn't realise, so we waited in the lobby with bags."
+  },
+  {
+    "id": "ta-101",
+    "source": "tripadvisor",
+    "rating": 5,
+    "date": "2026-10-01",
+    "text": "Breakfast was excellent, the pancakes especially. Perfect base for exploring the Old Port on foot."
+  },
+  {
+    "id": "ta-102",
+    "source": "tripadvisor",
+    "rating": 3,
+    "date": "2026-09-20",
+    "text": "Decent stay. Parking situation was confusing, no instructions anywhere before arrival."
+  },
+  {
+    "id": "ta-103",
+    "source": "tripadvisor",
+    "rating": 4,
+    "date": "2026-09-10",
+    "text": "Staff were lovely and the location can't be beaten."
+  }
 ]

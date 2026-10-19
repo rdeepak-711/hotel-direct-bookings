@@ -1,18 +1,80 @@
 {
   "id": "ChIJexampleHarborside",
-  "displayName": { "text": "Harborside Inn", "languageCode": "en" },
+  "displayName": {
+    "text": "Harborside Inn",
+    "languageCode": "en"
+  },
   "formattedAddress": "12 Commercial St, Portland, ME 04101, USA",
-  "location": { "latitude": 43.6565, "longitude": -70.2525 },
+  "location": {
+    "latitude": 43.6565,
+    "longitude": -70.2525
+  },
   "rating": 4.5,
   "userRatingCount": 1313,
   "websiteUri": "https://www.harborside-inn-example.com/",
   "nationalPhoneNumber": "(207) 555-0142",
   "editorialSummary": null,
   "reviews": [
-    { "name": "places/ChIJexampleHarborside/reviews/r1", "rating": 5, "publishTime": "2026-09-14T10:00:00Z", "text": { "text": "Steps from the Old Port and every restaurant we wanted. The staff remembered our names by day two." }, "authorAttribution": { "displayName": "A. Guest", "uri": "https://www.google.com/maps/contrib/1" } },
-    { "name": "places/ChIJexampleHarborside/reviews/r2", "rating": 4, "publishTime": "2026-08-30T10:00:00Z", "text": { "text": "Great location, wish we'd known parking was a block away in a paid garage. Rooms were spotless." }, "authorAttribution": { "displayName": "B. Guest", "uri": "https://www.google.com/maps/contrib/2" } },
-    { "name": "places/ChIJexampleHarborside/reviews/r3", "rating": 2, "publishTime": "2026-08-02T10:00:00Z", "text": { "text": "Booked through Expedia and the hotel had no record of us at check-in. Took 40 minutes to sort out. Location is good though." }, "authorAttribution": { "displayName": "C. Guest", "uri": "https://www.google.com/maps/contrib/3" } },
-    { "name": "places/ChIJexampleHarborside/reviews/r4", "rating": 5, "publishTime": "2026-07-19T10:00:00Z", "text": { "text": "The blueberry pancakes alone are worth the stay. Walkable to everything in the Old Port." }, "authorAttribution": { "displayName": "D. Guest", "uri": "https://www.google.com/maps/contrib/4" } },
-    { "name": "places/ChIJexampleHarborside/reviews/r5", "rating": 4, "publishTime": "2026-06-05T10:00:00Z", "text": { "text": "Comfortable beds, friendly front desk. Check-in isn't until 4 PM which we didn't realise, so we waited in the lobby with bags." }, "authorAttribution": { "displayName": "E. Guest", "uri": "https://www.google.com/maps/contrib/5" } }
+    {
+      "name": "places/ChIJexampleHarborside/reviews/r1",
+      "rating": 5,
+      "publishTime": "2026-09-14T10:00:00Z",
+      "text": {
+        "text": "Steps from the Old Port and every restaurant we wanted. The staff remembered our names by day two."
+      },
+      "authorAttribution": {
+        "displayName": "A. Guest",
+        "uri": "https://www.google.com/maps/contrib/1"
+      },
+      "googleMapsUri": "https://www.google.com/maps/reviews/example-g-1"
+    },
+    {
+      "name": "places/ChIJexampleHarborside/reviews/r2",
+      "rating": 4,
+      "publishTime": "2026-08-30T10:00:00Z",
+      "text": {
+        "text": "Great location, wish we'd known parking was a block away in a paid garage. Rooms were spotless."
+      },
+      "authorAttribution": {
+        "displayName": "B. Guest",
+        "uri": "https://www.google.com/maps/contrib/2"
+      }
+    },
+    {
+      "name": "places/ChIJexampleHarborside/reviews/r3",
+      "rating": 2,
+      "publishTime": "2026-08-02T10:00:00Z",
+      "text": {
+        "text": "Booked through Expedia and the hotel had no record of us at check-in. Took 40 minutes to sort out. Location is good though."
+      },
+      "authorAttribution": {
+        "displayName": "C. Guest",
+        "uri": "https://www.google.com/maps/contrib/3"
+      }
+    },
+    {
+      "name": "places/ChIJexampleHarborside/reviews/r4",
+      "rating": 5,
+      "publishTime": "2026-07-19T10:00:00Z",
+      "text": {
+        "text": "The blueberry pancakes alone are worth the stay. Walkable to everything in the Old Port."
+      },
+      "authorAttribution": {
+        "displayName": "D. Guest",
+        "uri": "https://www.google.com/maps/contrib/4"
+      }
+    },
+    {
+      "name": "places/ChIJexampleHarborside/reviews/r5",
+      "rating": 4,
+      "publishTime": "2026-06-05T10:00:00Z",
+      "text": {
+        "text": "Comfortable beds, friendly front desk. Check-in isn't until 4 PM which we didn't realise, so we waited in the lobby with bags."
+      },
+      "authorAttribution": {
+        "displayName": "E. Guest",
+        "uri": "https://www.google.com/maps/contrib/5"
+      }
+    }
   ]
 }

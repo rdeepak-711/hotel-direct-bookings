@@ -96,6 +96,10 @@ describe("buildReport", () => {
     expect(r.praise[0].quotes[0].quote).toBe("Steps from the Old Port and every restaurant we wanted");
     expect(r.praise[0].quotes[0].source).toBe("google");
     expect(r.praise[0].quotes[0].date).toBe("2026-09-14");
+    expect(r.praise[0].quotes[0].author).toBe("A. Guest");
+    expect(r.praise[0].quotes[0].url).toBe("https://www.google.com/maps/reviews/example-g-1");
+    expect(r.reviewsNotice).toMatch(/most relevant/);
+    expect(r.reviewsNotice).toMatch(/Google Maps/);
     expect(r.headline).toBe(base.themes.headline);
     expect(r.findings.find((f) => f.id === "no-description")!.fix).toContain("Location next to the Old Port");
   });
@@ -144,8 +148,8 @@ describe("buildReport", () => {
   });
 
   it("carries the direct booking score, computed from the same inputs", () => {
-    expect(buildReport(base).score).toEqual({ website: 23, messaging: 65, listing: 60, reviews: 90, overall: 54 });
-    expect(buildReport({ ...base, website: null, gaps: null }).score).toMatchObject({ website: null, messaging: null, listing: 60, reviews: 90 });
+    expect(buildReport(base).score).toEqual({ website: 23, messaging: 65, listing: 60, overall: 47 });
+    expect(buildReport({ ...base, website: null, gaps: null }).score).toMatchObject({ website: null, messaging: null, listing: 60 });
   });
 
   it("shows the Tripadvisor ranking in the listing section", () => {
@@ -167,21 +171,23 @@ describe("buildReport", () => {
     expect(f.evidence.toLowerCase()).toMatch(/not a website of your own/);
     expect(r.findings.some((x) => ["slow-mobile", "no-book-now", "no-tap-to-call"].includes(x.id))).toBe(false);
     expect(r.score.website).toBe(0);
-    expect(r.sections.gapCheck).toEqual({ siteText: "no website" });
+    expect(r.sections.gapCheck).toEqual({ siteText: "no website", pagesRead: 0 });
   });
 
   it("says the site could not be read instead of claiming it is silent", () => {
-    const r = buildReport({ ...base, siteText: "unreadable", gaps: [{ themeName: "Parking", topic: "parking", count: 2, mentionedOnSite: null }, { themeName: "Check-in time", topic: "check-in", count: 1, mentionedOnSite: null }] });
+    const r = buildReport({ ...base, siteText: "unreadable", pagesRead: 1, gaps: [{ themeName: "Parking", topic: "parking", count: 2, mentionedOnSite: null }, { themeName: "Check-in time", topic: "check-in", count: 1, mentionedOnSite: null }] });
     const f = r.findings.find((x) => x.id === "site-unreadable")!;
     expect(f.severity).toBe("medium");
     expect(f.evidence.toLowerCase()).toMatch(/could not read/);
     expect(r.findings.find((x) => x.id === "gap-parking")).toBeUndefined();
-    expect(r.sections.gapCheck).toEqual({ siteText: "unreadable" });
+    expect(r.sections.gapCheck).toEqual({ siteText: "unreadable", pagesRead: 1 });
   });
 
   it("defaults siteText from the inputs and adds no unreadable finding for a readable site", () => {
     const r = buildReport(base);
-    expect(r.sections.gapCheck).toEqual({ siteText: "read" });
+    expect(r.sections.gapCheck).toEqual({ siteText: "read", pagesRead: 1 });
+    expect(buildReport({ ...base, pagesRead: 3 }).sections.gapCheck).toEqual({ siteText: "read", pagesRead: 3 });
+    expect(buildReport({ ...base, pagesRead: 3 }).findings.find((x) => x.id === "gap-parking")!.evidence).toMatch(/3 pages checked/);
     expect(r.findings.find((x) => x.id === "site-unreadable")).toBeUndefined();
   });
 });

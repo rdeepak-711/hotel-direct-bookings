@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { MIN_PAGE_TEXT, TOPICS, extractText, findGaps, isReadableText, siteMentions, topicForTheme } from "@/lib/gaps";
+import { INTERNAL_PAGE_PATTERN, MIN_PAGE_TEXT, TOPICS, TOPIC_EXCLUDES, extractInternalLinks, extractText, findGaps, isReadableText, siteMentions, topicForTheme } from "@/lib/gaps";
 import { readFileSync } from "node:fs";
 import path from "node:path";
 
@@ -50,6 +50,12 @@ describe("siteMentions", () => {
     expect(siteMentions(text, "parking")).toBe(false);
     expect(siteMentions(text, "pets")).toBe(false);
   });
+  it("does not count Central Park, Park Avenue or a parkway as parking", () => {
+    expect(TOPIC_EXCLUDES.parking.length).toBeGreaterThan(0);
+    expect(siteMentions("Rooms with views of Central Park. Walk to Park Avenue.", "parking")).toBe(false);
+    expect(siteMentions("Minutes from the Garden State Parkway.", "parking")).toBe(false);
+    expect(siteMentions("Views of Central Park and a free parking garage.", "parking")).toBe(true);
+  });
 });
 
 describe("findGaps", () => {
@@ -84,5 +90,40 @@ describe("unreadable pages", () => {
     expect(isReadableText(" ".repeat(500))).toBe(false);
     expect(isReadableText(null)).toBe(false);
     expect(isReadableText("a".repeat(200))).toBe(true);
+  });
+});
+
+describe("extractInternalLinks", () => {
+  const page = "https://www.harborside-inn-example.com/";
+  const html = `<nav>
+    <a href="/">Home</a>
+    <a href="/rooms">Rooms</a>
+    <a href="https://www.harborside-inn-example.com/faq">FAQ</a>
+    <a href="https://harborside-inn-example.com/policies#pets">Policies</a>
+    <a href="/about-us">About</a>
+    <a href="/gallery">Gallery</a>
+    <a href="/brochure.pdf">Parking map</a>
+    <a href="https://www.facebook.com/harborside">Guest reviews</a>
+    <a href="mailto:hi@harborside-inn-example.com">Guest services</a>
+    <a href="/contact">Contact</a>
+    <a href="/parking">Where to park</a>
+  </nav>`;
+  it("returns up to four same-host pages whose path or text looks informational, in document order", () => {
+    expect(extractInternalLinks(html, page)).toEqual([
+      "https://www.harborside-inn-example.com/rooms",
+      "https://www.harborside-inn-example.com/faq",
+      "https://harborside-inn-example.com/policies",
+      "https://www.harborside-inn-example.com/about-us",
+    ]);
+    expect(extractInternalLinks(html, page, 10)).toContain("https://www.harborside-inn-example.com/parking");
+  });
+  it("skips other hosts, files, mail links and the page itself", () => {
+    const links = extractInternalLinks(html, page, 10);
+    expect(links.some((l) => l.includes("facebook.com") || l.includes(".pdf") || l.startsWith("mailto:") || l === page)).toBe(false);
+    expect(links).not.toContain("https://www.harborside-inn-example.com/gallery");
+  });
+  it("matches the agreed words", () => {
+    for (const w of ["faq", "policies", "amenities", "rooms", "about", "parking", "pets", "guest-info", "your-stay"]) expect(INTERNAL_PAGE_PATTERN.test(w)).toBe(true);
+    expect(INTERNAL_PAGE_PATTERN.test("gallery")).toBe(false);
   });
 });

@@ -1,0 +1,334 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Direct Booking Check Review</title>
+<meta name="description" content="Review of the Direct Booking Check spec from four angles: the gaps, the Hotelzify job, the CV, X distribution and revenue. 19 Oct 2026.">
+<style>
+  :root {
+    --bg: #fbfaf7; --panel: #ffffff; --ink: #1d232b; --muted: #5d6673; --line: #e3e0d8;
+    --accent: #1f5f8b; --accent-soft: #e6f0f7; --good: #2f7d4f; --good-soft: #e7f4ec;
+    --warn: #a2631a; --warn-soft: #fbf0e1; --bad: #a83a32; --bad-soft: #fbe9e7; --code: #f2efe8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #14171b; --panel: #1b1f25; --ink: #e7e9ec; --muted: #9aa3ae; --line: #2c323a;
+      --accent: #6fb1e0; --accent-soft: #1b2b38; --good: #6cc391; --good-soft: #17291f;
+      --warn: #e2a65a; --warn-soft: #2d2416; --bad: #ec8a80; --bad-soft: #301c1a; --code: #232830;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #14171b; --panel: #1b1f25; --ink: #e7e9ec; --muted: #9aa3ae; --line: #2c323a;
+    --accent: #6fb1e0; --accent-soft: #1b2b38; --good: #6cc391; --good-soft: #17291f;
+    --warn: #e2a65a; --warn-soft: #2d2416; --bad: #ec8a80; --bad-soft: #301c1a; --code: #232830;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink); font: 16px/1.6 -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, sans-serif; }
+  main { max-width: 900px; margin: 0 auto; padding: 32px 16px 80px; }
+  h1 { font-size: 2rem; line-height: 1.2; margin: 0 0 6px; }
+  h2 { font-size: 1.35rem; margin: 48px 0 10px; padding-top: 12px; border-top: 1px solid var(--line); }
+  h3 { font-size: 1.05rem; margin: 22px 0 6px; }
+  p { margin: 8px 0; }
+  .sub { color: var(--muted); margin: 0 0 20px; }
+  nav { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 16px; margin: 20px 0; }
+  nav ol { margin: 4px 0; padding-left: 20px; columns: 2; column-gap: 24px; }
+  nav a { color: var(--accent); text-decoration: none; }
+  a { color: var(--accent); }
+  code { background: var(--code); padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+  .card { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px 16px; margin: 12px 0; }
+  .tldr { background: var(--accent-soft); border-color: transparent; }
+  .good { background: var(--good-soft); border-color: transparent; }
+  .warn { background: var(--warn-soft); border-color: transparent; }
+  .bad { background: var(--bad-soft); border-color: transparent; }
+  .label { font-size: .75rem; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: .92rem; margin: 10px 0; }
+  th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+  th { color: var(--muted); font-weight: 600; font-size: .8rem; text-transform: uppercase; letter-spacing: .04em; }
+  .tablewrap { overflow-x: auto; }
+  .pill { display: inline-block; padding: 1px 8px; border-radius: 999px; font-size: .75rem; font-weight: 600; margin-left: 4px; white-space: nowrap; }
+  .must { background: var(--bad-soft); color: var(--bad); }
+  .should { background: var(--warn-soft); color: var(--warn); }
+  .nice { background: var(--code); color: var(--muted); }
+  .quote { border-left: 3px solid var(--line); padding-left: 10px; color: var(--muted); font-style: italic; margin: 6px 0; }
+  .post { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 12px 14px; margin: 10px 0; white-space: pre-wrap; font-size: .95rem; }
+  .verdict { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .verdict .card { margin: 0; }
+  .score { font-size: 1.6rem; font-weight: 700; }
+  ul, ol { padding-left: 22px; }
+  li { margin: 4px 0; }
+  @media (max-width: 640px) { nav ol { columns: 1; } h1 { font-size: 1.6rem; } .verdict { grid-template-columns: 1fr; } }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Direct Booking Check: a review from four angles</h1>
+<p class="sub">19 Oct 2026, after the spec was finalised and before any code. Read with <code>spec/site.md</code> (commit <code>7a91123</code>), <code>docs/plan.html</code> and <code>docs/mental-model.md</code>. Angles: the spec and its gaps, the Hotelzify job, your CV, X, and money.</p>
+
+<div class="card tldr">
+  <div class="label">The short version</div>
+  <p><b>The spec is solid where it matters</b> (the quote check, the two new inferences, the safety calls, the tests written first). <b>It has six gaps worth fixing before the build</b>, two of which would embarrass you in front of Hotelzify: anyone can add <code>?audience=partner</code> to the public link and see Hotelzify's name, and the report says "your website doesn't mention parking" when it only read the home page.</p>
+  <p><b>For the job it is the right build</b>: it is the challenge they will set, done early, and it automates the report the CEO hands out by hand. <b>For your CV it fits unusually well</b>: three years of travel and hospitality sites at Firestorm, plus your own travel ventures, make this a story rather than a one-off. <b>On X it is a method story, not a product launch</b>: your 33 followers can't distribute a hotel tool, but the "my AI isn't allowed to say anything it can't quote" angle fits the strategy you set on 17 Oct. <b>Revenue is unlikely</b> without a distribution channel you don't have; the one realistic path is a batch "prospect list" sold to hotel-tech sales teams, and even that is a long shot. Build it for the job; treat money as a bonus.</p>
+</div>
+
+<div class="verdict">
+  <div class="card"><div class="label">Hotelzify job</div><div class="score">Strong fit</div><p>Right build, right timing. Fix the two embarrassing gaps first.</p></div>
+  <div class="card"><div class="label">CV and portfolio</div><div class="score">Good fit</div><p>Second half of a two-project story with escalation-gate. Needs the hand check to be resume-grade.</p></div>
+  <div class="card"><div class="label">X distribution</div><div class="score">Useful, limited</div><p>Four posts about the method and the drop rates. No hotel names, no "owners try this".</p></div>
+  <div class="card"><div class="label">Revenue</div><div class="score">Low odds</div><p>Costs are near zero; buyers are far away. One narrow path worth a two-week test, later.</p></div>
+</div>
+
+<nav>
+  <div class="label">Contents</div>
+  <ol>
+    <li><a href="#spec">The spec: what is solid</a></li>
+    <li><a href="#gaps">The gaps, ranked</a></li>
+    <li><a href="#job">The Hotelzify angle</a></li>
+    <li><a href="#cv">On your CV: travel, Firestorm, passion</a></li>
+    <li><a href="#x">X distribution</a></li>
+    <li><a href="#money">Revenue, honestly</a></li>
+    <li><a href="#questions">Questions for you</a></li>
+    <li><a href="#next">Next steps and cost in hours</a></li>
+  </ol>
+</nav>
+
+<h2 id="spec">1. The spec: what is solid</h2>
+
+<p>Before the gaps, what is right, because these are the things to protect when day 2 runs late.</p>
+
+<ul>
+  <li><b>One AI step, checked by code.</b> The model only reads reviews and proposes themes with quotes. Code verifies every quote against the real review, recomputes counts, and drops what it can't verify. The findings, the score and the fixes are all plain code. This is the single most defensible design decision in the project, and it is the same shape as escalation-gate, which lets you tell one story across two projects.</li>
+  <li><b>Two inferences no single site makes.</b> The gap check (guests ask about parking in reviews; the hotel's page never mentions it) and the neighbour comparison (your mobile speed 38 against the five nearest hotels' 76). Everything else on the page is context. The plan names these as the point, and the spec builds them first, in pure logic, with tests.</li>
+  <li><b>Failure is contained per section.</b> Only the Google place lookup can fail the run. PageSpeed, the home page, neighbours, Tripadvisor and the AI each fail alone and the report still comes out. The tests prove it.</li>
+  <li><b>Safety calls are explicit and tested.</b> The locked-down fetch (no private networks, redirects re-checked, 8-second and 2 MB caps), review text framed as data not instructions, keys never reaching the browser, no database, no stored review text. These are the things the job post says it will judge ("architecture, reliability and security, because US hotels trust us with guest and payment data").</li>
+  <li><b>Fairness rules are written down.</b> Neighbours counted, never named. No named hotel's bad score in public. Real reports only privately to Hotelzify.</li>
+  <li><b>Tests before code, 11 files, about 120 cases</b> after this morning's additions, all failing with "cannot find module", which is the right reason. Codex builds to them, you review against them.</li>
+  <li><b>Honest about the thin sample.</b> Five Google reviews per hotel (that is all the API gives) plus up to three from Tripadvisor. The report talks in counts ("2 of 8 reviews") and never in percentages, and a test enforces it.</li>
+  <li><b>The three additions from this morning</b> close the three ways the report could be confidently wrong: grading a Facebook page as the hotel's site, calling a JavaScript shell "silent on parking", and having no number for how often the AI invents quotes.</li>
+</ul>
+
+<h2 id="gaps">2. The gaps, ranked</h2>
+
+<p>Each row says what the gap is, why it matters, the fix, and whether it should block the build. "Must" means fix it in the spec before <code>handoff</code>; "Should" means day 3; "Nice" means only if someone asks.</p>
+
+<div class="tablewrap">
+<table>
+  <tr><th>#</th><th>Gap</th><th>Why it matters</th><th>Fix</th><th>When</th></tr>
+  <tr><td>1</td><td><b>The partner view is one query parameter away from public.</b> <code>/report?placeId=…&amp;audience=partner</code> adds Hotelzify's product names. Nothing stops a stranger adding it.</td><td>Plan section 11 says "No Hotelzify name or branding on the public site". The spec breaks that promise. If a hotel owner or a competitor finds it, the tool looks like a Hotelzify sales page you had no right to make.</td><td>Gate the partner audience behind an environment secret: <code>PARTNER_TOKEN</code>, passed as <code>?partner=&lt;token&gt;</code>, checked on the server; wrong or missing token falls back to public. Add one test in <code>api.test.ts</code>: a POST with <code>audience: "partner"</code> and no token returns the public report.</td><td><span class="pill must">Must</span></td></tr>
+  <tr><td>2</td><td><b>"Your website doesn't mention parking" is only true of the home page.</b> The pipeline fetches one page. Parking, pets and fees usually live on an FAQ, Policies or Rooms page.</td><td>This is the tool's flagship finding, and on many real hotels it will be false. A wrong high-severity finding is the exact failure the morning's rules were added to prevent, and the CEO will spot it on the first hotel he knows.</td><td>Two options. <b>Cheap:</b> change the wording everywhere to "your home page", and the fix text to "put the answer on the home page or one click from it". Change the test regex in <code>report.test.ts</code> from <code>website</code> to <code>home page</code>. <b>Better:</b> after the home page, follow up to 4 internal links whose text or path matches <code>faq|polic|amenit|rooms|about|parking|pets</code>, through <code>safeFetch</code>, and join the text. Cap total at 4 fetches and 20 seconds. Add a pipeline test with a home page that links to <code>/faq</code> that mentions parking.</td><td><span class="pill must">Must</span> (at least the wording)</td></tr>
+  <tr><td>3</td><td><b>Nothing enforces "US hotels only".</b> <code>searchHotels</code> sends a text query with no region. Typing "Taj Mahal Palace" returns Mumbai.</td><td>The plan says US only because the job is the US business. A report on an Indian hotel is harmless but off-message, and the neighbour comparison, PageSpeed and fee topics are tuned for the US.</td><td>Add <code>regionCode: "US"</code> to the search body, and filter results whose <code>formattedAddress</code> doesn't end in "USA". One test in <code>sources.test.ts</code> asserting the body carries <code>regionCode</code>.</td><td><span class="pill should">Should</span></td></tr>
+  <tr><td>4</td><td><b>No <code>maxDuration</code> on the report route.</b> The spec targets under 60 seconds, but six PageSpeed calls (the hotel plus five neighbours) can each take 45 seconds, and Vercel's limit is set per function.</td><td>If the function times out, the visitor gets a 504 after waiting a minute, which is the worst possible demo. Vercel's docs list a 300-second default and maximum on Hobby with Fluid Compute, so the headroom exists, but only if the route declares it.</td><td>Add to step 11: <code>export const maxDuration = 120</code> in <code>app/api/report/route.ts</code>, and a 50-second cap on the neighbour PageSpeed batch (whatever hasn't returned becomes <code>mobileScore: null</code>). README notes the Vercel limit.</td><td><span class="pill should">Should</span></td></tr>
+  <tr><td>5</td><td><b>The PageSpeed key is optional in the spec.</b> Without a key the API is heavily throttled; with one it is about 25,000 queries a day and 400 per 100 seconds.</td><td>Six PageSpeed calls per report means the keyless quota dies after a handful of reports, and the website section silently falls back to the weaker HTML check. You would not know why the scores vanished.</td><td>Make <code>PAGESPEED_API_KEY</code> required in production; the run log already records how often the fallback ran, so you will see it.</td><td><span class="pill should">Should</span></td></tr>
+  <tr><td>6</td><td><b>Google's terms on sending review text to a third-party model are still "unclear".</b> The plan has said so since revision 1 and nobody has checked.</td><td>If it is forbidden, the public demo must run the AI on Tripadvisor reviews only, which changes the pipeline and the fixtures. Better to know before Codex builds the prompt path.</td><td>Thirty minutes reading the Places API policies page (linked in <code>findings.md</code>). Write the answer into <code>docs/decisions.md</code> either way. Also: Google requires author attribution and that review text isn't altered; the report shows fragments, so keep the author line and the "quoted from a Google review, &lt;date&gt;" label on every quote.</td><td><span class="pill should">Should</span>, before the public link</td></tr>
+  <tr><td>7</td><td><b>The Reviews sub-score (20% of the total) has nothing to do with direct bookings.</b> Rating out of 5, minus 10 for under 50 reviews.</td><td>A 4.8-star hotel with a dreadful website gets a pass it hasn't earned, and the CEO will ask why rating counts toward a "direct booking" score.</td><td>Either drop it (re-spread weights to 40/30/30) or rename the whole thing "Direct Booking Readiness" and say in the README that reviews are included because guests read them before choosing where to book. Either is fine; the point is to have an answer ready. The fixture expectation (54) changes if you drop it.</td><td><span class="pill nice">Nice</span></td></tr>
+  <tr><td>8</td><td><b>Nothing is cached, so two visitors checking the same hotel pay twice.</b></td><td>Google forbids storing reviews, but place IDs, PageSpeed results and neighbour lists can be held briefly. Mostly a cost issue; see section 6.</td><td>In-memory cache keyed by place id, 10 minutes, for PageSpeed and nearby results only. Day 3.</td><td><span class="pill nice">Nice</span></td></tr>
+  <tr><td>9</td><td><b>Topic matching is keywords only.</b> "Street noise" never gets a gap check. "Park" matches "Central Park views".</td><td>Known and documented. It makes some gaps invisible and could produce a false "mentioned" for parking.</td><td>Leave it. Record the misses in the 10-hotel hand check and put the table in the README. That honesty is worth more to Hotelzify than a cleverer matcher.</td><td><span class="pill nice">Nice</span></td></tr>
+</table>
+</div>
+
+<div class="card good"><b>Update, 19 Oct evening: Deepak said "fix all". All nine are now in the spec and tests</b> (commit after <code>7a91123</code>): partner token, key pages read with the gap check, US-only search, <code>maxDuration</code> and a neighbour budget, PageSpeed key required, Google attribution and review links, Reviews sub-score dropped (weights 40/30/30, fixture score 47), a 10-minute cache, and parking excludes for "Central Park" and the like. Details in <code>docs/decisions.md</code>.</div>
+
+<h2 id="job">3. The Hotelzify angle</h2>
+
+<h3>What the post asks for, and where this build answers it</h3>
+
+<div class="tablewrap">
+<table>
+  <tr><th>The post says</th><th>This build shows it by</th><th>Strength</th></tr>
+  <tr><td>"Pick a real hotel problem, build a working prototype with AI tools, explain your choices" (the 48-hour challenge)</td><td>This is that challenge, done before they set it, with the explanation already written in <code>docs/decisions.md</code> and <code>docs/mental-model.md</code>.</td><td>Strong</td></tr>
+  <tr><td>"Ship a customer-visible improvement in your first month"</td><td>A hotel owner can read this report. The founder already hands out a hand-made version at AAHOA events; this is the automatic one.</td><td>Strong</td></tr>
+  <tr><td>"Talk to US hoteliers directly, understand the real problem"</td><td>You chose not to contact owners. The evidence comes from 12 Reddit threads, 122 competitor reviews and 106 guest reviews instead, and a feasibility run on 60 real reviews that killed your first idea.</td><td>Medium: good research, but the post wants conversations. Say so plainly: "I didn't talk to owners for this; here is what I would ask first."</td></tr>
+  <tr><td>"Integrations with PMS and channel managers, and the data behind them"</td><td>Four live data sources joined, plus booking-engine detection from network requests (SynXis, Cloudbeds, Mews…). No PMS integration.</td><td>Medium: the day-60 roadmap item should name one PMS (Mews has a public demo environment, unverified) so the gap looks planned, not missed.</td></tr>
+  <tr><td>"Architecture, reliability and security, because US hotels trust us with guest and payment data"</td><td>Plan section 6: locked-down fetch, no database, keys server-only, viewer's key used once and never stored, review text treated as data, hard spend cap at Google.</td><td>Strong, once gap 1 (the partner view) is closed.</td></tr>
+  <tr><td>"How honestly you tell us where it went wrong"</td><td>The quote check exists because free models invent quotes. The run log counts every drop. The 10-hotel hand check records every wrong finding.</td><td>Strong, if the hand check actually happens. Without it this is a claim.</td></tr>
+  <tr><td>"What to build and what to leave out when a problem is vague"</td><td>Plan section 9 lists what was cut and why: price comparison (no legal API), phone agent (guests hang up on AI), the per-hotel complaints report (killed by data).</td><td>Strong</td></tr>
+  <tr><td>"Things you built that nobody asked you to build, especially ones with real users"</td><td>Nobody asked. No real users yet.</td><td>Weak on users. Your real-user proof is elsewhere: 68 Firestorm sites and CrowdTracker's 600+ daily users. Lead with those for "real users" and let this build carry "nobody asked".</td></tr>
+</table>
+</div>
+
+<h3>What the CEO will probe on the call, and the answer to have ready</h3>
+
+<ul>
+  <li><b>"We already make this report by hand. What's new?"</b> The two inferences (gap check, neighbour comparison) and the fact that it runs in 30 seconds on any US hotel. Never say "new idea"; say "the automatic version of the report you hand out, plus two checks the hand version can't do at scale".</li>
+  <li><b>"Why only five reviews?"</b> That is all Google's API gives; Tripadvisor's free plan gives three. The report says the count every time and never speaks in percentages. The batch version would use the Google Business Profile API, which gives the hotel's full review history, once a hotel connects its account. That is the day-60 item.</li>
+  <li><b>"Your tool flags booking on another domain. Our hotels book on bookmystay.io."</b> Yes, and their own Trustpilot reviews show guests distrusting the <code>.io</code> domain. Raise it as an insight you found while building, with the fix (a custom domain per hotel), not as a criticism. This is the strongest single moment you can have on the call: it shows you looked at their product the way a guest does.</li>
+  <li><b>"How much does a report cost us?"</b> About 3 to 6 US cents in Google calls and under a cent in model calls on a cheap model; see section 6. A sales team running 500 prospects a week is about $25.</li>
+  <li><b>"Where did the AI go wrong?"</b> Have the run-log numbers: quotes offered, quotes dropped, by model. And two or three specific invented quotes from the hand check. If you have no numbers, you have no answer to the question the post says they care most about.</li>
+  <li><b>"What would you do in the first 90 days?"</b> Month 1: this, inside the sales flow, as the free report for AAHOA leads. Day 60: batch mode plus the Google Business Profile connection. Day 90: a roadmap built from what the sales team heard from the first 50 owners who got a report. Frame every item as "what I'd check with customers first".</li>
+</ul>
+
+<h3>What to send, and in what order</h3>
+
+<ol>
+  <li>The live link and the repo, after the hand check, not before.</li>
+  <li>Three to five founder's-version reports on real US independent hotels, sent privately. Pick hotels of different sizes and at least one that scores well, so it doesn't read as a hit piece.</li>
+  <li>The short write-up: problem and evidence, what was built and left out, the security calls, where the AI went wrong (with numbers), the hand-check table.</li>
+  <li>One page for a hotel owner in plain English.</li>
+  <li>The 2-minute voice note, only when they ask for the challenge.</li>
+</ol>
+
+<div class="card bad"><b>Two things that would hurt you here.</b> (1) A dead or slow link: Google quota exhausted, PageSpeed throttled, a 504. Keep three saved reports that always load, and test the live link the morning you send it. (2) A wrong finding on a hotel the CEO knows. Hence gaps 1 and 2 above, and the hand check.</div>
+
+<h2 id="cv">4. On your CV: does it match your niche, your office work, your passion?</h2>
+
+<h3>The match is better than most people's side projects</h3>
+
+<p>Your CV already says, in the Firestorm line: "a network of attraction-ticket and destination sites, earning through GetYourGuide, Viator and Tiqets affiliate programmes". You built the pipeline behind 68 of those sites, and CrowdTracker tells travellers when to visit an attraction. Your own ventures are travel too: the itinerary tool, the Northern Lights and Bay of Kotor sites, the attraction forums. A hotel tool is the hospitality end of the same industry. A reader sees one person who has spent three years building things for travellers and the businesses that serve them, now doing it for hotels. That reads as a track, not a scattering.</p>
+
+<p>The connection you can state in one sentence, and it is true: <b>"My affiliate sites only earn when travellers find them and trust them; this tool checks the same two things for a hotel's own website."</b> That line also works for Fibr ("agent readiness" is the same problem from the AI-reader side) and for any travel-tech company.</p>
+
+<h3>Where it doesn't match, said plainly</h3>
+
+<ul>
+  <li><b>Your title is "AI Automation Engineer" and your target companies are Series A/B AI startups in Bangalore.</b> Most of them don't care about hotels. For them this project has to be read as "an AI product whose every claim is checked", which is exactly how escalation-gate is read. So the CV bullet must lead with the checking, not the hotel.</li>
+  <li><b>The X strategy you set on 17 Oct says travel content is off X.</b> This is an engineering build, so it's allowed, but keep the posts about the method (section 5) or you drift back into the thing you stopped.</li>
+  <li><b>Passion is not the same as a market.</b> You like travel; hotel owners are not your audience and you have no way to reach them. That matters for section 6, not for the CV.</li>
+</ul>
+
+<h3>The CV bullet, in the style of the current CV</h3>
+
+<p>Add under Projects, after escalation-gate, once the hand check is done. Numbers in brackets are placeholders to fill from the run log and the hand check; never ship the bullet with invented ones.</p>
+
+<div class="post">### Direct Booking Check · Next.js, TypeScript, Google Places, PageSpeed, OpenRouter · 2026
+[repo link] · [live link]
+
+- **Type a US hotel's name and get a one-page check of why guests book through Expedia instead of direct.** Joins the hotel's Google listing and reviews, its website loaded in a phone browser, and the five nearest hotels into one report with the three fixes that matter most.
+- **The AI reads the reviews; code checks every quote.** A quote the model can't back with a real review is dropped and counted. On [N] runs the free model invented [x] of [y] quotes; the paid one [z].
+- **Two findings no single site gives:** questions guests ask in reviews that the hotel's own site never answers, and every number ranked against the hotels next door.
+- **Hand-checked on 10 real hotels:** [k] of 30 top-three findings were true on inspection; the misses are listed in the README.</div>
+
+<p>Keep it to four bullets. The CV is already at the length where a fifth project bullet pushes Education off the page.</p>
+
+<h3>What makes it resume-grade, and what doesn't</h3>
+
+<div class="tablewrap">
+<table>
+  <tr><th>Resume-grade when</th><th>Not yet when</th></tr>
+  <tr><td>The live link loads in under a minute for a stranger, every time</td><td>The link depends on a free model that is down half the time</td></tr>
+  <tr><td>The README has the hand-check table with real misses</td><td>The README says "works great" with no numbers</td></tr>
+  <tr><td>The drop rate per model is a number</td><td>"The AI sometimes hallucinates" with no count</td></tr>
+  <tr><td>It is in the portfolio next to escalation-gate under one heading like "AI that checks its own claims"</td><td>It sits alone as "a hotel tool"</td></tr>
+</table>
+</div>
+
+<h2 id="x">5. X distribution</h2>
+
+<h3>The constraints you already set</h3>
+
+<ul>
+  <li>33 followers; before 17 Oct your posts had sent 0 profile visits and 0 link clicks. X cannot distribute a product for you. Its value is the people on your target list seeing how you work.</li>
+  <li>X is for the job search first, escalation-gate second. Travel content is off X. This project is allowed as an engineering build, not as a travel product.</li>
+  <li>Four posts a day at most, scheduled at 14:30, 18:30, 21:30, 23:30 IST, after the 5 Oct limit for scripted posting. Check the scheduled list first.</li>
+  <li>Every project post carries the link in the post or the first self-reply, full URL with <code>?ref=x</code>.</li>
+  <li>Never a real hotel's name next to a bad score.</li>
+</ul>
+
+<h3>What to post: the method, with numbers</h3>
+
+<p>The thread that fits your audience is not "I built a hotel tool". It is "I made an AI write a report where every sentence has to quote its source, and here is how often it tried to cheat". That is the same story as escalation-gate with a new dataset, which is good: it makes the two projects look like one belief.</p>
+
+<p>Five posts, in order, one per day, each with an image or table and no video. Drafts, in your plain style. Fill the bracketed numbers from the run log; don't post without them.</p>
+
+<div class="post"><b>Post 1, the setup (day the build is green)</b>
+Built a thing this weekend: type a US hotel's name, get one page on why guests book through Expedia instead of direct. Google listing + reviews, the site loaded on a phone, the 5 hotels next door. One AI call reads the reviews. Everything the AI says has to be a quote from a real review, or code throws it out.
+[image: the score gauge and top-3 fixes on a saved, anonymised report]
+Reply 1: link with ?ref=x</div>
+
+<div class="post"><b>Post 2, the drop rate (after 20+ runs)</b>
+Ran it on [N] hotels. The free model invented [x] of [y] quotes it offered. The paid one invented [z]. Every invented quote was dropped before anyone saw it. Same lesson as escalation-gate: the model proposes, code verifies.
+[image: a two-row table, model vs quotes offered vs dropped]</div>
+
+<div class="post"><b>Post 3, the inference nobody else makes</b>
+The part I'm proudest of: guests ask "where do we park?" in reviews, and the hotel's own site never says. 2 of 8 reviews asking about something the site is silent on is the single most fixable leak a small hotel has. The tool checks that automatically.
+[image: the gap table from a saved report, hotel name blurred]</div>
+
+<div class="post"><b>Post 4, the mistake (from the hand check)</b>
+Where it went wrong: on [k] of 10 hotels it said "your site doesn't mention parking" when parking was on the FAQ page. It only read the home page. Fixed by [following the FAQ link / changing the wording]. Posting the misses because that's the part I'd want to read.
+[image: the hand-check table]</div>
+
+<div class="post"><b>Post 5, the comparison</b>
+A 4.5 rating means nothing alone. Next to the 5 hotels on the same street it means "4th of 6". Same for mobile speed: 38 against the neighbours' 76 is the finding, not 38. Numbers only make sense next to the people a guest is choosing between.
+[image: the radar or bar comparison, neighbours unnamed]</div>
+
+<h3>Who to reply to, beyond the current target list</h3>
+
+<p>Your target list is Bangalore Series A/B AI founders and US AI-tooling founders. Add a small second list for this project only: people who build or write about hotel tech and AI evaluation. Reply with substance two or three times before any DM, as per the 17 Oct routine.</p>
+
+<ul>
+  <li>Hotelzify's founder, if he posts on X (check; his activity is on LinkedIn). If he does, one genuine reply to a post of his, not a link drop.</li>
+  <li>Founders of Canary, Cloudbeds, Akia, Little Hotelier, and the HotelTechReport account: they post about AI concierges and "AI gives wrong hotel info" is a complaint in their reviews. Your post 2 is a direct answer to that.</li>
+  <li>People posting about LLM evals and citation checking: the escalation-gate audience. Posts 2 and 4 belong to them.</li>
+</ul>
+
+<h3>What not to do on X</h3>
+
+<ul>
+  <li>No "hotel owners, check your score here". They aren't on your X and the ones who find it will see a stranger grading their business.</li>
+  <li>No screenshots with a hotel name and a red score. Blur the name or use a hotel that scores well.</li>
+  <li>No "better than Hotelzify / Canary" claims. You are applying to one and may apply to the others.</li>
+  <li>No thread longer than the five posts above; your reach in October is low and a long thread of unseen posts looks worse than five spaced ones.</li>
+</ul>
+
+<h2 id="money">6. Revenue, honestly</h2>
+
+<h3>What a report costs you</h3>
+
+<div class="tablewrap">
+<table>
+  <tr><th>Call</th><th>Per report</th><th>Price</th><th>Free each month</th></tr>
+  <tr><td>Google Place Details with reviews (Enterprise + Atmosphere)</td><td>1</td><td>about $0.025</td><td>1,000 calls</td></tr>
+  <tr><td>Google Nearby Search, with website and phone fields</td><td>1</td><td>about $0.03 (Enterprise tier; check the pricing page)</td><td>1,000 calls</td></tr>
+  <tr><td>Google Text Search for the search box</td><td>1 per search</td><td>about $0.03</td><td>a few thousand</td></tr>
+  <tr><td>PageSpeed</td><td>6</td><td>free</td><td>about 25,000 a day with a key</td></tr>
+  <tr><td>Model, cheap paid (for example Llama 70B via OpenRouter)</td><td>1–2</td><td>under $0.01</td><td>free models: about 50 a day on the free tier</td></tr>
+  <tr><td>Vercel Hobby</td><td>—</td><td>$0</td><td>enough for a demo</td></tr>
+</table>
+</div>
+
+<p>So roughly <b>$0.06 to $0.10 a report after the free tier, and the first ~1,000 reports a month free.</b> Verify the Nearby Search tier on Google's English pricing page before quoting it; the SKU names changed in 2025 and the tier depends on which fields you request. Cost is not the problem. Nobody paying is the problem.</p>
+
+<h3>Four ways it could earn, ranked by odds</h3>
+
+<div class="tablewrap">
+<table>
+  <tr><th>Path</th><th>Who pays</th><th>What it would take</th><th>Odds</th><th>Fits your goals?</th></tr>
+  <tr><td><b>1. Batch prospect lists for hotel-tech sales teams.</b> "Paste 500 hotels, get them ranked by how badly they leak direct bookings, with the three fixes each." A sales rep calls the worst 50 first with a report in hand.</td><td>Hotelzify, Canary, Cloudbeds, Little Hotelier, regional web agencies for hotels. $200–500 a month, or per-list.</td><td>Batch mode (the day-60 item), the Google Business Profile connection is not needed. One pilot customer, found through the Hotelzify process itself or a LinkedIn message to a head of sales at a competitor. Two to three weeks of evenings.</td><td>Low, but real: it is the one version where the buyer already does this by hand (Hotelzify's founder literally does).</td><td>Yes: a product, not a service, and it serves the job search (every pilot conversation is an interview in disguise).</td></tr>
+  <tr><td><b>2. Paid single reports to hotel owners.</b> $19–29 via Stripe for the full report and a PDF.</td><td>Independent hotel owners.</td><td>A way to reach owners: SEO on "why aren't guests booking direct" queries, AAHOA forums, Facebook groups for innkeepers. Months of distribution work you don't have time for, and the goals file says the job comes first.</td><td>Very low in the next six months.</td><td>Partly: product, not service, but it competes with applications for time and the audience isn't yours.</td></tr>
+  <tr><td><b>3. Affiliate referrals inside the report.</b> "Your booking engine is on another domain: here are three that run on yours" with partner links.</td><td>Booking-engine and website vendors with partner programmes.</td><td>Traffic. Same problem as path 2. Also it changes the report from a check-up into a sales page, which costs you the "not affiliated with any company" line that makes it credible to Hotelzify.</td><td>Very low, and it damages path 1 and the job angle.</td><td>No.</td></tr>
+  <tr><td><b>4. Done-for-you fixes.</b> "Your score is 38; I'll rebuild your site for $X."</td><td>Owners.</td><td>You, as a web agency.</td><td>It is a known business, so the odds aren't zero.</td><td><b>No.</b> The goals file ruled out client service work on 5 Oct. Don't reopen it.</td></tr>
+</table>
+</div>
+
+<h3>Verdict on money</h3>
+
+<p>Build it for the job. Its job value is high and its running cost is near zero, so there is no reason not to. Treat revenue as a two-week experiment <b>after</b> the Hotelzify process has run its course, and only path 1: batch mode plus one pilot conversation with a sales lead at a hotel-tech company. If that conversation doesn't produce a "yes, send me a list" within two weeks, stop and leave the tool as a portfolio piece. That keeps the rule you set on 6 Oct: products and learning yield to applications whenever they compete.</p>
+
+<p>One honest note on the conflict: the "no outreach to hotel owners" rule was set for this build, so the evidence came from public data. Any revenue path means talking to someone. That's fine; the rule was about the build, not forever. But it means revenue is a different project from this one, with its own hours.</p>
+
+<h2 id="questions">7. Questions for you</h2>
+
+<ol>
+  <li><s>Gap 2 and gap 7</s>: answered by "fix all" (follow the pages; drop the Reviews sub-score).</li>
+  <li><b>Which paid model for the hand check and the numbers?</b> The free tier is fine for demos, but the drop-rate post needs a paid model as the comparison. A few dollars of OpenRouter credit covers it. OK to spend?</li>
+  <li><s>Partner token</s>: added.</li>
+  <li><b>Revenue path 1:</b> park it until Hotelzify answers, or write the batch-mode spec now while the model is fresh? My advice is park it.</li>
+</ol>
+
+<h2 id="next">8. Next steps and cost in hours</h2>
+
+<ol>
+  <li><b>Done, 19 Oct:</b> all nine gaps in the spec and tests, committed.</li>
+  <li><b>You:</b> run <code>handoff</code> in <code>/Volumes/asus/projects/hotel-direct-bookings</code>. Build time about 12–14 hours over two days, as planned, plus one hour for today's additions.</li>
+  <li><b>After the build (3–4 hours):</b> live runs with real keys, the 10-hotel hand check, the README results table, the write-up for Hotelzify, the CV bullet with real numbers.</li>
+  <li><b>X (20 minutes a day for five days):</b> the five posts above, in order, numbers filled in.</li>
+  <li><b>Revenue: parked</b> until Hotelzify replies. Then, if at all, two weeks on path 1.</li>
+</ol>
+
+<p class="sub">Feeds Tier 1 (the job). Moves phase 1. Total new time beyond the existing plan: about 5 hours of yours, 1 of mine.</p>
+
+<p class="sub">Sources checked for this page: <a href="https://developers.google.com/maps/billing-and-pricing/pricing">Google Maps Platform pricing</a>, <a href="https://openplacesapi.com/blog/google-places-api-pricing">a third-party breakdown of Places SKUs</a>, <a href="https://vercel.com/docs/functions/limitations">Vercel function limits</a>, <a href="https://blog.vercel.com/docs/functions/configuring-functions/duration">Vercel duration docs</a>, <a href="https://unlighthouse.dev/learn-lighthouse/pagespeed-insights-api/rate-limits">PageSpeed Insights API rate limits</a>, <a href="https://apis.io/rate-limits/google-chrome/google-chrome-rate-limits/">Chrome API rate limits</a>. Project files: <code>spec/site.md</code>, <code>docs/plan.html</code>, <code>docs/mental-model.md</code>, <code>findings.md</code>, and the research in <code>/Volumes/asus/career-ops/research/hotelzify/</code>.</p>
+
+</main>
+</body>
+</html>

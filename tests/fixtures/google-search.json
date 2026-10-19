@@ -1,6 +1,31 @@
 {
   "places": [
-    { "id": "ChIJexampleHarborside", "displayName": { "text": "Harborside Inn" }, "formattedAddress": "12 Commercial St, Portland, ME 04101, USA", "rating": 4.5, "userRatingCount": 1313 },
-    { "id": "ChIJexampleOther", "displayName": { "text": "Harbor View Suites" }, "formattedAddress": "40 Fore St, Portland, ME 04101, USA", "rating": 4.2, "userRatingCount": 410 }
+    {
+      "id": "ChIJexampleHarborside",
+      "displayName": {
+        "text": "Harborside Inn"
+      },
+      "formattedAddress": "12 Commercial St, Portland, ME 04101, USA",
+      "rating": 4.5,
+      "userRatingCount": 1313
+    },
+    {
+      "id": "ChIJexampleOther",
+      "displayName": {
+        "text": "Harbor View Suites"
+      },
+      "formattedAddress": "40 Fore St, Portland, ME 04101, USA",
+      "rating": 4.2,
+      "userRatingCount": 410
+    },
+    {
+      "id": "ChIJexampleCanada",
+      "displayName": {
+        "text": "Harbourside Inn Halifax"
+      },
+      "formattedAddress": "1 Water St, Halifax, NS B3J 1A1, Canada",
+      "rating": 4.3,
+      "userRatingCount": 210
+    }
   ]
 }

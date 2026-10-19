@@ -115,3 +115,13 @@
 **Why:** each one removes a way the report could be confidently wrong about a real hotel, which is the failure that would hurt most in front of Hotelzify or on X. The log line is the only source for "how often does the AI invent quotes" as a number.
 
 **Cost:** about 1 extra hour of build time, and the 200-character limit is a guess: a short but real page could be called unreadable. The hand check on 10 hotels (plan 14b) is where that gets tested.
+
+## 2026-10-19 · "Fix all": the nine gaps from the review, decided in one go
+
+**Decided (Deepak: "fix all"):** every gap in `docs/review-2026-10-19.html` goes into the spec and tests before handoff. (1) Partner view gated by `PARTNER_TOKEN`, checked on the server. (2) The gap check reads the home page plus up to four informational pages it links to, within a 20-second budget, and the finding says how many pages were checked. (3) Search is US only: `regionCode: "US"` and addresses ending in `USA`. (4) `maxDuration = 120` on the report route and a 50-second budget for the neighbours' PageSpeed runs. (5) `PAGESPEED_API_KEY` required in live mode. (6) Google display policy applied: author name and a link to the original review on every quote, and an ordering notice; the policies page has no rule against reading reviews with a model at request time, and nothing is stored, so the AI step stays on Google reviews. (7) The Reviews sub-score is dropped; weights become 40/30/30 and the fixture total 47. (8) A ten-minute in-memory cache for PageSpeed results and the neighbour list only. (9) Parking excludes for "Central Park", "Park Avenue", "parkway".
+
+**Considered:** wording-only fix for (2); keeping the Reviews sub-score under a "readiness" name for (7); removing the partner audience entirely for (1).
+
+**Why:** (1) and (2) were the two that could embarrass the tool in front of Hotelzify; the rest each remove a silent failure (throttled PageSpeed, a 504, a non-US hotel) or a question with no answer on the CEO call.
+
+**Cost:** about an hour more build time; the mock-up's fourth gauge segment is gone; the 200-character and 20-second limits are guesses to be checked in the 10-hotel hand check. The Google terms question is closed on the policies page only; the broader Service Terms were not re-read.

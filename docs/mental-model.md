@@ -18,7 +18,7 @@ Think of five people each handing us one piece of paper:
 
 1. **Google Places** hands us the listing: name, address, coordinates, rating, review count, website, phone, description, and the five reviews Google thinks are most relevant. This is the only source that must work; without it there is nothing to report on.
 2. **Google PageSpeed** loads the hotel's website in a real phone browser and hands us a report card: a speed score 0–100, whether it's secure (HTTPS), whether it fits a phone screen, and, crucially, the list of every network request the page made. That list is how we know the booking engine: if the page calls `be.synxis.com`, the hotel books through SynXis on someone else's domain.
-3. **The hotel's own website**, fetched by us as plain text. We need the words on the page to answer "does the site mention parking?". This fetch is locked down (see safety below) because the URL comes from Google, not from us.
+3. **The hotel's own website**, fetched by us as plain text: the home page, plus up to four pages it links to that look informational (FAQ, policies, rooms, about, parking, pets), because that is where the answers usually live. We need the words on those pages to answer "does the site mention parking?". The report says how many pages were read. A Facebook or booking-site link counts as no website at all and is never fetched. This fetch is locked down (see safety below) because the URL comes from Google, not from us.
 4. **Google Places again, nearby search**: the five lodging places within 1.5 km. For each we take only rating, review count, whether they have a website, a phone, a description. Never their reviews. We then run PageSpeed on each neighbour's website too.
 5. **Tripadvisor** (optional, built only if time remains): three recent reviews and the hotel's rank in its city.
 
@@ -44,12 +44,11 @@ Everything above is data the owner could, with effort, find themselves. Two sect
 
 ## The score
 
-One number so the owner remembers one thing. Four sub-scores, each 0–100:
+One number so the owner remembers one thing. Three sub-scores, each 0–100 (a fourth, Reviews, was dropped on 19 Oct because a star rating says nothing about whether guests book direct):
 
-- **Website (weight 35):** the PageSpeed score, minus deductions for http, no viewport, booking on another company's domain, no tap-to-call. The biggest weight because it's what the owner controls most and where most hotels lose.
-- **Guest messaging (25):** 100 minus 25 per question the site doesn't answer, minus 10 per question it does answer or we couldn't check.
-- **Google listing (20):** 40 for a description, 30 for a website, 30 for a phone.
-- **Reviews (20):** rating out of 5 scaled to 100, minus 10 if there are fewer than 50 reviews.
+- **Website (weight 40):** the PageSpeed score, minus deductions for http, no viewport, booking on another company's domain, no tap-to-call. The biggest weight because it's what the owner controls most and where most hotels lose.
+- **Guest messaging (30):** 100 minus 25 per question the site doesn't answer, minus 10 per question it does answer or we couldn't check.
+- **Google listing (30):** 40 for a description, 30 for a website, 30 for a phone.
 
 If a sub-score has no data (the AI failed, the site wouldn't load), it drops out and the weights are re-spread over the rest. The weights are a judgement, not measured against bookings, and the README will say so.
 
@@ -71,11 +70,11 @@ Three places:
 - **Our server** is a set of Vercel functions behind two routes: `GET /api/search?q=` and `POST /api/report`. The report route checks a per-visitor rate limit, picks which AI client to use (a fake one for tests and previews, the viewer's key if given, else our demo key), and runs the pipeline. All API keys live here as environment variables and never reach the browser.
 - **Outside services**: Google Places, Google PageSpeed, the hotel's website, Tripadvisor, OpenRouter. The server is the only thing that talks to them.
 
-There is no database. A report is computed, returned, and gone. That is partly Google's rule (review text may not be stored) and partly the safest design: nothing stored, nothing to leak.
+There is no database. A report is computed, returned, and gone. That is partly Google's rule (review text may not be stored) and partly the safest design: nothing stored, nothing to leak. The one exception is a ten-minute in-memory cache of PageSpeed results and the neighbour list, which are our own derived numbers and place ids, so two people checking the same hotel don't pay twice.
 
 ## Two audiences, one codebase
 
-The public page uses generic fix categories: booking website, Google profile, marketing, guest messaging. The version sent to Hotelzify's founder adds one line per fix naming the matching Hotelzify product. It's the same report with `?audience=partner`; the public JSON never contains the word Hotelzify, and a test asserts that.
+The public page uses generic fix categories: booking website, Google profile, marketing, guest messaging. The version sent to Hotelzify's founder adds one line per fix naming the matching Hotelzify product. It's the same report, unlocked by a secret token (`?partner=<token>`, checked on the server against `PARTNER_TOKEN`); without the right token the public report comes back, and the public JSON never contains the word Hotelzify. Tests assert both.
 
 ## The safety calls, in plain words
 

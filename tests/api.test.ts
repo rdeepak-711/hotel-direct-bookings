@@ -39,11 +39,31 @@ describe("fixture mode", () => {
     expect(JSON.stringify(body)).not.toContain("Took 40 minutes to sort out");
   });
 
-  it("POST /api/report with audience=partner adds product names", async () => {
+  it("POST /api/report with audience=partner adds product names only with the right PARTNER_TOKEN", async () => {
     vi.stubEnv("SOURCES_MODE", "fixture");
     vi.stubEnv("LLM_MODE", "fake");
-    const res = await reportPOST(req("/api/report", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ placeId: "ChIJexampleHarborside", audience: "partner" }) }));
-    expect(JSON.stringify(await res.json())).toMatch(/Hotelzify/);
+    vi.stubEnv("PARTNER_TOKEN", "s3cret-partner");
+    const post = (body: Record<string, unknown>) => reportPOST(req("/api/report", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify(body) }));
+    const ok = await (await post({ placeId: "ChIJexampleHarborside", audience: "partner", partnerToken: "s3cret-partner" })).json();
+    expect(JSON.stringify(ok)).toMatch(/Hotelzify/);
+    expect(JSON.stringify(ok)).not.toContain("s3cret-partner");
+    const noToken = await (await post({ placeId: "ChIJexampleHarborside", audience: "partner" })).json();
+    expect(JSON.stringify(noToken)).not.toMatch(/hotelzify/i);
+    const wrong = await (await post({ placeId: "ChIJexampleHarborside", audience: "partner", partnerToken: "guess" })).json();
+    expect(JSON.stringify(wrong)).not.toMatch(/hotelzify/i);
+  });
+
+  it("disables the partner audience entirely when PARTNER_TOKEN is empty", async () => {
+    vi.stubEnv("SOURCES_MODE", "fixture");
+    vi.stubEnv("LLM_MODE", "fake");
+    vi.stubEnv("PARTNER_TOKEN", "");
+    const res = await reportPOST(req("/api/report", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ placeId: "ChIJexampleHarborside", audience: "partner", partnerToken: "" }) }));
+    expect(JSON.stringify(await res.json())).not.toMatch(/hotelzify/i);
+  });
+
+  it("declares a maxDuration long enough for PageSpeed", async () => {
+    const route = await import("@/app/api/report/route");
+    expect(route.maxDuration).toBeGreaterThanOrEqual(120);
   });
 
   it("POST /api/report rejects a missing placeId", async () => {

@@ -28,7 +28,14 @@ describe("google", () => {
     const headers = init.headers as Record<string, string>;
     expect(headers["X-Goog-Api-Key"]).toBe("test-key");
     expect(headers["X-Goog-FieldMask"]).toContain("places.id");
-    expect(JSON.parse(init.body as string)).toMatchObject({ textQuery: "Harborside Inn Portland", includedType: "lodging" });
+    expect(JSON.parse(init.body as string)).toMatchObject({ textQuery: "Harborside Inn Portland", includedType: "lodging", regionCode: "US" });
+  });
+
+  it("searchHotels drops places outside the US", async () => {
+    vi.stubEnv("GOOGLE_PLACES_API_KEY", "test-key");
+    const results = await searchHotels("Harbourside Inn", { fetchImpl: async () => json(searchFx) });
+    expect(results.map((r) => r.placeId)).not.toContain("ChIJexampleCanada");
+    expect(searchFx.places.some((p) => p.formattedAddress.endsWith("Canada"))).toBe(true);
   });
 
   it("getPlace normalises the listing and reviews, with ids g-1..g-5 and attribution kept", async () => {
@@ -40,7 +47,8 @@ describe("google", () => {
       location: { lat: 43.6565, lng: -70.2525 },
     });
     expect(hotel.reviews).toHaveLength(5);
-    expect(hotel.reviews[0]).toEqual({ id: "g-1", source: "google", rating: 5, date: "2026-09-14", text: placeFx.reviews[0].text.text, author: "A. Guest", authorUrl: "https://www.google.com/maps/contrib/1" });
+    expect(hotel.reviews[0]).toEqual({ id: "g-1", source: "google", rating: 5, date: "2026-09-14", text: placeFx.reviews[0].text.text, author: "A. Guest", authorUrl: "https://www.google.com/maps/contrib/1", url: "https://www.google.com/maps/reviews/example-g-1" });
+    expect(hotel.reviews[1].url).toBeUndefined();
   });
 
   it("fails clearly without a key", async () => {
@@ -98,10 +106,14 @@ describe("tripadvisor", () => {
 });
 
 describe("pagespeed", () => {
+  it("refuses to run without a key unless allowNoKey is set", async () => {
+    vi.stubEnv("PAGESPEED_API_KEY", "");
+    await expect(runPageSpeed("https://x.example.com/", { fetchImpl: vi.fn() })).rejects.toThrow(/PAGESPEED_API_KEY/);
+  });
   it("calls the PSI API for mobile with the performance category and returns the raw result", async () => {
     vi.stubEnv("PAGESPEED_API_KEY", "");
     const fetchImpl = vi.fn(async () => json(psiFx));
-    const result = await runPageSpeed("https://www.harborside-inn-example.com/", { fetchImpl });
+    const result = await runPageSpeed("https://www.harborside-inn-example.com/", { fetchImpl, allowNoKey: true });
     expect(result.lighthouseResult.categories.performance.score).toBe(0.38);
     const [url] = fetchImpl.mock.calls[0] as unknown as [string];
     expect(url).toMatch(/^https:\/\/www\.googleapis\.com\/pagespeedonline\/v5\/runPagespeed\?/);

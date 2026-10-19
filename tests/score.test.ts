@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { SCORE_WEIGHTS, computeScore, listingScore, messagingScore, reviewsScore, websiteScore } from "@/lib/score";
+import { SCORE_WEIGHTS, computeScore, listingScore, messagingScore, websiteScore } from "@/lib/score";
 import { analyzeLighthouse } from "@/lib/website";
 import psi from "./fixtures/pagespeed.json";
 import psiNoBooking from "./fixtures/pagespeed-no-booking.json";
@@ -54,28 +54,20 @@ describe("listingScore", () => {
   });
 });
 
-describe("reviewsScore", () => {
-  it("scales the rating and charges 10 for a thin review base", () => {
-    expect(reviewsScore(hotel)).toBe(90);
-    expect(reviewsScore({ rating: 4.0, reviewCount: 20 })).toBe(70);
-    expect(reviewsScore({ rating: 4.0, reviewCount: null })).toBe(70);
-    expect(reviewsScore({ rating: null, reviewCount: 10 })).toBeNull();
-  });
-});
-
 describe("computeScore", () => {
-  it("weights the four sub-scores 35/25/20/20 and gives 54 on the fixtures", () => {
-    expect(SCORE_WEIGHTS).toEqual({ website: 35, messaging: 25, listing: 20, reviews: 20 });
-    expect(computeScore({ hotel, website: analyzeLighthouse(psi), gaps })).toEqual({ website: 23, messaging: 65, listing: 60, reviews: 90, overall: 54 });
+  it("weights the three sub-scores 40/30/30 and gives 47 on the fixtures", () => {
+    expect(SCORE_WEIGHTS).toEqual({ website: 40, messaging: 30, listing: 30 });
+    expect(computeScore({ hotel, website: analyzeLighthouse(psi), gaps })).toEqual({ website: 23, messaging: 65, listing: 60, overall: 47 });
+    expect(Object.keys(computeScore({ hotel, website: null, gaps: null })).sort()).toEqual(["listing", "messaging", "overall", "website"]);
   });
   it("renormalises the weights when a sub-score is null", () => {
     const s = computeScore({ hotel, website: analyzeLighthouse(psi), gaps: null });
     expect(s.messaging).toBeNull();
-    expect(s.overall).toBe(51); // (23*35 + 60*20 + 90*20) / 75
+    expect(s.overall).toBe(39); // (23*40 + 60*30) / 70
   });
   it("is null overall only when nothing could be scored", () => {
     const s = computeScore({ hotel: { description: null, website: "https://x.example.com", phone: null, rating: null, reviewCount: null }, website: null, gaps: null });
-    expect(s).toEqual({ website: null, messaging: null, listing: 30, reviews: null, overall: 30 });
+    expect(s).toEqual({ website: null, messaging: null, listing: 30, overall: 30 });
   });
 });
 

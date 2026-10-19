@@ -139,7 +139,7 @@
 <p>The full mock-up is <code>docs/report-infographic.html</code> (open it next to this page). A fictional hotel, every number sample data; the live page fills them from real sources. Written for an owner: no jargon, no percentages, "booking sites like Expedia" instead of "OTA".</p>
 <div class="tablewrap"><table>
   <tr><th>Section, in order</th><th>What it answers</th><th>New or existing data</th></tr>
-  <tr><td><b>Direct booking score</b>, gauge 0–100 with four sub-scores</td><td>"How bad is it?" in one number: website 35, guest messaging 25, Google listing 20, reviews 20</td><td>New framing, formula in code (section 3c)</td></tr>
+  <tr><td><b>Direct booking score</b>, gauge 0–100 with three sub-scores (Reviews dropped 19 Oct)</td><td>"How bad is it?" in one number: website 35, guest messaging 25, Google listing 20, reviews 20</td><td>New framing, formula in code (section 3c)</td></tr>
   <tr><td><b>The leak</b>: four steps from "searches your name" to "books on Expedia"</td><td>"Where exactly do I lose them?"</td><td>New framing of the checks</td></tr>
   <tr><td><b>Fix these first</b>: three cards with time estimate and impact</td><td>"What do I do Monday morning?"</td><td>Ranking is ours</td></tr>
   <tr><td><b>Gap check</b>: what guests asked that your website never answers</td><td>"Which questions send guests to Expedia's call centre?"</td><td><b>New.</b> Crosses review questions with the site's own text</td></tr>
@@ -286,7 +286,7 @@
   <li><b>Safe fetch</b><br>The locked-down URL fetch (private networks blocked, redirects re-checked, size and time caps).</li>
   <li><b>Gap check</b> <span class="pill">pure logic</span><br>Page text extraction, topic keywords, "does the site mention it".</li>
   <li><b>Neighbour comparison</b><br>Nearby search without reviews; averages and ranks.</li>
-  <li><b>Score</b> <span class="pill">pure logic</span><br>The four sub-scores and the weighted total (3c).</li>
+  <li><b>Score</b> <span class="pill">pure logic</span><br>The three sub-scores and the weighted total (3c); weights 40/30/30 since 19 Oct.</li>
   <li><b>Sources</b><br>Google, PageSpeed, Tripadvisor clients and the fixture mode, tested on recorded responses.</li>
 </ol>
 <h3>Day 2: joining, AI, page, ship</h3>
@@ -352,7 +352,7 @@
   <tr><td><code>safeFetch.test.ts</code></td><td>3</td><td>Private and internal addresses are refused before any request is made; every redirect hop is re-checked; it gives up after 3 redirects, cuts bodies at 2 MB and times out.</td></tr>
   <tr><td><code>gaps.test.ts</code></td><td>4</td><td>Page text comes out without scripts and tags, every topic has keywords, a theme maps to a topic, and each guest question is marked answered / not answered / unknown (unknown when there is no page text).</td></tr>
   <tr><td><code>compare.test.ts</code></td><td>5</td><td>Nearby search asks for lodging within 1.5 km and <b>never asks for reviews</b>; the hotel itself is dropped; averages and ranks are right; no neighbours gives null, not a crash; a metric the hotel lacks is skipped.</td></tr>
-  <tr><td><code>score.test.ts</code></td><td>6</td><td>Each sub-score line by line, the floors at 0, the fixture total of 54, the re-spread of weights when a sub-score is missing, and "null only when nothing could be scored".</td></tr>
+  <tr><td><code>score.test.ts</code></td><td>6</td><td>Each sub-score line by line, the floors at 0, the fixture total of 47 (was 54 with the Reviews sub-score, dropped 19 Oct), the re-spread of weights when a sub-score is missing, and "null only when nothing could be scored".</td></tr>
   <tr><td><code>sources.test.ts</code></td><td>7</td><td>The exact requests to Google, PageSpeed and Tripadvisor; review ids <code>g-1…</code> and <code>ta-…</code>; author attribution kept; a missing key fails with the variable's name; a non-2xx reply fails with the status code; name matching picks the best name, not the nearest place.</td></tr>
   <tr><td><code>report.test.ts</code></td><td>8</td><td>No percentages anywhere, never the word "OTA", "not found" rather than "missing", top 3 ranked by severity then by review support, partner product names only for the partner audience, an unanswered question becomes a high-severity gap finding, the neighbour average appears in the evidence, the score is carried, and a missing source marks its section unavailable instead of failing.</td></tr>
   <tr><td><code>llm.test.ts</code></td><td>9</td><td>The prompt includes every review by id and frames review text as data; the parser accepts the fixed JSON shape (with or without a code fence) and rejects prose or missing keys; one retry on bad output, then a clear failure; no model call when there are no reviews; an OpenRouter error never contains the key.</td></tr>
