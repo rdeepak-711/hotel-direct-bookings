@@ -61,3 +61,22 @@ Twelve Portland, Maine hotels, 5 Google reviews each, 16 of them rated 1–3 sta
 
 - Google Places policies: https://developers.google.com/maps/documentation/places/web-service/policies
 - Terra docs: https://docs.terra.tripadvisor.com/docs
+
+## Issue, 19 Oct 2026: npm install crashes during ENG-004 (resolved)
+
+Error: `npm error Cannot read properties of null (reading 'edgesOut')`, stack in `@npmcli/arborist` `build-ideal-tree.js` `#loadPeerSet`. npm 10.9.3, Node 22.20.0.
+
+1. First install crashed but reported exit 0, because the output was piped into `tail`. Lesson: never pipe an install into `tail` without keeping its exit code.
+2. Pinned `vite` 8.3.2 explicitly (vitest 5 takes vite as a peer). Same crash.
+3. Bisected with `--dry-run` installs in an empty folder: next+react+react-dom OK, typescript OK, vite OK, @types OK, **`vitest@5.0.3` alone fails**. Swapped to `vitest@4.1.11`: the full install still fails. The debug log's last placement before the crash is `fdir@6.5.0` (via `tinyglobby`); `fdir` has an optional peer `picomatch`, which vitest also depends on directly. Hypothesis, not verified: an npm 10 bug in peer-set loading.
+
+4. **Resolved:** `npx -y npm@11.21.0 install` with vitest back at 5.0.3: 59 packages, exit 0. The bug is in npm 10.9.3, not our dependencies. `package.json` now declares `packageManager: npm@11.21.0` and `engines.npm >=11`; CI must install npm 11 before `npm ci`.
+
+## Research, 19 Oct 2026: build-in-public posts that reached people (research agent; links opened via fxtwitter API)
+
+- Small-account breakouts showed a working thing or a real failure, never a teaser. Yasser Elsaid's Chatbase demo reached 826K views at 16 followers ("third tweet ever"): x.com/yasser_elsaid_/status/1621954428105379846. @leastfavorite_'s prompt-injection screenshots got 10.3K likes: x.com/leastfavorite_/status/1570475633557348355.
+- Riley Goodside's prompt-injection post got 5.2K likes (x.com/goodside/status/1569128808308957185). Simon Willison's "Lethal Trifecta" post got 658K views (x.com/simonw/status/1934602159984984235). Prompt injection is a topic people already argue about, and that is where our `--tools ""` guard fits.
+- X's published ranking weights (open-source algorithm, Apr 2023, may have changed): like 0.5, retweet 1, reply 13.5, profile click 12, a reply the author engages with 75, negative feedback −74. Replies and conversation outweigh likes.
+- Buffer 2025 (second-hand report): median engagement 3.56% for text vs 3.40% for images. Format barely matters; content does.
+- No controlled evidence on reply-to-big-accounts strategy or on teasers. Anecdotes only.
+- Templates in use: failure or security screenshot; named rule ("LLM proposes, code verifies") with a diagram; counter-intuitive story ("deleted my own tests"); showing the paperwork (spec, decisions log); replying with a point and a screenshot under big accounts' prompt-injection posts, without dropping a link in their thread.

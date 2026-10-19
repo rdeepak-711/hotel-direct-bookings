@@ -64,8 +64,8 @@ Arrows point from the module that imports to the module it depends on. The spec'
 **Purpose:** know the Node and npm versions every later command assumes. **Prerequisites:** none. **Files:** none changed.
 **Verification:** `node -v && npm -v` → saved to `docs/evidence/ENG-001.txt` (create `docs/evidence/`). **Acceptance:** Node 20 or newer. **Evidence:** the file.
 
-### [ ] ENG-004 Scaffold the project by hand (no `create-next-app`)
-**Owner:** Deepak types it, Claude dictates and explains each line. **Prerequisites:** ENG-001. **Purpose:** you asked to start from the documents, so the scaffold is the first thing you build and understand, not a template.
+### [x] ENG-004 Scaffold the project by hand (no `create-next-app`)
+**Owner:** Claude writes it after Deepak confirms (changed 19 Oct: the junior-dev loop), Deepak reads every file. **Prerequisites:** ENG-001. **Purpose:** you asked to start from the documents, so the scaffold is the first thing you build and understand, not a template.
 **Files:** `package.json`, `tsconfig.json`, `vitest.config.ts`, `next.config.ts`, `.gitignore` (already present).
 **Steps:** (1) `package.json` with `name`, `private: true`, scripts `dev`, `build`, `start`, `test: vitest run`, `typecheck: tsc --noEmit`; dependencies `next`, `react`, `react-dom`; devDependencies `typescript`, `vitest`, `@types/node`, `@types/react`, pinned to exact versions Claude gives you. (2) `tsconfig.json` with `strict: true`, `paths: { "@/*": ["./*"] }`, `moduleResolution: "bundler"`, the Next plugin. (3) `vitest.config.ts` with `include: ["tests/**/*.test.ts"]`, `environment: "node"`, and the `@` alias resolved to the repo root. (4) install the dependencies (run it in the background; it can take a minute).
 **Verification:** `npx tsc --noEmit` exits 0 on an empty project; `npx vitest run` reports "No test files found". **Learning note:** the `@` alias has to be declared twice, once for TypeScript (`paths`) and once for Vitest (`resolve.alias`), because they are two different module resolvers reading two different configs. This is the single most common "works in the editor, fails in the test" cause in a Next project.
@@ -82,7 +82,7 @@ Arrows point from the module that imports to the module it depends on. The spec'
 ### [ ] ENG-003 Decide and apply DEC-2: minimal CI
 **Owner:** Deepak or Claude. **Prerequisites:** DEC-2 approved, ENG-004.
 **Files:** `.github/workflows/test.yml` (new).
-**Steps:** on push and pull request: checkout, `actions/setup-node@v4` with Node 20 and npm cache, `npm ci`, `npx tsc --noEmit`, `npx vitest run --passWithNoTests` (drop the flag once ENG-010 lands). No secrets; tests must stay offline (fixtures and FakeLLM).
+**Steps:** on push and pull request: checkout, `actions/setup-node@v4` with Node 22 and npm cache, `npm install -g npm@11.21.0` (npm 10 crashes on vitest's peer set, see findings.md), `npm ci`, `npx tsc --noEmit`, `npx vitest run --passWithNoTests` (drop the flag once ENG-010 lands). No secrets; tests must stay offline (fixtures and FakeLLM).
 **Verification:** push; the Actions tab shows a green run on the empty scaffold.
 **Risks:** `npm ci` needs `package-lock.json` committed (ENG-004 does that). **Learning note:** CI is "someone else's machine runs your verification commands on every push". Its value is not catching bugs you'd catch locally; it's that a green badge is evidence a reviewer or recruiter can trust without cloning.
 **Public-build:** MKT-005. **Evidence:** a workflow run URL in `docs/project-status.md`.

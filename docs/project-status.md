@@ -6,13 +6,12 @@ Status levels, in order of strength: **draft** (text or code exists, unverified)
 
 ## Current phase
 
-Phase 0. Documents only: spec, decisions, mental model, system design, the three playbooks, findings. No tests, no scaffold, no code. Deepak's call on 19 Oct evening: build from the documents, writing each test file by hand before its module.
+Phase 0, scaffold done (ENG-004). Before that, documents only: spec, decisions, mental model, system design, the three playbooks, findings. No tests, no scaffold, no code. Deepak's call on 19 Oct evening: build from the documents, writing each test file by hand before its module.
 
 ## Next actionable tasks
 
 | Track | Task | Owner | Blocked by |
 |---|---|---|---|
-| Engineering | ENG-004 scaffold by hand (package.json, tsconfig, vitest config) | Deepak types, Claude dictates | ENG-001 |
 | Engineering | ENG-003 minimal CI | Deepak or Claude | DEC-2 approval, ENG-004 |
 | Engineering | ENG-010 quote check: test file first, then `lib/types.ts`, `lib/quotes.ts` | tests: Deepak with Claude; code: Codex | ENG-004 |
 | Marketing | MKT-001 positioning sheet | Claude drafts, Deepak approves | nothing |
@@ -30,6 +29,7 @@ Phase 0. Documents only: spec, decisions, mental model, system design, the three
 | 19 Oct | ENG-000 repository assessment; playbooks and status tracker | `ecdc4e2` |
 | 19 Oct | Reset to documents only: tests, fixtures, scaffold removed (Deepak) | `17199a8` |
 | 19 Oct | DEC-1 to DEC-4 decided per recommendation (Deepak); ENG-001 toolchain; ENG-002 `.env.example` complete (9 vars) | `docs/evidence/ENG-001.txt`, `.env.example` |
+| 19 Oct | ENG-004 scaffold: next 16.3.8, react 19.3.0, typescript 6.0.3, vitest 5.0.3; tsc exit 0, vitest finds no tests; needs npm 11 | `docs/evidence/ENG-004.txt` |
 | 19 Oct | DEC-6 recorded: `claude -p` first locally, with tools off and refused on Vercel | `docs/decisions.md` |
 
 ## Open decisions (need Deepak)
@@ -51,8 +51,8 @@ None. Hotelzify's 48-hour challenge invite has not arrived; if it does before EN
 
 | Check | Status | Evidence |
 |---|---|---|
-| `npx vitest run` | no project yet | ENG-004 |
-| `npx tsc --noEmit` | no project yet | ENG-004 |
+| `npx vitest run` | runs, no test files yet | `docs/evidence/ENG-004.txt` |
+| `npx tsc --noEmit` | exit 0 | `docs/evidence/ENG-004.txt` |
 | CI | none | DEC-2 |
 
 ## Deployment status

@@ -1,0 +1,16 @@
+ENG-004 evidence, 2026-10-19 20:22 IST
+node v22.20.0; install run with npm 11.21.0 via npx (npm 10.9.3 crashes on vitest's peer set, see findings.md)
+
+$ ./node_modules/.bin/tsc --noEmit
+exit 0
+
+$ ./node_modules/.bin/vitest run
+
+ RUN  v5.0.3 /Volumes/asus/projects/hotel-direct-bookings
+
+No test files found, exiting with code 1
+
+include: tests/**/*.test.ts
+exclude:  **/node_modules/**, **/.git/**
+
+exit 1
