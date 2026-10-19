@@ -1,0 +1,26 @@
+[
+  {
+    "id": "r1",
+    "source": "google",
+    "rating": 4,
+    "date": "2026-09-14",
+    "text": "Lovely stay. The staff were so friendly and the breakfast was great. Parking was a nightmare though.",
+    "author": "Fixture Guest One"
+  },
+  {
+    "id": "r2",
+    "source": "google",
+    "rating": 4,
+    "date": "2026-09-02",
+    "text": "Friendly staff, clean room.\nWhere do we  park? Couldn’t find any info on the “website”.",
+    "author": "Fixture Guest Two"
+  },
+  {
+    "id": "r3",
+    "source": "google",
+    "rating": 3,
+    "date": "2026-08-21",
+    "text": "Breakfast was great value. Room was small.",
+    "author": "Fixture Guest Three"
+  }
+]
