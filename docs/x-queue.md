@@ -68,7 +68,7 @@ Lengths: post 1 = 278 chars, post 2 = 277 chars (em-dash and arrow count as 1 on
 
 ## MKT-2A · none (feasibility, 18 Oct) · drafted 2026-10-20 00:46 IST
 Status: awaiting approval
-Slot: Tue 21 Oct, 21:30 IST (main slot). Replaces whatever is booked at 21:30 Tue; not added on top (posting cap: 2 originals a day).
+Slot: Tue 20 Oct, 21:30 IST (main slot). Replaces whatever is booked at 21:30 Tue; not added on top (posting cap: 2 originals a day).
 Audience: hiring managers for applied AI roles first (judgement: test the idea on real data before building); hotel-tech second
 Template: counter-intuitive story / honest small numbers (findings.md, "Research, 19 Oct 2026"); example 2a, Pillar 2 "Data that changed the plan", docs/x-growth-review.html
 Post:
