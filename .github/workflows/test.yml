@@ -1,0 +1,25 @@
+name: test
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # npm 10 (bundled with Node 22) crashes on vitest's peer set; see findings.md, 19 Oct.
+      - run: npm install -g npm@11.21.0
+      - run: npm ci --no-audit --no-fund
+      - run: npx tsc --noEmit
+      # Drop --passWithNoTests once ENG-010 adds the first test file.
+      - run: npx vitest run --passWithNoTests
