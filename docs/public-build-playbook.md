@@ -4,7 +4,7 @@ Owner: Agent B (build-in-public and distribution). Written 19 Oct 2026. Every it
 
 Standing rules, from Deepak's own notes:
 - **X is the channel.** Job-search outreach stays on x.com; LinkedIn gets the two long-form posts only (launch, case study). No YC, Wellfound, email or DM campaigns from this playbook.
-- **Four posts a day at most on X**, through the X scheduler at 14:30, 18:30, 21:30, 23:30 IST. Check the scheduled list before adding. Never script posting.
+- **Two streams on X.** Build updates go out in real time: the x-drafter agent drafts, Deepak approves and posts by hand at that moment. The four scheduled slots (14:30, 18:30, 21:30, 23:30 IST) carry other content and are unaffected. Never script posting.
 - **Every post about the project carries the project link**, full URL with `?ref=x`, in the post or the immediate self-reply.
 - **Replies need context**: say what was built before quoting a result.
 - **No fabricated metrics, users, testimonials or results.** Fixture data is always labelled "fixture data" or "sample data".

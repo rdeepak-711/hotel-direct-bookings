@@ -36,7 +36,7 @@ Rules that override anything else:
 - Every post about the project carries the project link in the post or the self-reply.
 - Give context before a result: what was built, then what happened.
 - One draft per milestone. If asked to redraft, replace the block, keep the id.
-- Do not draft more than four for one day; the X account posts four a day at 14:30, 18:30, 21:30, 23:30 IST and Deepak checks the scheduled list first.
+- Build updates are real-time: Deepak posts each one himself the moment he approves it, separate from the four scheduled daily slots (14:30, 18:30, 21:30, 23:30 IST), which carry other content. No daily cap on drafts, but one draft per milestone.
 
 ## After drafting
 
