@@ -72,6 +72,14 @@ No auth or accounts; no CI yet; no alerting or SLO; no retries or circuit breake
 
 - "Documents only": `ls -A` after the reset shows `.env .env.example .git .gitignore docs feasibility-counts.json findings.md spec tasks`.
 
+## X (checked Sundays, 20 min; from `docs/x-growth-review.html` section 10)
+
+| Week ending | Median views per original | Replies per original | New mutuals in the two lanes | Conversations with hiring people | Interviews or referrals from X |
+|---|---|---|---|---|---|
+| 26 Oct (bar) | ≥15 | ≥1 | +5 | 1 | — |
+
+View counts without Premium: the fxtwitter one-liner at the end of section 10 of the review.
+
 ## Feedback
 
 None yet (opens at MKT-021).

@@ -27,7 +27,7 @@ Audience: <from the playbook>
 Post:
 <the text, under 280 characters unless a thread is called for; then number the posts>
 Self-reply with link:
-<full project URL with ?ref=x, or the portfolio URL until the repo is public>
+<the public repo URL, or the portfolio URL with ?ref=x once it has a project card>
 Visual: <file path under docs/evidence/ or "none">
 Claims:
 - <claim> → <evidence path>
@@ -39,7 +39,13 @@ Rules that override anything else:
 - Every post about the project carries the project link in the post or the self-reply.
 - Give context before a result: what was built, then what happened.
 - One draft per milestone. If asked to redraft, replace the block, keep the id.
-- Build updates are real-time: Deepak posts each one himself the moment he approves it, separate from the four scheduled daily slots (14:30, 18:30, 21:30, 23:30 IST), which carry other content. No daily cap on drafts, but one draft per milestone.
+- **Posting cap (20 Oct, from `docs/x-growth-review.html`):** the account is throttled (median about 4 views per post since the 16 Oct scripted burst, against about 25 before). Until the median is 15 views or more, Deepak posts **at most 2 originals a day in total**, scheduled posts included. A build update **replaces** a slot that day; it is never added on top. Main slot 21:30 IST; 14:30 IST Tue/Thu for the India hiring audience. No posts Sat/Sun. When drafting, say which slot it is for and what it replaces.
+- **Audience order:** hiring managers for applied AI roles first, hotel-tech second. Every post must also work as proof of engineering judgement.
+- **Hook:** lead with what happened. Task ids ("ENG-010", "step 1 of 13") go at the end, never first.
+- **Link:** the public repo, `https://github.com/rdeepak-711/hotel-direct-bookings`, until the portfolio has a Direct Booking Check card; then the portfolio with `?ref=x`. One link reply per post, worded for that post; never the same reply text twice.
+- **Two lanes only until 30 Nov:** AI verification engineering and Direct Booking Check.
+- **Pick from the review's pillars and its 10 example posts** (`docs/x-growth-review.html`, sections 5 and 6) before inventing a new angle; check every number against its source file yourself.
+- Still: Deepak posts by hand, through the X interface or its scheduler. Nothing scripted, no bursts.
 
 ## After drafting
 
