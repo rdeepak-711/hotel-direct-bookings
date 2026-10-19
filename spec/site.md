@@ -23,7 +23,7 @@ Preview pages: `/, /report?placeId=ChIJexampleHarborside`
 - `next.config.ts`, `next-env.d.ts`, `README.md`, `docs/decisions.md`, `docs/flow.md`, `docs/mental-model.md`
 - `package.json` only to add a missing dependency; never to change the scripts or remove one
 
-Do not change: `tests/**`, `spec/**`, `docs/plan.html`, `docs/system-design.html`, `findings.md`, `.gitignore`, `.env.example`.
+Do not change: `tests/**`, `spec/**`, `docs/plan.html`, `docs/system-design.html`, `docs/implementation-playbook.md`, `docs/public-build-playbook.md`, `docs/project-status.md`, `findings.md`, `.gitignore`, `.env.example`.
 
 ## Environment variables
 
