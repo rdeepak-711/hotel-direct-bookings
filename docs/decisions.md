@@ -158,3 +158,13 @@
 
 **Cost:** (a) A demo filmed on `claude -p` cannot be reproduced by anyone who clones the repo, and the free OpenRouter model is weaker, so its themes will differ and more quotes may be dropped. Any post that shows output must say which model produced it. (b) `claude-cli` must never run on Vercel: the client refuses to start when `process.env.VERCEL` is set, and the route never chooses it on its own. (c) Review text is untrusted input going into an agentic CLI, so the call runs with every tool off and no MCP servers (`claude -p --tools "" --strict-mcp-config --output-format json`); without that, a review that says "run this command" is a prompt-injection path into Deepak's machine. (d) The fixture preview and CI are unaffected, because they use `LLM_MODE=fake`.
 
+
+## 2026-10-20 · The quote check matches exact words, not meaning
+
+**Decided:** a quote survives only if its exact words appear in the review it cites, after lowercasing, straightening curly quotes and collapsing whitespace (spec step 1). A quote that means the same thing in different words ("breakfast was excellent" against "breakfast was great") is dropped.
+
+**Considered:** fuzzy matching (edit distance), embeddings similarity, or a second model call asking "does this quote mean the same as the review?"
+
+**Why:** the report shows quotes in quotation marks under the guest's name. A hotel owner who searches the review for those words must find them. Exact matching is checkable by anyone in seconds; any meaning-based check needs another model or a threshold, which moves the trust problem instead of removing it.
+
+**Cost:** paraphrases and quotes with typos fixed by the model are dropped too, so weaker models will lose more praise. The drop count in the run log (step 10) is how we will see that rate.

@@ -62,7 +62,7 @@ Not deployed. No Vercel project linked. Google Cloud quota on the Places key: no
 
 ## Public content awaiting approval
 
-None drafted yet. MKT-004 is the first candidate once ENG-010's first red run exists.
+Two drafts in `docs/x-queue.md`, awaiting Deepak: MKT-DEC6 (prompt-injection guard, needs the DEC-6 screenshot) and MKT-ENG010 ("the model proposes, code verifies", needs the passing-tests screenshot).
 
 ## Known limitations (carried from `docs/system-design.html` §13)
 
