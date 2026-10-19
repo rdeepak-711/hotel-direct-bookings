@@ -65,3 +65,41 @@ Claims:
 - Matcher forced to accept everything → tests 7, 9, 10 fail → docs/evidence/ENG-010.txt (mutation check line)
 - Not claimed: any measured hallucination or drop rate (none measured, "can be counted later"); real hotels or users; that the full product works.
 Lengths: post 1 = 278 chars, post 2 = 277 chars (em-dash and arrow count as 1 on X).
+
+## MKT-2A · none (feasibility, 18 Oct) · drafted 2026-10-20 00:46 IST
+Status: awaiting approval
+Slot: Tue 21 Oct, 21:30 IST (main slot). Replaces whatever is booked at 21:30 Tue; not added on top (posting cap: 2 originals a day).
+Audience: hiring managers for applied AI roles first (judgement: test the idea on real data before building); hotel-tech second
+Template: counter-intuitive story / honest small numbers (findings.md, "Research, 19 Oct 2026"); example 2a, Pillar 2 "Data that changed the plan", docs/x-growth-review.html
+Post:
+1/
+I killed my first idea with 60 reviews.
+
+Plan: show each US hotel the booking problems guests complain about.
+
+12 hotels × 5 Google reviews (the API's cap). Booking/OTAs came up in 10, complaint or not. Cancellation: 2.
+
+Per hotel, that report would mostly be empty. Dropped it.
+
+2/
+What the 60 did talk about: rooms (42), location (41), staff (37).
+
+Two things guests kept raising that a hotel's own site could answer: check-in info (19), parking (14).
+
+Crude keyword tags, counts only, no review text kept. Enough to kill an idea, not to rank themes.
+
+Self-reply with link:
+The decision log entry that killed this idea, and what replaced it, are in the repo: https://github.com/rdeepak-711/hotel-direct-bookings
+Visual: docs/evidence/feasibility-chart.png (rendered 20 Oct from feasibility-counts.json `all`; page: docs/evidence/feasibility-chart.html)
+Claims:
+- 12 hotels, 5 Google reviews each, 60 total → feasibility-counts.json (`hotels`: 12 × 5; `total`: 60)
+- 5 is the API's cap → findings.md, "Data sources": Places API (New) returns at most 5 reviews per place
+- Booking/OTA 10, cancel/refund 2 → feasibility-counts.json `all`
+- "complaint or not": the 10 counts every review mentioning booking/OTA, positive or negative (only 6 are in 1–3 star reviews) → feasibility-counts.json `neg_themes` booking/OTA 6
+- Room/bed 42, location 41, staff 37; check-in info 19, parking 14 → feasibility-counts.json `all`
+- Plan was a per-hotel booking-problems report; it would mostly come out empty; dropped → docs/decisions.md, 18 Oct "What to build" (Considered: per-hotel booking-complaint mining, "killed by a feasibility run … most per-hotel reports would be empty"); findings.md "What it means" ("would usually come out empty. That idea fails at this data size.")
+- Check-in info and parking are things a hotel's own site could answer → findings.md "What it means" (inference, not measured); same idea became the gap check, docs/decisions.md 18 Oct Revision 3
+- Crude keyword tags, counts only, no review text kept → findings.md feasibility section ("Only counts were saved … no review text was stored"; "keyword tags are crude"); docs/decisions.md "Review text is never stored"
+- Not claimed: any hotel or city name; Hotelzify; percentages; per-hotel theme counts (never computed: "mostly empty" is inferred from 10 booking mentions across 12 hotels, under 1 per hotel on average).
+Lengths: post 1 = 279 chars, post 2 = 268 chars, link reply = 108 chars (URL counts as 23 on X).
+Tools: marketing:draft-content and marketing:brand-review both used; hashtags and emojis they suggest dropped per my-voice.md.
