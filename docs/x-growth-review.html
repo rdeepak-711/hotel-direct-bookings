@@ -1,0 +1,588 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>X Growth Review</title>
+<style>
+:root{
+  --bg:#fbfaf7; --surface:#ffffff; --surface-2:#f2efe8; --text:#1d1c1a; --muted:#5f5b53; --line:#e2ddd2;
+  --accent:#1f5f8b; --accent-soft:#e3eef6;
+  --src:#1e6b3a; --src-bg:#e2f2e7; --inf:#8a5300; --inf-bg:#fbefd9; --ms:#6b3fa0; --ms-bg:#efe6fa;
+  --warn:#9b2c2c; --warn-bg:#fbe5e3; --code-bg:#f2efe8;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#151513; --surface:#1d1d1a; --surface-2:#262622; --text:#ecebe6; --muted:#a9a59b; --line:#36352f;
+    --accent:#7db7e0; --accent-soft:#1f3242;
+    --src:#8fd6a5; --src-bg:#1b3324; --inf:#f0c070; --inf-bg:#3a2c12; --ms:#c9a6f2; --ms-bg:#2e2340;
+    --warn:#f2a29b; --warn-bg:#3d1f1d; --code-bg:#262622;
+  }
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font:17px/1.6 ui-serif,Georgia,"Iowan Old Style","Palatino Linotype",serif}
+main{max-width:780px;margin:0 auto;padding:32px 16px 80px}
+h1,h2,h3,h4{font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.25;letter-spacing:-.01em}
+h1{font-size:2rem;margin:.2em 0 .3em}
+h2{font-size:1.45rem;margin:2.4em 0 .6em;padding-top:.6em;border-top:2px solid var(--line)}
+h3{font-size:1.12rem;margin:1.8em 0 .4em}
+h4{font-size:1rem;margin:1.3em 0 .3em}
+p{margin:.6em 0}
+a{color:var(--accent);text-underline-offset:2px;overflow-wrap:anywhere}
+small,.muted{color:var(--muted)}
+.meta{font:14px/1.5 ui-sans-serif,system-ui,sans-serif;color:var(--muted)}
+nav.toc{font:15px/1.6 ui-sans-serif,system-ui,sans-serif;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 16px;margin:20px 0}
+nav.toc ol{margin:.3em 0;padding-left:1.3em}
+.tag{display:inline-block;font:600 11px/1 ui-sans-serif,system-ui,sans-serif;letter-spacing:.04em;text-transform:uppercase;padding:3px 6px;border-radius:4px;vertical-align:2px;margin-right:4px;white-space:nowrap}
+.tag.src{color:var(--src);background:var(--src-bg)}
+.tag.inf{color:var(--inf);background:var(--inf-bg)}
+.tag.ms{color:var(--ms);background:var(--ms-bg)}
+.tag.warn{color:var(--warn);background:var(--warn-bg)}
+.summary{background:var(--surface);border:1px solid var(--line);border-left:5px solid var(--accent);border-radius:10px;padding:16px 18px;margin:18px 0}
+.summary ol{padding-left:1.3em;margin:.4em 0}
+.summary li{margin:.55em 0}
+.callout{background:var(--warn-bg);border-radius:10px;padding:12px 16px;margin:16px 0}
+.note{background:var(--surface-2);border-radius:10px;padding:12px 16px;margin:16px 0}
+.tablewrap{overflow-x:auto;-webkit-overflow-scrolling:touch;margin:14px 0;border:1px solid var(--line);border-radius:8px}
+table{border-collapse:collapse;width:100%;font:14px/1.45 ui-sans-serif,system-ui,sans-serif;background:var(--surface)}
+th,td{padding:8px 10px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}
+th{background:var(--surface-2);font-weight:600}
+tr:last-child td{border-bottom:none}
+td.num{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+code{font:0.88em/1.4 ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--code-bg);padding:1px 4px;border-radius:4px;overflow-wrap:anywhere}
+pre.cmd{overflow-x:auto;background:var(--code-bg);border-radius:8px;padding:10px 12px;font:13px/1.45 ui-monospace,SFMono-Regular,Menlo,monospace;white-space:pre}
+pre.cmd code{background:none;padding:0;overflow-wrap:normal}
+.post{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin:14px 0}
+.post .head{font:600 13px/1.4 ui-sans-serif,system-ui,sans-serif;color:var(--muted);margin-bottom:8px}
+.post pre{white-space:pre-wrap;word-wrap:break-word;font:15px/1.5 ui-sans-serif,system-ui,-apple-system,sans-serif;margin:0 0 8px;color:var(--text)}
+.post .reply{border-left:3px solid var(--line);padding-left:10px;margin-top:8px}
+.post .why{font:14px/1.5 ui-sans-serif,system-ui,sans-serif;color:var(--muted);margin-top:8px}
+ul,ol{padding-left:1.4em}
+li{margin:.3em 0}
+.grid2{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:680px){.grid2{grid-template-columns:1fr 1fr}}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:12px 14px}
+.card h4{margin-top:0}
+footer{margin-top:60px;font:14px/1.5 ui-sans-serif,system-ui,sans-serif;color:var(--muted)}
+.sources li{font:14px/1.5 ui-sans-serif,system-ui,sans-serif;margin:.45em 0}
+</style>
+</head>
+<body>
+<main>
+
+<p class="meta">Direct Booking Check · build-in-public review · written 20 Oct 2026 for @rDeepak_ACEz · local file, not published</p>
+<h1>X Growth Review</h1>
+<p>How small indie developers turned X posts into revenue, sign-ups, followers or job offers, what the October 2026 ranking code says, and a six-week posting plan for Direct Booking Check, ending 30 Nov 2026.</p>
+<p class="meta"><span class="tag src">sourced</span> a source I opened says it, link given · <span class="tag inf">inference</span> my reading, not proven · <span class="tag ms">milestone</span> a post that is only true after a build step ships</p>
+
+<section class="summary" id="summary">
+<h3 style="margin-top:0">The five moves, ranked</h3>
+<ol>
+<li><strong>Fix the account before posting more.</strong> Your original posts from 17 to 20 Oct got a median of about 4 views each. Posts from 12 to 16 Oct got a median of about 25. The drop starts right after the 16 Oct scripted burst. Open X's "Under the Hood" page (<code>x.com/i/jf/under_the_hood</code>) to see whether a visibility label is on the account. Until views recover, post at most two originals a day, no duplicate replies, nothing scripted. <span class="tag src">sourced</span> numbers <span class="tag inf">inference</span> cause</li>
+<li><strong>Put the hiring audience first.</strong> The offer deadline is 30 Nov and the product has no demo yet. Every post should also work as proof for a hiring manager. Hotel-tech people come second, and they are also the overlap: hotel-tech companies hire engineers. <span class="tag inf">inference</span></li>
+<li><strong>Spend most of your X time on replies, not posts.</strong> In the 2026 code, a reply is weighted 5 against 0.66 for a like. Replies from mutual follows get an extra boost of 15. The only self-reported 0-to-500 case I found credits replies with about 80% of the growth. 45 minutes a day, in two blocks. <span class="tag src">sourced</span></li>
+<li><strong>Make one pinned post the hub and point everything at it.</strong> The current bio names escalation-gate, the portfolio does not mention Direct Booking Check, and the repo is still private. Rewrite the pinned "looking for my next role" post with both projects and links. When v1 ships, pin the demo. <span class="tag inf">inference</span></li>
+<li><strong>At v1, launch with a short screen recording of the output, not a thread about process.</strong> The posts that broke through for small and new accounts showed the thing working: Chatbase's demo video, HeadshotPro's photos at 2.07M views. Engineering posts get your hiring audience; the demo gets hotel-tech. <span class="tag src">sourced</span></li>
+</ol>
+<p class="meta" style="margin-bottom:0">Time cost of the plan: about 75 minutes a day, about 8–9 hours a week, capped so applications still come first. <span class="tag inf">inference</span></p>
+</section>
+
+<nav class="toc" aria-label="Contents">
+<strong>Contents</strong>
+<ol>
+<li><a href="#account">Your account, measured</a></li>
+<li><a href="#research">Research findings</a></li>
+<li><a href="#patterns">Patterns that convert</a></li>
+<li><a href="#plan">The plan: positioning and pillars</a></li>
+<li><a href="#posts">The 10 example posts</a></li>
+<li><a href="#v1">The v1 introduction and launch sequence</a></li>
+<li><a href="#profile">Profile fixes</a></li>
+<li><a href="#rhythm">Weekly rhythm and reply routine</a></li>
+<li><a href="#stop">What to stop doing</a></li>
+<li><a href="#metrics">Metrics</a></li>
+<li><a href="#sources">Sources</a></li>
+</ol>
+</nav>
+
+<!-- ============================================================ -->
+<h2 id="account">1. Your account, measured</h2>
+<p>I read every recent post's public view count through the fxtwitter API on 20 Oct 2026 <a href="#s7">[S7]</a>. Account state that day: 33 followers, following 324, joined June 2020, bio about escalation-gate, link to rdeepak.vercel.app. <span class="tag src">sourced</span></p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Window</th><th>Original posts</th><th>Views per post</th><th>Median</th></tr></thead>
+<tbody>
+<tr><td>24 Sep – 1 Oct</td><td class="num">4</td><td>38, 34, 10, 20</td><td class="num">≈27</td></tr>
+<tr><td>12 – 16 Oct</td><td class="num">11</td><td>34, 77, 25, 18, 16, 35, 91, 16, 52, 23, 21</td><td class="num">≈25</td></tr>
+<tr><td>17 – 20 Oct</td><td class="num">12</td><td>5, 9, 2, 5, 5, 3, 4, 5, 4, 2, 2, 2</td><td class="num">≈4</td></tr>
+</tbody></table></div>
+<p>The "The model proposes, code verifies" thread (19 Oct, 18:49 UTC) had <strong>2 views, 0 likes</strong> when I read it. The best recent posts were the 15 Oct LifeDots post (91 views), the 12 Oct HackerRank hiring-agent post (77) and the 16 Oct "I'm looking for my next role" post (52). <span class="tag src">sourced</span></p>
+
+<div class="callout">
+<p><strong>What this probably means</strong> <span class="tag inf">inference</span></p>
+<p>Posts from 17–18 Oct are already older than 48 hours, and the 2026 code drops posts older than 48 hours from For You <a href="#s1">[S1]</a>. So their view counts are close to final. A fall from about 25 to about 4 views per post, starting the day after you posted 20 times by script, points to a visibility label, not to bad content. The 19 Oct thread is a decent post that nobody was shown.</p>
+<p>How to check: X's open-source repo says a pilot page, <code>x.com/i/jf/under_the_hood</code>, shows "the visibility-impacting labels that have been applied to their account and posts" <a href="#s1">[S1]</a>. The repo says availability is being expanded "over time", so it may not open for you yet. If it doesn't, the view counts above are your test: when original posts get back to 15–30 views, the label has likely lifted.</p>
+<p>Two smaller things I noticed: the 14 Oct self-replies "Code: … Live packets: …" went out more than once with the same text a minute apart, and five unrelated topics ran in one week (LifeDots, northern lights, Claude Code setup, escalation-gate, Direct Booking Check). Duplicates are the kind of thing spam rules look for. I can't see which rule fired.</p>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="research">2. Research findings</h2>
+<p class="note">This builds on <code>findings.md</code> → "Research, 19 Oct 2026: build-in-public posts". That section already covers Chatbase (826K views at 16 followers), Riley Goodside's and @leastfavorite_'s prompt-injection posts, and X's 2023 weights. Below, I only add what is new, and I update the 2023 weights, because X published new ranking code in 2026.</p>
+
+<h3 id="algo">2.1 How X ranks posts in October 2026</h3>
+<p>X open-sourced a new For You algorithm on 20 Jan 2026 <a href="#s6">[S6]</a> and keeps the repo at <a href="https://github.com/xai-org/x-algorithm">github.com/xai-org/x-algorithm</a>. The README was last updated 18 Sep 2026 and the weights file is synced from production values <a href="#s1">[S1]</a> <a href="#s2">[S2]</a>. I read the README, <code>home-mixer/params/param.rs</code>, <code>home-mixer/scorers/author_cold_start.rs</code> and <code>docs/BIDIRECTIONAL_BOOST_CHANGE.md</code>. <span class="tag src">sourced</span></p>
+
+<p>How it works: a model predicts how likely each viewer is to take each action on a post, and the score is the sum of weight × predicted probability. The README warns that weights multiply probabilities, not counts. So a weight of 5 doesn't mean one reply equals five likes. It means the model's guess that you will reply moves the score more. <span class="tag src">sourced</span></p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Action</th><th class="num">2026 weight</th><th class="num">2023 weight (findings.md)</th></tr></thead>
+<tbody>
+<tr><td>Like</td><td class="num">0.66</td><td class="num">0.5</td></tr>
+<tr><td>Reply</td><td class="num">5.0</td><td class="num">13.5</td></tr>
+<tr><td>Reply, viewer and author follow each other (extra boost)</td><td class="num">+15</td><td class="num">—</td></tr>
+<tr><td>Repost</td><td class="num">1.0</td><td class="num">1</td></tr>
+<tr><td>Quote</td><td class="num">5.0</td><td class="num">—</td></tr>
+<tr><td>Share via copy link</td><td class="num">20.0</td><td class="num">—</td></tr>
+<tr><td>Share via DM</td><td class="num">5.0</td><td class="num">—</td></tr>
+<tr><td>Follow the author</td><td class="num">4.0</td><td class="num">—</td></tr>
+<tr><td>Profile click</td><td class="num">0.0</td><td class="num">12</td></tr>
+<tr><td>Open link</td><td class="num">0.2</td><td class="num">—</td></tr>
+<tr><td>Author replied to the reply</td><td class="num">not in 2026 params</td><td class="num">75</td></tr>
+<tr><td>Not interested / mute / block / report</td><td class="num">−52.3 / −58.8 / −31.2 / −234</td><td class="num">−74 (negative feedback)</td></tr>
+</tbody></table></div>
+<p class="meta">2026 values from <a href="#s2">[S2]</a>; the mutual-follow boost and its history (tested at 5–20 from 10 July 2026, set to 15 on 24 July) from <a href="#s4">[S4]</a>.</p>
+
+<p>Five rules in the code matter for a 33-follower account: <span class="tag src">sourced</span></p>
+<ul>
+<li><strong>Small authors get a trial slot, briefly.</strong> The cold-start scorer gives a slot around position 15–16 in a viewer's feed to posts that are original (not a reply, not a repost), from authors with at most 50,000 followers, with fewer than 200 impressions, and less than 2 hours old. Among the eligible posts, it samples using each post's likes per home-feed view <a href="#s3">[S3]</a> <a href="#s2">[S2]</a>.</li>
+<li><strong>Posts expire after 48 hours.</strong> <code>AgeFilter</code> removes posts older than 48 hours from For You <a href="#s1">[S1]</a>.</li>
+<li><strong>Your own posts compete with each other.</strong> "Each post after an author's first is multiplied by a decaying factor, down to a floor" (Author Diversity) <a href="#s1">[S1]</a>.</li>
+<li><strong>Strangers' feeds discount you.</strong> Posts from accounts the viewer doesn't follow are multiplied by a factor below 1, and so are replies and reposts from accounts they do follow <a href="#s1">[S1]</a>.</li>
+<li><strong>Links are not penalised in the code.</strong> "Open link" carries a small positive weight (0.2) <a href="#s2">[S2]</a>. On 28–29 July 2026, X's product head Nikita Bier told Mark Zuckerberg "you do not need to put the links in replies anymore", and Elon Musk replied to Paul Graham "We haven't for over a year" <a href="#s5">[S5]</a>. An October 2024 test by Jesse Colombo found 94% fewer views on a linked post <a href="#s6">[S6]</a>, but that predates both the new code and Musk's statement.</li>
+</ul>
+<p><strong>What that means for you</strong> <span class="tag inf">inference</span></p>
+<ul>
+<li>The first two hours of an original post decide most of its reach, and the trial is judged on likes per view. Post when your audience is awake, and be around to answer replies.</li>
+<li>Four posts a day split the same small pool of viewers, and each one after the first is discounted. Fewer, better posts.</li>
+<li>Profile clicks no longer score anything. A profile visit only matters if the profile turns it into a follow, a link click or a DM.</li>
+<li>Mutual follows are the strongest lever the code gives a small account. Thirty mutuals who actually reply are worth more than three hundred passive followers.</li>
+<li>The "link in the first reply" rule can relax. Put the link in the post when the click is the point (a demo, the repo). Keep discussion posts link-free because they're meant to get replies.</li>
+</ul>
+
+<h3 id="cases">2.2 Indie developers whose X posts produced money or attention</h3>
+<p>Views and likes were read from each post through the fxtwitter API on 20 Oct 2026 <a href="#s7">[S7]</a>, and follower counts the same day <a href="#s8">[S8]</a>. Revenue figures are the founders' own words unless marked TrustMRR (Stripe-verified). <span class="tag src">sourced</span></p>
+
+<div class="tablewrap"><table>
+<thead><tr><th>Who · followers today</th><th>What they post</th><th>Posts I opened (views · likes)</th><th>Outcome</th></tr></thead>
+<tbody>
+<tr><td>@levelsio · 978K</td><td>Revenue milestones with customer counts, costs and the stack; failures in the same format</td><td><a href="https://x.com/levelsio/status/1631715500010135552">$10K MRR after 3 weeks, 318 customers</a> (Mar 2023): 243.6K · 455<br><a href="https://x.com/levelsio/status/1636770414293843971">$25K MRR, 836 customers, costs and profit</a>: 234K · 544<br><a href="https://x.com/levelsio/status/1748018428466647298">"First month in iOS App Store… Not great"</a>: 175K · 539<br><a href="https://x.com/levelsio/status/1970858876212756506">Photo AI record $150K/mo</a> (Sep 2025): 812K · 5,199</td><td>Bio today lists Photo AI $86K/m and, relevant to you, Hotelist.com $5K/m <a href="#s8">[S8]</a></td></tr>
+<tr><td>@marclou · 414K</td><td>Revenue totals, launch recaps, the failures before the hit</td><td><a href="https://x.com/marclou/status/1777354473293402337">"$100,000 in revenue in the last 30 days… Mood2Movie made $0"</a>: 543K · 1,647<br><a href="https://x.com/marclou/status/1767932387802100012">ShipFast crossed $300K: visitors, buyers, margin</a>: 66K · 476<br><a href="https://x.com/marclou/status/2096911867516252385">"$3M with my 36 startups"</a> (7 Sep 2026): 2.44M · 8,490</td><td>His own account: "After failing as an entrepreneur for 5 years, I got a job in 2021… 2021 and 2022 were quiet." TrustMRR: ShipFast $1.27M all-time but $1,694 in the last 30 days; DataFast $29.2K MRR <a href="#s9">[S9]</a></td></tr>
+<tr><td>@tdinh_me · 205K</td><td>Short revenue and product posts</td><td><a href="https://x.com/tdinh_me/status/1633486840044089345">"$3,100 in revenue from typingmind.com already!"</a> (Mar 2023): 75K · 317<br><a href="https://x.com/tdinh_me/status/1908345028327727335">"$148k revenue last month"</a> (Apr 2025): 55K · 939</td><td>Bio: TypingMind $137K/m. A HackerNoon summary says he went from zero to $45K/mo in 2 years, with 97K followers at the time <a href="#s19">[S19]</a></td></tr>
+<tr><td>@dannypostma · 188K</td><td>Launches built around the product's output</td><td><a href="https://x.com/dannypostma/status/1636337910017556480">"These headshots? Made entirely by AI. Introducing HeadshotPro"</a> (photo): 2.07M · 3,925<br><a href="https://x.com/dannypostma/status/1680462209531645952">"AI built 90% of HeadshotPro's image generation funnel… I don't know Python."</a>: 40K · 262</td><td>The launch post's image is the product's output</td></tr>
+<tr><td>@yongfook · 174K</td><td>MRR moods, contrarian tech takes</td><td><a href="https://x.com/yongfook/status/1731862000504852890">"Daily fluctuations at 53K MRR are brutal"</a>: 28K · 113<br><a href="https://x.com/yongfook/status/1969022369336356874">"$1 million ARR on Rails 6 and jQuery"</a>: 21.6K · 347</td><td>Bio: Bannerbear $81K MRR</td></tr>
+<tr><td>@arvidkahl · 213K</td><td>Small, honest revenue numbers and invisible engineering</td><td><a href="https://x.com/arvidkahl/status/1767552084725948836">"Podscan now has made over $1000 in revenue. 4-figure biz 🤣"</a>: 22K · 138<br><a href="https://x.com/arvidkahl/status/1807544021935693880">"a massive change… that no one will ever see"</a> (infra rebuild): 42K · 213</td><td>The engineering post got about twice the views of the revenue post</td></tr>
+<tr><td>@steventey · 59K</td><td>Open-source launches, one line plus stack</td><td><a href="https://x.com/steventey/status/1572958186667233282">"Introducing my new side project: dub.sh… open-source"</a> (Sep 2022): 1,647 likes<br><a href="https://x.com/steventey/status/1574393362991685635">"trending on GitHub all weekend… 2K stars"</a>: 74 likes</td><td>Bio: founder of Dub, "previously @vercel". Whether X led to the Vercel job: not confirmed by any source I found</td></tr>
+<tr><td>@ajlkn · 65K</td><td>Charts of users, sites and revenue, years apart</td><td><a href="https://x.com/ajlkn/status/996448887945785345">Carrd monthly stats 2016–2018 chart</a>: 113 likes<br><a href="https://x.com/ajlkn/status/1388232473352491009">"2.5M sites, $1M ARR, and a funding round… AMA"</a>: 231 likes</td><td>Low cadence, long horizon</td></tr>
+<tr><td>Damon Chen (Testimonial)</td><td>MRR milestones and a public quit-your-job pledge</td><td>Tweet "close to hitting $1,000 MRR" drew Acquire.com's founder Andrew Gazdecki, who signed up for the top plan <a href="#s10">[S10]</a>; pledged to quit at $1K MRR (#QuitInPublic) <a href="#s11">[S11]</a></td><td>His @damengchen handle didn't resolve when I checked, so I couldn't open his posts</td></tr>
+<tr><td>@Shpigford · 76K</td><td>Pioneered open revenue dashboards (Baremetrics)</td><td><a href="https://x.com/Shpigford/status/1985180293645611380">"very few instances where openly sharing revenue is beneficial"</a> (Nov 2025): 18K · 52</td><td>The open-startup pioneer now argues against it</td></tr>
+<tr><td>@jakobgreenfeld · 23K</td><td>Writing about audience growth</td><td><a href="https://x.com/jakobgreenfeld/status/1619668018577149952">"2500 views with 37,000 followers"</a> (Jan 2023): 35K · 59</td><td>Even mid-size accounts reach a small share of followers per post</td></tr>
+<tr><td>India: @saguppa (SalesRobot)</td><td>Long revenue story</td><td><a href="https://x.com/saguppa/status/2035710588761121155">"I finally crossed $1M ARR"</a> (Mar 2026): 592 views · 11 likes</td><td>A real $1M ARR milestone from India got 592 views. Revenue and reach are separate things</td></tr>
+</tbody></table></div>
+<p class="meta">Not covered: @csallen (70K, founder of Indie Hackers). I found no breakout post or outcome of his that I could open. 100x Engineers and named Indian indie hackers on X: searches returned only Indie Hackers profile pages with no handles or numbers, so I left them out.</p>
+
+<h3 id="jobs">2.3 The job-seeker angle</h3>
+<ul>
+<li><strong>Hired by DM in Chennai's AI scene.</strong> Raj Dabre, writing about AI4Bharat in April 2026, says a candidate's emailed CV got ignored. Two weeks later Dabre DMed the same person on Twitter because of their public work: "One interview later and I instantly hired him. Probably the best hire of my life." (62K views) <a href="#s12">[S12]</a> <span class="tag src">sourced</span></li>
+<li><strong>#applyinpublic.</strong> In Sep 2020, after two years of shipping no-code side projects in public, KP posted that he was job hunting. The thread got 74 likes, and he reports 13 serious leads that month and six final rounds. On Deck made its offer in a public tweet that cited his "building in public" brand (289 likes) <a href="#s13">[S13]</a>. He is now Head of Community at Netlify, per his bio <a href="#s8">[S8]</a>. <span class="tag src">sourced</span></li>
+<li><strong>Project fame leads to a lab hire, at a scale you can't plan for.</strong> Sam Altman announced on 15 Feb 2026 that OpenClaw's creator Peter Steinberger was joining OpenAI, calling him "a genius with a lot of amazing ideas about the future of very smart agents" <a href="#s14">[S14]</a>. The article doesn't credit X posts. <span class="tag src">sourced</span></li>
+<li><strong>Screenshots, then a new job title.</strong> Riley Goodside posted chatbot screenshots through 2022 (his bio: "Mostly screenshots of chatbots") and became Scale AI's lead prompt engineer, in a role Semafor says "didn't exist a year ago" <a href="#s15">[S15]</a>. I found no source that ties the hire to specific posts. <span class="tag src">sourced</span></li>
+<li><strong>Learn in public.</strong> swyx's essay says the people you help in public "will want to pay you for your help too. A lot more than you think." It is self-reported and has no numbers <a href="#s16">[S16]</a>. <span class="tag src">sourced</span></li>
+<li><strong>What hiring managers screen AI engineers for</strong>, per Gauntlet AI's CTO (Apr 2026): evals ("the part people skip"), knowing when to trust model output and how to validate it, trade-off reasoning, and shipped work you can explain. Red flag: "relying on the model without verifying its output" <a href="#s17">[S17]</a>. That last line is your product's first rule. <span class="tag src">sourced</span></li>
+<li><strong>How recruiters search X:</strong> keywords in the bio and header, role plus location ("Software Engineer California"), Boolean queries, lists and communities <a href="#s18">[S18]</a>. <span class="tag src">sourced</span></li>
+<li><strong>The counter-case.</strong> Justin Poehnelt says Google fired him after his Workspace CLI went viral. He says legal grilled him "about why the Google logo and brand colors" were on it <a href="#s20">[S20]</a>. <span class="tag src">sourced</span> Your project leans on Google data. Keep Google's logo and colours to the attribution Google's terms require, and check your Firestorm contract on side projects before the repo goes public. <span class="tag inf">inference</span></li>
+</ul>
+<p><strong>What the job cases have in common</strong> <span class="tag inf">inference</span>: none of them came from follower count. They came from a specific person seeing specific work: a lab lead who already knew the candidate's posts, a hiring team who read two years of shipped projects. With 33 followers and six weeks, X can't bring in offers by itself. It can make every application and every reply land on proof. The plan below is built that way.</p>
+
+<h3 id="audits">2.4 Audits as content, and their ethics</h3>
+<ul>
+<li><strong>Public roasting builds reach, not necessarily money.</strong> AyeshaBuilds roasted landing pages in public for free before building RoastMyLanding. TrustMRR shows $48 total revenue across three products, 3 paying customers and 430 followers <a href="#s21">[S21]</a>. The public examples I found were founders who submitted their own URLs or tagged the roaster. Nobody was roasted uninvited. <span class="tag src">sourced</span></li>
+<li><strong>Paid roasts are sold as private.</strong> A search summary describes Olly's Roast My Landing Page as "100% private" for paid roasts, claiming £70,000 of work from 200 roasts. The page redirected to another domain, so I could not open it. <span class="tag warn">unverified</span></li>
+<li><strong>Google's rules make public quoting of real reviews hard anyway.</strong> Google's Places policies say "You must always credit the author when displaying photos or reviews", that end users "must always have access to view the individual source… review on Google Maps", and that Places content can't be cached apart from place IDs <a href="#s22">[S22]</a>. <span class="tag src">sourced</span> A screenshot of a real review in a post would need the author's name and a link to the review, which identifies the hotel. <span class="tag inf">inference</span></li>
+<li><strong>Anonymising is weaker than it looks.</strong> A search summary of an Australian law firm's note says a business can be defamed without being named if it is identifiable from the description. I couldn't open the page (HTTP 503). <span class="tag warn">unverified</span> The practical point stands either way: "a 120-room hotel on the Portland waterfront" names the hotel. <span class="tag inf">inference</span></li>
+</ul>
+<div class="note">
+<p><strong>Policy for this project</strong> <span class="tag inf">inference</span>, consistent with the standing rule in <code>docs/public-build-playbook.md</code></p>
+<ol>
+<li><strong>Fixture data</strong> ("Harborside Inn", invented reviews) for every screenshot of a report, labelled "fixture data".</li>
+<li><strong>Aggregates only</strong> for real data: "12 hotels in one US city, 60 reviews", counts, no hotel details, no review text.</li>
+<li><strong>Praise only</strong> if a real hotel is ever named: something it does well, with no score next to it.</li>
+<li><strong>Consent, privately</strong> for a full report on a real hotel: only for the hotel's own owner or staff, and never posted.</li>
+<li>Never name Hotelzify publicly. The spec says the public site carries no Hotelzify name, and that applies to posts too.</li>
+</ol>
+</div>
+
+<h3 id="small">2.5 Small-account specifics</h3>
+<ul>
+<li><strong>0 to 500 in 30 days, mostly from replies</strong> (self-reported, HackerNoon, Apr 2026). The author credits about 80% of growth to replies under large accounts. He wrote 15–20 quality replies a day for two weeks, picked 10 niche accounts with 5K–100K followers, and judged results after 30 days. What failed: AI-generated replies ("essentially flat"), mass-following, and generic tips threads ("drove almost no follows"). His own caveat: the percentages are estimates <a href="#s23">[S23]</a>. <span class="tag src">sourced</span></li>
+<li><strong>Timing.</strong> Sprout Social (2 billion engagements, 307,000 profiles, Nov 2025–Feb 2026): best overall Tue–Thu 12–6 p.m. in the <em>audience's</em> local time. For Software &amp; Technology: Tue–Thu 11 a.m.–4 p.m., and avoid Saturday <a href="#s24">[S24]</a>. <span class="tag src">sourced</span></li>
+<li><strong>Frequency.</strong> Buffer suggests 3–5 posts a day, but the source is "a study of 30 top X accounts" <a href="#s25">[S25]</a>. <span class="tag src">sourced</span> That advice is for large accounts. For an account getting 4 views a post, it means more posts splitting the same tiny audience. <span class="tag inf">inference</span></li>
+<li><strong>Communities.</strong> I found no measured data on reach for small accounts posting in X Communities. Only marketing blogs, which I'm not relying on. <span class="tag warn">no evidence</span></li>
+<li><strong>Bio, banner and pinned post.</strong> No controlled study exists. The benchmarks floating around (10% visit-to-follow and similar) come from blogs without data. <span class="tag warn">no evidence</span> Four of the people in 2.2 (levelsio, marclou, tdinh_me, yongfook) put product names and monthly revenue straight in the bio <a href="#s8">[S8]</a>. <span class="tag src">sourced</span></li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="patterns">3. Patterns that convert</h2>
+<p>"Convert" here means a profile click that becomes a follow, a link click, a sign-up or a DM, not just views.</p>
+
+<div class="grid2">
+<div class="card"><h4>Show the output</h4><p>The biggest breakouts from small or new accounts showed the product doing its job: Chatbase's demo video, HeadshotPro's AI photos (2.07M views) <span class="tag src">sourced</span>. For you, the output is the report, and a report with dropped quotes visible is more interesting than one without. <span class="tag inf">inference</span></p></div>
+<div class="card"><h4>Numbers with their context</h4><p>levelsio's milestone posts carry customers, price, costs and next steps, not just a total <span class="tag src">sourced</span>. You have no revenue, so use numbers that are true: tests, reviews checked, quotes dropped, hotels in a sample. <span class="tag inf">inference</span></p></div>
+<div class="card"><h4>Honest small numbers and failures</h4><p>"Not great, but it's a start" (175K), "4-figure biz 🤣" (22K), "Daily fluctuations… are brutal" (28K) <span class="tag src">sourced</span>. Your "I killed my first idea with 60 reviews" is this type. <span class="tag inf">inference</span></p></div>
+<div class="card"><h4>Invisible engineering, for the hiring audience</h4><p>Arvid's "a massive change… that no one will ever see" got about twice the views of his revenue post <span class="tag src">sourced</span>. Engineering posts reach engineers and hiring managers, not buyers. <span class="tag inf">inference</span></p></div>
+<div class="card"><h4>Public commitments</h4><p>#QuitInPublic (Damon Chen) and #applyinpublic (KP) both ended in outcomes <span class="tag src">sourced</span>. A dated public goal ("v1 live by [date]") gives people a reason to come back. <span class="tag inf">inference</span></p></div>
+<div class="card"><h4>Replies before posts</h4><p>Highest code weight among common actions, plus the mutual-follow boost, plus the only self-reported case <span class="tag src">sourced</span>. Replies say something specific or disagree with a reason. No link drops in other people's threads. <span class="tag inf">inference</span></p></div>
+<div class="card"><h4>Links where the click is the point</h4><p>X says no link penalty, and the code weights link opens positively <span class="tag src">sourced</span>. Keep "?ref=x" on every link so clicks can be counted on your side. <span class="tag inf">inference</span></p></div>
+<div class="card"><h4>Open revenue is optional</h4><p>The open-startup pioneer now says sharing revenue rarely helps <span class="tag src">sourced</span>. It doesn't apply yet, since there's no revenue. Note it for later. <span class="tag inf">inference</span></p></div>
+</div>
+
+<p><strong>What doesn't convert, per the sources:</strong> generic tips threads, AI-written replies, mass-following <a href="#s23">[S23]</a>. <span class="tag src">sourced</span> I'd add teasers before something exists, and "Day N" posts with no result in them. <span class="tag inf">inference</span> (findings.md already notes no controlled evidence on teasers.)</p>
+
+<!-- ============================================================ -->
+<h2 id="plan">4. The plan: positioning and pillars</h2>
+
+<h3>4.1 Two audiences, in this order</h3>
+<div class="tablewrap"><table>
+<thead><tr><th></th><th>1. Hiring managers and engineers (first)</th><th>2. Hotel and hotel-tech people (second)</th></tr></thead>
+<tbody>
+<tr><td>Who</td><td>Founders, engineering leads and senior engineers at Series A/B product companies, Bangalore first, then remote</td><td>Booking-engine and hotel-marketing founders, hotel-tech engineers, people who post about OTA commission</td></tr>
+<tr><td>What they want to see</td><td>Judgment about when to trust a model, tests that catch real bugs, security calls, shipped work you can explain <a href="#s17">[S17]</a></td><td>A finding they didn't know, from data, and a report they can picture using</td></tr>
+<tr><td>Why this order</td><td colspan="2">The offer deadline is 30 Nov. Income after 1 Dec isn't guaranteed. The product has no demo until v1, and owners can't use a screenshot of a test. The project was started as job evidence for a hotel-tech founding-engineer role, so the overlap is real: hotel-tech companies hire engineers, and an engineering post about hotel data reaches both groups. Hotel-tech moves up to equal billing on the day v1 ships. <span class="tag inf">inference</span></td></tr>
+<tr><td>One-line pitch</td><td colspan="2"><em>"I build LLM features where code checks the model's work. Right now: a tool that audits how ready a US hotel is to take bookings directly. Every AI quote in it is checked against the real review."</em> <span class="tag inf">inference</span></td></tr>
+</tbody></table></div>
+<p>Hotel owners are not an X audience you can reach in six weeks from 33 followers. Don't write for them yet. <span class="tag inf">inference</span></p>
+
+<h3>4.2 Five pillars</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>#</th><th>Pillar</th><th>Audience</th><th>What it proves</th></tr></thead>
+<tbody>
+<tr><td>1</td><td><strong>Verify the model</strong>: the model proposes, code verifies</td><td>Hiring, devs</td><td>You validate AI output instead of trusting it</td></tr>
+<tr><td>2</td><td><strong>Data that changed the plan</strong>: decisions forced by real numbers</td><td>Hiring, hotel-tech</td><td>Judgment, and you test ideas before building</td></tr>
+<tr><td>3</td><td><strong>What guests can't find</strong>: the gap check and the neighbour comparison, aggregates and fixtures only</td><td>Hotel-tech</td><td>You understand the domain</td></tr>
+<tr><td>4</td><td><strong>Safe by default</strong>: tools off, SSRF, no stored reviews, BYOK</td><td>Hiring, devs</td><td>Security thinking in an LLM product</td></tr>
+<tr><td>5</td><td><strong>Receipts and the ask</strong>: weekly progress with evidence, plus the job post</td><td>Hiring</td><td>You ship, and you're available</td></tr>
+</tbody></table></div>
+
+<!-- ============================================================ -->
+<h2 id="posts">5. The 10 example posts</h2>
+<p>Written to <code>~/claude-work-me/my-voice.md</code>: short sentences, proof before claims, numbers over adjectives. Every fact below is true on 20 Oct 2026 and traced to a file, unless it carries a <span class="tag ms">milestone</span> tag. Character counts use X's rules (URL = 23, arrow = 2). Each still goes through the x-drafter approval loop. Nothing here posts itself.</p>
+
+<h3>Pillar 1 · Verify the model</h3>
+<div class="post">
+<div class="head">1a · true now · 267 chars · best slot 21:30 IST</div>
+<pre>How do you know your tests test anything?
+
+Break the code on purpose.
+
+I made my quote matcher accept every quote, real or invented. Tests 7, 9 and 10 went red. Those three are what stop an AI-written quote from reaching a report.
+
+Direct Booking Check, step 1 of 13.</pre>
+<div class="reply"><pre>Repo: https://github.com/rdeepak-711/hotel-direct-bookings?ref=x</pre></div>
+<div class="why">Visual: the "Mutation check" line from <code>docs/evidence/ENG-010.txt</code> next to tests 7, 9, 10. Source: that file. The self-reply link needs the repo public; until then use the portfolio link. It's an engineering post that also explains itself to a non-engineer.</div>
+</div>
+<div class="post">
+<div class="head">1b · <span class="tag ms">milestone</span> ENG-041 plus one real run · 255 chars</div>
+<pre>First real run of the review step.
+
+The model returned [N] quotes as proof for [T] themes. Code checked each one against the review it cited.
+
+[D] were dropped: the words weren't in that review.
+
+That's why the model never gets the last word in this tool.</pre>
+<div class="why">Fill only from the run log line, with no hotel named. If D is 0, post that instead ("0 dropped on this run; the check still runs every time"). An honest zero is still a post.</div>
+</div>
+
+<h3>Pillar 2 · Data that changed the plan</h3>
+<div class="post">
+<div class="head">2a · true now · thread of 2 · 258 + 253 chars</div>
+<pre>I killed my first idea with 60 reviews.
+
+Plan: show each US hotel the booking problems guests complain about.
+
+12 hotels, 5 Google reviews each. Booking or OTAs came up in 10 of 60. Cancellation in 2.
+
+Per hotel, that report comes out empty. So I dropped it.</pre>
+<div class="reply"><pre>What the 60 did talk about: rooms (42), location (41), staff (37).
+
+And two things guests had to work out alone: check-in info (19) and parking (14).
+
+Crude keyword tags, counts only, no review text kept. Good enough to kill an idea, not to rank themes.</pre></div>
+<div class="why">Source: <code>feasibility-counts.json</code> (18 Oct) and the 18 Oct decision in <code>docs/decisions.md</code>. Counts, not percentages, to match the project's own rule. Visual: a plain bar chart of the 12 counts. This is the strongest post you can make today. It's honest, it has numbers, and it works for both audiences.</div>
+</div>
+<div class="post">
+<div class="head">2b · true now · 271 chars</div>
+<pre>"Analyse all of a hotel's reviews" was never possible.
+
+Google's Places API returns at most 5 reviews per hotel.
+Tripadvisor retired its old Content API on 31 Aug. The free plan of the new one returns the 3 most recent.
+
+So the tool asks a smaller question it can answer.</pre>
+<div class="why">Source: <code>findings.md</code> → "Data sources (tested 18 Oct 2026)". Hotel-tech people who've hit the same limits will reply.</div>
+</div>
+
+<h3>Pillar 3 · What guests can't find</h3>
+<div class="post">
+<div class="head">3a · true now as a design statement · 271 chars</div>
+<pre>Guests ask hotels the same things in reviews: check-in info came up in 19 of the 60 I read, parking in 14.
+
+Step 4 of Direct Booking Check compares those questions with the hotel's own website.
+
+"Views of Central Park" must not count as parking. The spec already says so.</pre>
+<div class="why">Source: <code>feasibility-counts.json</code>; <code>spec/site.md</code> (<code>siteMentions</code>, the Central Park line). When ENG-012 ships, repost it with the three-state table (mentioned / not mentioned / could not check) and the <code>MIN_PAGE_TEXT = 200</code> rule as the visual.</div>
+</div>
+<div class="post">
+<div class="head">3b · <span class="tag ms">milestone</span> ENG-040 neighbour comparison · 255 chars</div>
+<pre>"Your mobile speed is 38" means nothing alone.
+
+"38 against your 5 nearest hotels' 76" does.
+
+Direct Booking Check compares every number with the neighbours, counted and never named. It never even fetches their reviews: the API field mask leaves them out.</pre>
+<div class="why">The 38/76 example is the spec's own illustration, not a measurement. Say "example" in the image caption. Source: <code>spec/site.md</code> line 9 and the <code>nearbyHotels</code> field mask.</div>
+</div>
+
+<h3>Pillar 4 · Safe by default</h3>
+<div class="post">
+<div class="head">4a · true now · 267 chars</div>
+<pre>Rules for a tool that reads strangers' hotel reviews:
+
+- review text is fetched live, never stored
+- test fixtures use invented text
+- no real hotel named with a score in public
+
+Google's Places terms don't allow caching review content anyway. Same rule, two reasons.</pre>
+<div class="why">Source: README "Rules"; <code>docs/decisions.md</code> 18 Oct "Review text is never stored"; Google Places policies <a href="#s22">[S22]</a>. Pairs with the queued MKT-DEC6 tools-off post. Don't post both on the same day.</div>
+</div>
+<div class="post">
+<div class="head">4b · <span class="tag ms">milestone</span> ENG-020 safeFetch green · 263 chars</div>
+<pre>My tool fetches a URL a stranger typed in. That's how SSRF starts.
+
+So every fetch goes through one function: private address ranges blocked, every redirect hop re-checked, max 3 hops, 2 MB, 8 seconds.
+
+The test that redirects to a private address gets "blocked".</pre>
+<div class="why">Check the limits against <code>spec/site.md</code> step 3 the day it ships. Visual: that one test, passing.</div>
+</div>
+
+<h3>Pillar 5 · Receipts and the ask</h3>
+<div class="post">
+<div class="head">5a · true now · 276 chars · pin this (see Profile)</div>
+<pre>I'm looking for an applied AI engineer role: Series A/B, Bangalore or remote.
+
+I build LLM features where code checks the model's work.
+
+- escalation-gate: GitHub issue → checked root cause → the PR that fixes it (live demo)
+- Direct Booking Check: building it in public now</pre>
+<div class="reply"><pre>escalation-gate demo: https://escalation-gate-rdeepak.vercel.app/?ref=x
+Direct Booking Check thread: [link to 2a]
+Portfolio and CV: https://rdeepak.vercel.app/?ref=x
+DMs open.</pre></div>
+<div class="why">This replaces the 16 Oct job post as the pinned hub. Recruiters search bios and posts for role plus place <a href="#s18">[S18]</a>, so "applied AI engineer" and "Bangalore" appear verbatim.</div>
+</div>
+<div class="post">
+<div class="head">5b · <span class="tag ms">milestone</span> repo public · Friday weekly receipt · 230 chars</div>
+<pre>Direct Booking Check, week 1:
+
+- step 1 of 13 done: the quote check
+- 13 tests, written red before the code
+- CI green on every push
+- every decision logged with what it costs
+
+Next: website checks. Repo is public now, link below.</pre>
+<div class="why">Same format every Friday, with the numbers updated from <code>docs/project-status.md</code>. A recurring receipt gives a hiring manager six weeks of dated evidence in one scroll.</div>
+</div>
+
+<!-- ============================================================ -->
+<h2 id="v1">6. The v1 introduction and launch sequence</h2>
+<p><span class="tag ms">milestone</span> ENG-083 (deployed and checked). Everything here waits for a public URL that works.</p>
+
+<h3>6.1 The introduction post</h3>
+<div class="post">
+<div class="head">v1 · post 1 of a 2-post thread · 268 chars with link</div>
+<pre>Type a US hotel's name. In [T] seconds you get:
+
+- a direct-booking readiness score
+- the evidence behind each point
+- the top 3 fixes
+
+Every guest quote in the report is checked against the real review. If the words aren't there, it's dropped.
+
+[production URL]?ref=x</pre>
+<div class="reply"><pre>What it does not claim: it doesn't measure lost bookings. The score is fixed rules in code, explained line by line.
+
+Built in public over [N] weeks: [link to the first thread]. Bring your own OpenRouter key for the AI step.</pre></div>
+<div class="why">
+<strong>Format:</strong> native video, 30–45 seconds, uploaded to X rather than linked. The breakouts in 2.2 were a demo video and an image of the output <span class="tag src">sourced</span>.<br>
+<strong>Video:</strong> type "Harborside Inn" → report appears → zoom on one dropped quote with its reason → zoom on one fix. "Fixture data" stays on screen the whole time. No real hotel. <span class="tag inf">inference</span><br>
+<strong>Hook:</strong> the first line is the user's action and what they get back. Not "I built", not "Day 30". <span class="tag inf">inference</span><br>
+<strong>[T]:</strong> wall time from a real run-log line, not a guess.<br>
+<strong>Link:</strong> in the post itself, because the click is the point <a href="#s5">[S5]</a>.
+</div>
+</div>
+
+<h3>6.2 Launch sequence</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>When</th><th>What</th><th>Why</th></tr></thead>
+<tbody>
+<tr><td>Before launch</td><td>Portfolio card for Direct Booking Check live; README leads with the result and a 20-second GIF; repo public; bio updated. No teaser posts.</td><td>Profile visits score nothing in the ranking, so the profile has to convert them <span class="tag src">sourced</span>/<span class="tag inf">inference</span></td></tr>
+<tr><td>Day 0, Tue–Thu, 21:30 IST</td><td>The v1 video post. Pin it. Reply to every reply for the next 2 hours.</td><td>Midday ET; the 2-hour cold-start window; replies score <span class="tag src">sourced</span></td></tr>
+<tr><td>Day 0, 23:30 IST</td><td>Quote-post your own 2a thread: "Three weeks ago I killed the first idea. This is what replaced it."</td><td>Gives the build history a second entry point <span class="tag inf">inference</span></td></tr>
+<tr><td>Day 1</td><td>MKT-015 "First real run": what it got right, what surprised you. No hotel named.</td><td>The honest-numbers pattern</td></tr>
+<tr><td>Day 2</td><td>LinkedIn announcement (one of the two LinkedIn posts in the playbook)</td><td>Hiring managers in India are on LinkedIn too</td></tr>
+<tr><td>Day 3–5</td><td>Hand-check post (ENG-082): "10 hotels, checked by hand against the report: [counts]."</td><td>Evals are what hiring managers look for <a href="#s17">[S17]</a></td></tr>
+<tr><td>Day 6</td><td>Optional, your call: Show HN with the repo. It's outside the current playbook (X plus two LinkedIn posts), so decide before launch week.</td><td>Not in the rules today <span class="tag inf">inference</span></td></tr>
+<tr><td>Week after</td><td>Case study (MKT-018) on LinkedIn and in the repo; link it from the pinned post's replies</td><td>One long piece a hiring manager can read in 5 minutes</td></tr>
+</tbody></table></div>
+
+<!-- ============================================================ -->
+<h2 id="profile">7. Profile fixes</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>Field</th><th>Now (20 Oct)</th><th>Change to</th></tr></thead>
+<tbody>
+<tr><td>Bio (≤160)</td><td>"AI automation engineer. Built escalation-gate: GitHub issue → checked root cause → which PR fixes it. Open to Series A/B roles · Bangalore or remote · DMs open"</td><td>"Applied AI engineer. The model proposes, code verifies. Building Direct Booking Check in public. Open to Series A/B roles · Bangalore or remote" (143 chars). Adds the title recruiters search for and names the current project. <span class="tag inf">inference</span></td></tr>
+<tr><td>Pinned post</td><td>Not checked (the API I used doesn't show pins)</td><td>Now: post 5a with its reply. After v1: the demo video post, with a reply linking 5a. <span class="tag inf">inference</span></td></tr>
+<tr><td>Website link</td><td>rdeepak.vercel.app (doesn't mention the project)</td><td>Keep the portfolio as the link, because one page holds both projects and the CV. Add a Direct Booking Check card first, with status "step N of 13", links to the repo and the first thread. Until that card exists, link the repo README instead, once it's public. <span class="tag inf">inference</span></td></tr>
+<tr><td>Banner (1500×500)</td><td>Exists; not reviewed</td><td>One line, "The model proposes, code verifies.", with a small diagram: LLM → quote check → kept / dropped. Keep text right of centre and clear of the bottom-left, where the avatar covers it on phones. No Google logo or colours <a href="#s20">[S20]</a>. <span class="tag inf">inference</span></td></tr>
+<tr><td>Location</td><td>Chennai, India</td><td>"Chennai · open to Bangalore / remote". The bio already says it, but location is a separate search field. <span class="tag inf">inference</span></td></tr>
+<tr><td>Repo README</td><td>Exists, private</td><td>Already strong: status line, the one rule, how to run the tests. Before public: check the Firestorm contract on side projects; add the X link and a "fixture data" screenshot once ENG-071 exists. <span class="tag inf">inference</span></td></tr>
+</tbody></table></div>
+
+<!-- ============================================================ -->
+<h2 id="rhythm">8. Weekly rhythm and reply routine</h2>
+
+<h3>8.1 Your slots, in your audiences' time</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>IST slot</th><th>Europe (CEST until 25 Oct / CET after)</th><th>US East (EDT until 1 Nov / EST after)</th><th>Use</th></tr></thead>
+<tbody>
+<tr><td>14:30</td><td>11:00 / 10:00</td><td>05:00 / 04:00</td><td>India hiring audience (Bangalore office hours). Job posts, pillar 5</td></tr>
+<tr><td>18:30</td><td>15:00 / 14:00</td><td>09:00 / 08:00</td><td>Europe tech afternoon; India evening. Secondary</td></tr>
+<tr><td>21:30</td><td>18:00 / 17:00</td><td>12:00 / 11:00</td><td><strong>Main slot.</strong> Inside the US tech window (Tue–Thu 11 a.m.–4 p.m. local) <a href="#s24">[S24]</a></td></tr>
+<tr><td>23:30</td><td>20:00 / 19:00</td><td>14:00 / 13:00</td><td>US afternoon. Second US post or hotel-tech</td></tr>
+</tbody></table></div>
+<p class="meta">Conversions computed from UTC offsets. EU clocks change on 25 Oct and US clocks on 1 Nov, so for one week the US slots run an hour earlier than the EU shift alone suggests.</p>
+
+<h3>8.2 The six weeks</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Week</th><th>Originals per day</th><th>Focus</th><th>Posts</th></tr></thead>
+<tbody>
+<tr><td>1 · 21–27 Oct</td><td>max 2 (21:30 daily; 14:30 Tue/Thu)</td><td>Account health. Profile fixes. Replies.</td><td>2a thread, 1a, 5a (pin), 2b, 4a</td></tr>
+<tr><td>2 · 28 Oct–3 Nov</td><td>max 2; go to 3 only if the median is ≥15 views</td><td>Replies build mutuals; repo public</td><td>5b receipt, 3a, build updates as they ship (ENG-011, ENG-012)</td></tr>
+<tr><td>3 · 4–10 Nov</td><td>max 3</td><td>Pure logic done (ENG-013/014)</td><td>Score post (MKT-009), 4b when ENG-020 ships, receipt</td></tr>
+<tr><td>4 · 11–17 Nov</td><td>max 3</td><td>Adapters, AI step</td><td>1b after ENG-041, 3b after ENG-040, receipt</td></tr>
+<tr><td>5 · 18–24 Nov</td><td>max 3</td><td>v1 if the build is there; otherwise keep the receipts going</td><td>Launch sequence (section 6) or MKT-014 fixture screenshots</td></tr>
+<tr><td>6 · 25–30 Nov</td><td>max 3</td><td>Hand-check post, case study, pinned hub updated</td><td>MKT-018 case study, retrospective draft</td></tr>
+</tbody></table></div>
+<p class="meta">Which milestones land in which week is a guess from one step done on 20 Oct. If the build slips, the receipts and pillar-2 posts carry the week, and the launch moves. Never post a milestone before it's true. <span class="tag inf">inference</span></p>
+
+<h3>8.3 A typical weekday</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Day</th><th>14:30 IST</th><th>21:30 IST (main)</th><th>23:30 IST</th></tr></thead>
+<tbody>
+<tr><td>Mon</td><td>—</td><td>Pillar 2 (data that changed the plan)</td><td>—</td></tr>
+<tr><td>Tue</td><td>Pillar 5 (India hiring)</td><td>Pillar 1 (verify the model)</td><td>Build update if one shipped</td></tr>
+<tr><td>Wed</td><td>—</td><td>Pillar 3 (hotel insight)</td><td>Build update if one shipped</td></tr>
+<tr><td>Thu</td><td>Pillar 5 or reply-only</td><td>Pillar 4 (safe by default)</td><td>—</td></tr>
+<tr><td>Fri</td><td>—</td><td>Weekly receipt (5b format)</td><td>—</td></tr>
+<tr><td>Sat</td><td colspan="3">No posts (weakest day per Sprout <a href="#s24">[S24]</a>). Replies optional.</td></tr>
+<tr><td>Sun</td><td colspan="3">No posts. 20 minutes: weekly metrics (section 10).</td></tr>
+</tbody></table></div>
+<p><strong>Real-time build updates</strong> replace a slot that day instead of being added on top. Two originals is the ceiling in weeks 1–2, three after. Each extra post is discounted by author diversity <a href="#s1">[S1]</a>. <span class="tag inf">inference</span></p>
+
+<h3>8.4 Daily reply routine (45 minutes)</h3>
+<ol>
+<li><strong>14:00–14:15 IST · India block.</strong> Search X for live posts from Indian startup engineers and founders hiring or discussing AI engineering, for example <code>"AI engineer" hiring Bangalore min_faves:10</code> and <code>evals LLM lang:en min_faves:20 -filter:replies</code>. Write 3 replies that add a fact or a disagreement with a reason.</li>
+<li><strong>21:00–21:30 IST · US block, just before the main post.</strong> 5–7 replies under posts about LLM evals and verification, prompt injection, agent security, and hotel direct booking or OTA commission (<code>"direct bookings" hotel</code>, <code>"OTA commission"</code>). Target 10–20 accounts with 1K–50K followers you'll see repeatedly. These are the future mutuals. <span class="tag inf">inference</span></li>
+<li><strong>For two hours after each original:</strong> answer every reply within the window. Replies from mutuals carry the extra weight <a href="#s4">[S4]</a>.</li>
+<li><strong>Reply rules</strong> (memory rule, 19 Oct): context before evidence ("I built X; it found Y"), no links in other people's threads unless asked, no AI-written replies <a href="#s23">[S23]</a>, no identical text twice.</li>
+</ol>
+
+<h3>8.5 Time cost</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>Task</th><th class="num">Per day</th><th class="num">Per week</th></tr></thead>
+<tbody>
+<tr><td>Replies (two blocks)</td><td class="num">45 min</td><td class="num">≈ 4 h (5 days, plus light weekends)</td></tr>
+<tr><td>Approve drafts, capture visuals, post</td><td class="num">15 min</td><td class="num">≈ 1.5 h</td></tr>
+<tr><td>Answer replies in the 2-hour window</td><td class="num">15 min</td><td class="num">≈ 1.5 h</td></tr>
+<tr><td>Weekly metrics (Sunday)</td><td class="num">—</td><td class="num">20 min</td></tr>
+<tr><td><strong>Total</strong></td><td class="num"><strong>≈ 75 min</strong></td><td class="num"><strong>≈ 8–9 h</strong></td></tr>
+</tbody></table></div>
+<p>Tier: phase 1 (job). It feeds applications rather than replacing them. If applications fall behind in a week, cut the 14:00 block first. <span class="tag inf">inference</span></p>
+
+<!-- ============================================================ -->
+<h2 id="stop">9. What to stop doing</h2>
+<ul>
+<li><strong>Four posts a day while posts get 2–5 views.</strong> More posts split the same small audience and each one is discounted <a href="#s1">[S1]</a>. Two a day until views recover.</li>
+<li><strong>Anything scripted or in bursts.</strong> The drop in section 1 starts the day after the 16 Oct burst. Use X's own scheduler, at a normal pace, and nothing else.</li>
+<li><strong>Repeated identical self-replies</strong> ("Code: … Live packets: …" posted more than once). One link reply per post, worded for that post.</li>
+<li><strong>Five topics a week.</strong> LifeDots, northern lights and Claude Code setup tips don't build toward the AI-engineer hire or the hotel-tech audience. Two lanes until 30 Nov: AI verification engineering and Direct Booking Check. Other projects get one mention each, in the pinned hub. <span class="tag inf">inference</span></li>
+<li><strong>Task IDs as hooks.</strong> "ENG-010" and "step 1 of 13" belong at the end of a post, not the start. Lead with what happened.</li>
+<li><strong>Generic tips posts</strong> ("my Claude Code setup: 3 models, 3 jobs"). The only source that measured them found good impressions but "almost no follows" <a href="#s23">[S23]</a>.</li>
+<li><strong>Treating views or followers as the goal.</strong> Count conversations with hiring people and hotel-tech people instead (section 10).</li>
+<li><strong>Real hotel names, real review text, or Hotelzify's name in public.</strong> Covered in 2.4.</li>
+</ul>
+
+<!-- ============================================================ -->
+<h2 id="metrics">10. Metrics (no Premium needed)</h2>
+<p>Check every Sunday, 20 minutes, in a table in <code>docs/project-status.md</code> under "X". <span class="tag inf">inference</span></p>
+<div class="tablewrap"><table>
+<thead><tr><th>Number</th><th>Where to read it</th><th>Week 1 bar</th><th>By 30 Nov</th></tr></thead>
+<tbody>
+<tr><td><strong>Median views per original post</strong> (account health)</td><td>The view count under each post, or the fxtwitter command below</td><td>≥15 (back to the 12–16 Oct level)</td><td>≥100</td></tr>
+<tr><td>Replies received per original post</td><td>Same</td><td>≥1</td><td>≥3</td></tr>
+<tr><td>Mutual follows in your two lanes</td><td>Your following list vs your followers; keep a short list</td><td>+5</td><td>30</td></tr>
+<tr><td>Followers</td><td>Profile</td><td>Record only</td><td>Record only</td></tr>
+<tr><td>Clicks from X</td><td>Your portfolio analytics, filtered on <code>?ref=x</code></td><td>Record</td><td>Record</td></tr>
+<tr><td>Repo visitors and referrers</td><td>GitHub → Insights → Traffic (views, unique visitors, referring sites incl. <code>t.co</code>; last 14 days only, so read it weekly)</td><td>After public</td><td>Record</td></tr>
+<tr><td><strong>Conversations with hiring people</strong> (a DM or a 2+ message reply thread with a founder, lead or recruiter)</td><td>Your own log</td><td>1</td><td>≥8</td></tr>
+<tr><td><strong>Interviews or referrals that came from X</strong></td><td>career-ops tracker</td><td>—</td><td>≥2</td></tr>
+<tr><td>Hotel-tech conversations</td><td>Your own log</td><td>—</td><td>≥3 after v1</td></tr>
+</tbody></table></div>
+<p class="meta">All bars are my estimates, not benchmarks from a source. The two bold rows near the bottom are the ones that matter for the 30 Nov goal. <span class="tag inf">inference</span></p>
+<p>To read your own view counts without Premium (public data, unofficial API, read-only):</p>
+<pre class="cmd"><code>curl -s "https://api.fxtwitter.com/2/profile/rDeepak_ACEz/statuses" | python3 -c "import json,sys;[print(t['created_at'][4:16],t.get('views'),t.get('likes'),t.get('replies'),t['text'][:60].replace(chr(10),' ')) for t in json.loads(sys.stdin.read(),strict=False)['results']]"</code></pre>
+
+<!-- ============================================================ -->
+<h2 id="sources">11. Sources</h2>
+<p class="meta">All opened on 20 Oct 2026 unless marked. Post metrics were read through api.fxtwitter.com, which mirrors X's public counts.</p>
+<ol class="sources">
+<li id="s1">[S1] xai-org/x-algorithm README (updated 18 Sep 2026): scoring, filters, author diversity, out-of-network discount, Under the Hood tool. <a href="https://github.com/xai-org/x-algorithm">github.com/xai-org/x-algorithm</a></li>
+<li id="s2">[S2] Ranking weights and cold-start params. <a href="https://github.com/xai-org/x-algorithm/blob/main/home-mixer/params/param.rs">home-mixer/params/param.rs</a></li>
+<li id="s3">[S3] Cold-start eligibility and sampling. <a href="https://github.com/xai-org/x-algorithm/blob/main/home-mixer/scorers/author_cold_start.rs">home-mixer/scorers/author_cold_start.rs</a></li>
+<li id="s4">[S4] Mutual-follow reply boost history, July 2026. <a href="https://github.com/xai-org/x-algorithm/blob/main/docs/BIDIRECTIONAL_BOOST_CHANGE.md">docs/BIDIRECTIONAL_BOOST_CHANGE.md</a></li>
+<li id="s5">[S5] PPC Land, 30 Jul 2026, "X drops year-old link penalty, Musk tells Zuckerberg on platform" (Bier and Musk quotes). <a href="https://ppc.land/x-drops-year-old-link-penalty-musk-tells-zuckerberg-on-platform/">ppc.land</a></li>
+<li id="s6">[S6] PPC Land, 21 Jan 2026, on links and the open-sourced code (repo release 20 Jan 2026; Colombo's Oct 2024 test). <a href="https://ppc.land/how-xs-algorithm-silently-kills-your-links-without-explicitly-penalizing-them/">ppc.land</a></li>
+<li id="s7">[S7] Post metrics via fxtwitter: @rDeepak_ACEz timeline (<a href="https://api.fxtwitter.com/2/profile/rDeepak_ACEz/statuses">api</a>), and every x.com post linked in section 2.2.</li>
+<li id="s8">[S8] Profiles via fxtwitter on 20 Oct 2026: levelsio, marclou, tdinh_me, dannypostma, arvidkahl, yongfook, Shpigford, csallen, steventey, ajlkn, jakobgreenfeld, goodside, yasser_elsaid_, thisiskp_, swyx, AyeshaBuilds, rDeepak_ACEz (e.g. <a href="https://api.fxtwitter.com/levelsio">api.fxtwitter.com/levelsio</a>).</li>
+<li id="s9">[S9] TrustMRR (Stripe-verified, updated 19 Oct 2026): <a href="https://trustmrr.com/startup/shipfast">ShipFast</a>, <a href="https://trustmrr.com/startup/datafast">DataFast</a>.</li>
+<li id="s10">[S10] Behind the Craft, "Damon Chen: engineer to one million". <a href="https://creatoreconomy.so/p/damon-chen-engineer-to-one-million">creatoreconomy.so</a></li>
+<li id="s11">[S11] Bootstrappers.com on Damon Chen's #QuitInPublic. <a href="https://bootstrappers.com/how-the-power-of-community-helped-this-founder-publicly-quit-his-job-on-twitter-and-launch-a-six-figure-startup/">bootstrappers.com</a></li>
+<li id="s12">[S12] Raj Dabre on hiring via a Twitter DM, 13 Apr 2026. <a href="https://x.com/prajdabre/status/2043480890429620313">x.com/prajdabre/status/2043480890429620313</a></li>
+<li id="s13">[S13] KP, "How I landed my dream job at an ambitious startup by building in public", Oct 2020. <a href="https://kp.substack.com/p/how-i-landed-my-dream-job-at-an-ambitious">kp.substack.com</a></li>
+<li id="s14">[S14] The Decoder, 16 Feb 2026, Steinberger joins OpenAI. <a href="https://the-decoder.com/openclaw-developer-peter-steinberger-joins-openai-to-build-ai-agents/">the-decoder.com</a></li>
+<li id="s15">[S15] Semafor, 21 Jul 2023, "What does an AI prompt engineer actually do?" <a href="https://www.semafor.com/article/07/21/2023/what-does-an-ai-prompt-engineer-actually-do">semafor.com</a></li>
+<li id="s16">[S16] swyx, "Learn in Public". <a href="https://www.swyx.io/learn-in-public">swyx.io</a></li>
+<li id="s17">[S17] Gauntlet AI Night School, "What Hiring Managers Actually Look for in AI Engineers", 8 Apr 2026. <a href="https://gauntletai.com/night-school/what-hiring-managers-actually-look-for-in-ai-engineers">gauntletai.com</a></li>
+<li id="s18">[S18] Paraform, "How to recruit tech candidates via X", 14 May 2024. <a href="https://www.paraform.com/blog/how-to-recruit-tech-candidates-via-x">paraform.com</a></li>
+<li id="s19">[S19] HackerNoon, "Everything I learned from reading Tony Dinh". <a href="https://hackernoon.com/everything-i-learned-from-reading-tony-dinh">hackernoon.com</a></li>
+<li id="s20">[S20] Justin Poehnelt's post on being fired, quoted in full via fxtwitter from <a href="https://x.com/theneurondaily/status/2070213101623087251">x.com/theneurondaily/status/2070213101623087251</a> (original: <a href="https://x.com/JPoehnelt/status/2069482265953087602">x.com/JPoehnelt/status/2069482265953087602</a>). Google's side not available.</li>
+<li id="s21">[S21] TrustMRR, AyeshaBuilds founder page. <a href="https://trustmrr.com/founder/ayeshabuilds">trustmrr.com/founder/ayeshabuilds</a></li>
+<li id="s22">[S22] Google Maps Platform, Places API policies. <a href="https://developers.google.com/maps/documentation/places/web-service/policies">developers.google.com</a></li>
+<li id="s23">[S23] deeflect, "How I grew my Twitter audience from 0 to 500 followers in just 30 days", HackerNoon, 8 Apr 2026. <a href="https://hackernoon.com/how-i-grew-my-twitter-audience-from-0-to-500-followers-in-just-30-days">hackernoon.com</a></li>
+<li id="s24">[S24] Sprout Social, "Best times to post on X in 2026", updated March 2026. <a href="https://sproutsocial.com/insights/best-times-to-post-on-twitter/">sproutsocial.com</a></li>
+<li id="s25">[S25] Buffer, "How often should I tweet", 13 Jan 2026. <a href="https://buffer.com/resources/how-often-should-i-tweet">buffer.com</a></li>
+</ol>
+<p class="meta"><strong>Tried and not opened</strong> (nothing from these is stated as fact above): Indie Hackers posts on Tony Dinh and Marc Lou (HTTP 403); yespress.io founder profiles (Cloudflare challenge); Olly's Roast My Landing Page blog (redirects to another domain); the SmartCompany defamation note (HTTP 503); a jxnl.co consulting post (404). Search-only claims I left out: Marc Lou's "167,000 impressions" launch post and "half of early traffic from Twitter"; Tony Dinh's "4k followers from one tweet"; any link between Steven Tey's posts and his Vercel job.</p>
+
+<footer>
+<p>Project files this relies on: <code>findings.md</code>, <code>feasibility-counts.json</code>, <code>docs/decisions.md</code>, <code>docs/public-build-playbook.md</code>, <code>docs/x-queue.md</code>, <code>docs/project-status.md</code>, <code>docs/evidence/ENG-010.txt</code>, <code>spec/site.md</code>, <code>README.md</code>. Nothing was posted, scheduled or changed on any account.</p>
+</footer>
+</main>
+</body>
+</html>
