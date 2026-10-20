@@ -1,6 +1,6 @@
 # Direct Booking Check: project status
 
-Updated 19 Oct 2026, 18:30 IST, after the reset to documents only. Engineering tasks are `ENG-nnn` in `docs/implementation-playbook.md`; content tasks are `MKT-nnn` in `docs/public-build-playbook.md`.
+Updated 20 Oct 2026 after ENG-011a. Engineering tasks are `ENG-nnn` in `docs/implementation-playbook.md`; content tasks are `MKT-nnn` in `docs/public-build-playbook.md`.
 
 Status levels, in order of strength: **draft** (text or code exists, unverified) · **local** (works on Deepak's machine) · **tested** (automated tests pass locally) · **CI** (the workflow passed on GitHub) · **deployed** (live on Vercel and checked).
 
@@ -12,7 +12,8 @@ Phase 0, scaffold done (ENG-004). Before that, documents only: spec, decisions, 
 
 | Track | Task | Owner | Blocked by |
 |---|---|---|---|
-| Engineering | ENG-011 website checks: test file first, then `lib/website.ts` | Claude after Deepak's go | ENG-010 |
+| Engineering | ENG-011h website harness: ~25 real sites, raw HTML against a real browser | junior dev after Deepak's go; Deepak labels 10 sites | ENG-011a |
+| Engineering | ENG-011b `analyzeLighthouse` | junior dev | PageSpeed API enabled on the Google key (Deepak) |
 | Marketing | MKT-001 positioning sheet | Claude drafts, Deepak approves | nothing |
 | Marketing | MKT-003 claim register | Claude | nothing |
 | Marketing | MKT-004 "I deleted the tests" post draft | Claude drafts | ENG-010 red run |
@@ -32,6 +33,8 @@ Phase 0, scaffold done (ENG-004). Before that, documents only: spec, decisions, 
 | 19 Oct | Repo pushed to GitHub (private); ENG-003 CI green | https://github.com/rdeepak-711/hotel-direct-bookings/actions/runs/39279152782 |
 | 19 Oct | ENG-004 scaffold: next 16.3.8, react 19.3.0, typescript 6.0.3, vitest 5.0.3; tsc exit 0, vitest finds no tests; needs npm 11 | `docs/evidence/ENG-004.txt` |
 | 19 Oct | DEC-6 recorded: `claude -p` first locally, with tools off and refused on Vercel | `docs/decisions.md` |
+| 20 Oct | DEC-7: "Book now" from home page HTML, not PageSpeed; junior dev made an agent with `scripts/check-junior.sh` | `docs/decisions.md` |
+| 20 Oct | ENG-011a website checks: 20 tests green, 2 mutation checks, CI green; junior dev found and fixed the /guestbook bug | `docs/evidence/ENG-011a.txt` |
 
 ## Open decisions (need Deepak)
 

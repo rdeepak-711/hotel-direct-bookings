@@ -1,0 +1,13 @@
+ENG-011a website checks without PageSpeed (lib/website.ts), 20 Oct 2026
+
+Built by the junior-dev agent (.claude/agents/junior-dev.md) against tests written first.
+Tests: tests/website.test.ts, 20 tests (19 at handoff, test 20 added after the junior dev found the /guestbook bug).
+
+npx vitest run       -> 33 passed (20 website + 13 quotes)
+npx tsc --noEmit     -> clean
+Mutation 1: drop the "." in hostIs -> tests 3 and 15 red; restored, all green.
+Mutation 2: remove the blocked-word step from the own-domain path check -> test 20 red; restored, all green.
+scripts/check-junior.sh a199b89 -> all six lines ok (tests unchanged, allowed paths only, vitest, tsc, no AI trailer, author Deepak).
+CI: https://github.com/rdeepak-711/hotel-direct-bookings/actions/runs/39446379061 (success)
+
+Bug found during the build: the spec's own-domain path rule counted /guestbook, /facebook-feed and /bookstore as booking pages. Fixed by removing the blocked words before the check, so /en/booknow still counts.

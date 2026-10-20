@@ -104,7 +104,7 @@ npx tsc --noEmit
 **Acceptance:** every test in the file passes; tsc has no errors in `lib/`. **Risks:** curly-quote normalisation is easy to get half right; the test covers `’ ‘ “ ”`. **Learning note:** "normalise both sides, then substring" is a deliberately dumb check. It's dumb so it's explainable to a hotel owner: "the quote is in the review, or it isn't." A fuzzier match would be more lenient and less defensible.
 **Public-build:** MKT-006 (why AI quotes need code verification; the `llm-hallucinated.json` fixture is the demo). **Evidence:** green run, diff read by Deepak, Deepak explains verifyThemes aloud.
 
-### [ ] ENG-011a Step 2: website checks without PageSpeed, `lib/website.ts`
+### [x] ENG-011a Step 2: website checks without PageSpeed, `lib/website.ts`
 **Prerequisites:** ENG-010. **Tests:** `tests/website.test.ts` (20 tests), written first from the step; fixture `tests/fixtures/home.html`, invented. **Spec:** step 2.
 **Steps:** `BOOKING_VENDORS`, `detectBookingEngine`, `isBookNowText`, `NOT_A_WEBSITE_HOSTS`, `isRealWebsite`, `analyzeHtml`.
 **Verification:** `npx vitest run tests/website.test.ts && npx tsc --noEmit`.

@@ -2,13 +2,13 @@
 
 A tool that audits how ready a US hotel is to take bookings directly, instead of through booking sites. It reads the hotel's Google listing, website, page speed and guest reviews, and returns a score out of 100, the evidence behind it, and the top three fixes.
 
-**Status: being built in public, step 1 of 13 done.** Nothing is deployed yet. Progress is posted on X: [@rDeepak_ACEz](https://x.com/rDeepak_ACEz).
+**Status: being built in public, steps 1 and 2a of 13 done.** Nothing is deployed yet. Progress is posted on X: [@rDeepak_ACEz](https://x.com/rDeepak_ACEz).
 
 ## The one rule the product rests on
 
 The model proposes, code verifies. An LLM reads the reviews and returns themes ("guests praise the breakfast") with quotes as proof. Code keeps a quote only if its exact words appear in the review it cites, and drops it with a reason otherwise. A theme with no surviving quotes is removed. The score itself comes from fixed rules, not from the model.
 
-Built so far: `lib/quotes.ts`, with 13 tests written before the code ([evidence](docs/evidence/ENG-010.txt)).
+Built so far, each with tests written before the code: `lib/quotes.ts`, 13 tests ([evidence](docs/evidence/ENG-010.txt)); `lib/website.ts`, the website checks, 20 tests ([evidence](docs/evidence/ENG-011a.txt)).
 
 ## Run the tests
 
