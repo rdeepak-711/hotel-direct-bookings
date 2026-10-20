@@ -11,3 +11,4 @@ scripts/check-junior.sh a199b89 -> all six lines ok (tests unchanged, allowed pa
 CI: https://github.com/rdeepak-711/hotel-direct-bookings/actions/runs/39446379061 (success)
 
 Bug found during the build: the spec's own-domain path rule counted /guestbook, /facebook-feed and /bookstore as booking pages. Fixed by removing the blocked words before the check, so /en/booknow still counts.
+The junior dev did not change the spec or code around the bug. Its report ended: "I built what the spec says. Whether to change it is Deepak's call, and if he does, a new test should come before the fix." Deepak approved; test 20 was written by the orchestrator (the agent may not edit tests/), then the agent fixed the code.
