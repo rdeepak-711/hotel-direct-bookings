@@ -106,7 +106,7 @@ Lengths: post 1 = 279 chars, post 2 = 268 chars, link reply = 108 chars (URL cou
 Tools: marketing:draft-content and marketing:brand-review both used; hashtags and emojis they suggest dropped per my-voice.md.
 
 ## MKT-DEC7 · none (decision DEC-7) · drafted 2026-10-20 19:05 IST · redrafted 2026-10-20 20:55 IST (merged MKT-HARNESS-PLAN in as post 3)
-Status: awaiting approval
+Status: published 2026-10-20 21:06 IST, https://x.com/rDeepak_ACEz/status/2112568527320449404 (4 posts; link in post 4, typed by Claude, Post clicked by Deepak)
 Slot: post this now (Tue 20 Oct, before MKT-2A at 21:30 IST). DEC-7 is on public main (b40af0c), so the link works.
 Audience: hiring managers for applied AI roles first (judgement: read the source before trusting a spec; measure against reality); hotel-tech second
 Template: counter-intuitive story / show the paperwork (findings.md, "Research, 19 Oct 2026")
