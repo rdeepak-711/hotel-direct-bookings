@@ -178,3 +178,13 @@
 **Why:** (a) cannot work. Lighthouse's `link-text` audit only lists links whose text is on a generic blocklist ("click here", "more"), so a "Book now" link never appears in it and every hotel would be told it has none (see findings.md, "Issue, 20 Oct 2026"). (b) works but adds a browser to a Vercel function: slow, heavy and costly for one field. (c) throws away one of the clearest signals of direct-booking readiness.
 
 **Cost:** a "Book now" button that JavaScript draws after the page loads is not in the raw HTML, so it is missed and the hotel is wrongly told it has none. How often that happens is unknown until the harness has run; its result goes here.
+
+## 2026-10-20 · The junior dev is an agent with a harness, not a chat role
+
+**Decided:** the junior developer is written down as `.claude/agents/junior-dev.md` with two modes (propose, build) and hard limits: it never edits `tests/`, only touches `lib/` and `docs/flow.md`, never pushes or merges. `scripts/check-junior.sh <handoff commit>` checks its work before Deepak reads it: tests unchanged, only allowed paths touched, vitest and tsc green, commits authored by Deepak with no AI trailer.
+
+**Considered:** keeping the junior dev as the main chat session's role, shaped only by memory notes and Deepak's rules file.
+
+**Why:** a role that lives only in a chat changes when the chat is summarised or a new session starts. A file is versioned and reviewable, and the check script turns the most important rules into something a machine verifies instead of something the agent promises. The biggest risk with a coding agent is that it edits a test to make it pass; the script catches that.
+
+**Cost:** one more handoff per task (the main session orchestrates, the agent builds), and the agent starts each build without the chat's context, so the task card and spec must be complete. Bash is not restricted by command, so the limits on git are rules the agent follows, checked after the fact, not blocked in advance.
