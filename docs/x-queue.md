@@ -103,3 +103,63 @@ Claims:
 - Not claimed: any hotel or city name; Hotelzify; percentages; per-hotel theme counts (never computed: "mostly empty" is inferred from 10 booking mentions across 12 hotels, under 1 per hotel on average).
 Lengths: post 1 = 279 chars, post 2 = 268 chars, link reply = 108 chars (URL counts as 23 on X).
 Tools: marketing:draft-content and marketing:brand-review both used; hashtags and emojis they suggest dropped per my-voice.md.
+
+## MKT-DEC7 · none (decision DEC-7) · drafted 2026-10-20 19:05 IST
+Status: awaiting approval
+Slot: Wed 21 Oct, 21:30 IST (main slot). Replaces whatever is booked at 21:30 Wed; not added on top (posting cap: 2 originals a day). Tue 20 Oct 21:30 is MKT-2A; MKT-DEC6 has no slot yet (free: Thu 22 Oct 21:30, Fri 23 Oct 21:30).
+Audience: hiring managers for applied AI roles first (judgement: read the source before trusting a spec); hotel-tech second
+Template: counter-intuitive story / show the paperwork (findings.md, "Research, 19 Oct 2026")
+Post:
+1/
+My spec said to read a hotel's "Book now" button from Google Lighthouse's link-text audit.
+
+Before coding I read the audit's source (v13.5.0). It only lists links with generic text like "click here".
+
+So every hotel would have been told it has no Book now button.
+
+2/
+The spec's tap-targets audit no longer exists either.
+
+Decision: read Book now from the home page HTML the checker already downloads.
+
+Cost: a button JavaScript draws after load is missed. How often is unknown — a harness will measure it and log the number.
+
+Self-reply with link:
+The full entry — what I considered, why HTML won, what it costs — is DEC-7 in the repo's decision log: https://github.com/rdeepak-711/hotel-direct-bookings
+Visual: screenshot of the DEC-7 entry in docs/decisions.md (Decided / Considered / Why / Cost), Deepak to capture; not yet under docs/evidence/
+Claims:
+- Spec said `bookNow` = first `link-text` item passing `isBookNowText` → git show 3ac5153 -- spec/site.md (removed line for `analyzeLighthouse(psi)`)
+- Read Lighthouse source, GoogleChrome/lighthouse main v13.5.0, core/audits/seo/link-text.js; it only lists links on a non-descriptive blocklist ("click here", "more") → findings.md "Issue, 20 Oct 2026"
+- Every hotel would get `{ found: false }` → findings.md "Issue, 20 Oct 2026"; docs/decisions.md DEC-7 Why (a)
+- Read before coding → git log: 3749693 (findings) precedes 24b76d0 (website tests); no lib/website.ts code yet
+- tap-targets audit no longer exists (target-size.js instead) → findings.md "Issue, 20 Oct 2026"
+- Decision: bookNow from home page HTML already downloaded by the gap check → docs/decisions.md DEC-7 Decided
+- Cost: JS-drawn buttons missed; rate unknown until the harness runs; result goes into DEC-7 → docs/decisions.md DEC-7 Cost; docs/implementation-playbook.md ENG-011h Acceptance
+- Not claimed: any miss rate, any real hotel, that the harness or the HTML check is built (ENG-011a tests are red, code not written).
+Lengths: post 1 = 263 chars, post 2 = 257 chars, link reply = 126 chars (URL counts as 23 on X).
+Before posting: DEC-7 (commit 3ac5153) is not on any remote branch yet. Push it to GitHub first, or the link reply points at a repo without DEC-7.
+Tools: marketing:draft-content and marketing:brand-review both used; hashtags and emojis they suggest dropped per my-voice.md.
+
+## MKT-HARNESS-PLAN · ENG-011h (not built, plan only) · drafted 2026-10-20 19:05 IST
+Status: awaiting approval
+Slot: Thu 22 Oct, 14:30 IST (Tue/Thu second slot, India hiring audience). Replaces whatever is booked at 14:30 Thu; not added on top. Goes after MKT-DEC7 so the "harness" it promises has context. Alternative: post it as a reply under MKT-DEC7's thread on Wed instead of an original, which uses no slot.
+Audience: hiring managers for applied AI roles first (judgement: tests only cover what you imagined; measure against reality); hotel-tech second
+Template: named rule / show the paperwork (findings.md, "Research, 19 Oct 2026")
+Post:
+Unit tests only check the cases I thought of.
+
+Next for my hotel website checker: run it on ~25 real hotel sites, once on the raw HTML and once in a real browser. Every blind spot it finds becomes a new unit test.
+
+Not built yet. That's the plan, written down before the code.
+
+Self-reply with link:
+The harness plan and the decision it will test (ENG-011h, DEC-7) are in the repo: https://github.com/rdeepak-711/hotel-direct-bookings
+Visual: none (optional: screenshot of the ENG-011h entry in docs/implementation-playbook.md, Deepak to capture)
+Claims:
+- About 25 US hotel sites, `analyzeHtml` on raw HTML and on the page a headless browser renders → docs/implementation-playbook.md ENG-011h Steps
+- Every blind spot found becomes a unit test with invented HTML before it is fixed → docs/implementation-playbook.md ENG-011h Acceptance
+- Not built; prerequisite ENG-011a still open → docs/implementation-playbook.md ("[ ] ENG-011h", "[ ] ENG-011b"); docs/project-status.md
+- Not claimed: any result, miss rate or site count actually run; any hotel name (ENG-011h rule: no real hotel named next to a result).
+Lengths: post = 276 chars, link reply = 105 chars (URL counts as 23 on X).
+Before posting: same as MKT-DEC7, push DEC-7 and the ENG-011h playbook entry (commit 3ac5153) first.
+Tools: marketing:draft-content and marketing:brand-review both used.
