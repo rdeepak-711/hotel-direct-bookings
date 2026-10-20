@@ -49,6 +49,13 @@ describe("detectBookingEngine", () => {
     expect(detectBookingEngine([`https://${OWN}/about`], OWN)).toBeNull();
   });
 
+  it("20. does not treat guestbook, facebook or bookstore pages as booking pages", () => {
+    for (const path of ["/guestbook", "/facebook-feed", "/bookstore"]) {
+      expect(detectBookingEngine([`https://${OWN}${path}`], OWN), path).toBeNull();
+    }
+    expect(detectBookingEngine([`https://${OWN}/en/booknow`], OWN)).toEqual({ domain: OWN, vendor: null, onOwnDomain: true });
+  });
+
   it("9. lists every vendor the spec requires", () => {
     const required: Record<string, string[]> = {
       SynXis: ["synxis.com"],

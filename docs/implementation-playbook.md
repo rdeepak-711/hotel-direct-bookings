@@ -105,10 +105,10 @@ npx tsc --noEmit
 **Public-build:** MKT-006 (why AI quotes need code verification; the `llm-hallucinated.json` fixture is the demo). **Evidence:** green run, diff read by Deepak, Deepak explains verifyThemes aloud.
 
 ### [ ] ENG-011a Step 2: website checks without PageSpeed, `lib/website.ts`
-**Prerequisites:** ENG-010. **Tests:** `tests/website.test.ts` (19 tests), written first from the step; fixture `tests/fixtures/home.html`, invented. **Spec:** step 2.
+**Prerequisites:** ENG-010. **Tests:** `tests/website.test.ts` (20 tests), written first from the step; fixture `tests/fixtures/home.html`, invented. **Spec:** step 2.
 **Steps:** `BOOKING_VENDORS`, `detectBookingEngine`, `isBookNowText`, `NOT_A_WEBSITE_HOSTS`, `isRealWebsite`, `analyzeHtml`.
 **Verification:** `npx vitest run tests/website.test.ts && npx tsc --noEmit`.
-**Acceptance:** 19 pass; a mutation (drop the `"." +` in the suffix match) turns test 3 red. **Risks:** suffix matching on hosts (`be.synxis.com` must match `synxis.com`; `notsynxis.com` must not): the implementation uses `host === d || host.endsWith("." + d)`. **Learning note:** the "Book now" check runs on raw HTML (DEC-7), so a button built by JavaScript is invisible to it. ENG-011h measures how often.
+**Acceptance:** 20 pass; a mutation (drop the `"." +` in the suffix match) turns test 3 red; removing the blocked-word step from the path check turns test 20 red. **Risks:** suffix matching on hosts (`be.synxis.com` must match `synxis.com`; `notsynxis.com` must not): the implementation uses `host === d || host.endsWith("." + d)`. **Learning note:** the "Book now" check runs on raw HTML (DEC-7), so a button built by JavaScript is invisible to it. ENG-011h measures how often.
 **Public-build:** MKT-007 (how to tell which booking engine a hotel uses from the outside). **Evidence:** green run, diff read, Deepak explains tests 3 and 11.
 
 ### [ ] ENG-011b Step 2: `analyzeLighthouse(psi, home)`
