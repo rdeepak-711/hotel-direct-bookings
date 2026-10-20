@@ -134,7 +134,7 @@ Not built yet. The HTML check itself is built and tested.
 
 Self-reply with link:
 Read Lighthouse's link-text audit first, then the decision: DEC-7 in the repo's decision log, with what it costs. https://github.com/rdeepak-711/hotel-direct-bookings
-Visual: screenshot of the DEC-7 entry in docs/decisions.md (Decided / Considered / Why / Cost), needs capturing; not under docs/evidence/
+Visual: docs/evidence/DEC-7-card.png (rendered 20 Oct from docs/evidence/DEC-7-card.html)
 Claims:
 - Spec said `bookNow` = first `link-text` item passing `isBookNowText` → git show 3ac5153 -- spec/site.md
 - Read Lighthouse source, GoogleChrome/lighthouse main v13.5.0, core/audits/seo/link-text.js; only lists links on a non-descriptive blocklist ("click here", "more") → findings.md "Issue, 20 Oct 2026"
