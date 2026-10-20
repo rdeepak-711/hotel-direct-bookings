@@ -168,3 +168,13 @@
 **Why:** the report shows quotes in quotation marks under the guest's name. A hotel owner who searches the review for those words must find them. Exact matching is checkable by anyone in seconds; any meaning-based check needs another model or a threshold, which moves the trust problem instead of removing it.
 
 **Cost:** paraphrases and quotes with typos fixed by the model are dropped too, so weaker models will lose more praise. The drop count in the run log (step 10) is how we will see that rate.
+
+## 2026-10-20 · DEC-7: "Book now" comes from the home page HTML, not from PageSpeed
+
+**Decided:** `bookNow` and `tapToCall` are read from the hotel's home page HTML (`analyzeHtml`), which the gap check already downloads. PageSpeed is kept only for what it alone can see: the mobile speed score, HTTPS, and booking engines that load through JavaScript. `tapTargetsOk` is always null for now and is removed once a real PageSpeed response has been captured (ENG-011b). A harness (ENG-011h) runs the checker on about 25 real hotel sites, raw HTML against a rendered browser, to measure what this misses.
+
+**Considered:** (a) keep the spec as written and read "Book now" from Lighthouse's `link-text` audit; (b) render every hotel page in a headless browser in production; (c) drop the "Book now" check.
+
+**Why:** (a) cannot work. Lighthouse's `link-text` audit only lists links whose text is on a generic blocklist ("click here", "more"), so a "Book now" link never appears in it and every hotel would be told it has none (see findings.md, "Issue, 20 Oct 2026"). (b) works but adds a browser to a Vercel function: slow, heavy and costly for one field. (c) throws away one of the clearest signals of direct-booking readiness.
+
+**Cost:** a "Book now" button that JavaScript draws after the page loads is not in the raw HTML, so it is missed and the hotel is wrongly told it has none. How often that happens is unknown until the harness has run; its result goes here.

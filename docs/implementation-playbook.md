@@ -104,12 +104,22 @@ npx tsc --noEmit
 **Acceptance:** every test in the file passes; tsc has no errors in `lib/`. **Risks:** curly-quote normalisation is easy to get half right; the test covers `’ ‘ “ ”`. **Learning note:** "normalise both sides, then substring" is a deliberately dumb check. It's dumb so it's explainable to a hotel owner: "the quote is in the review, or it isn't." A fuzzier match would be more lenient and less defensible.
 **Public-build:** MKT-006 (why AI quotes need code verification; the `llm-hallucinated.json` fixture is the demo). **Evidence:** green run, diff read by Deepak, Deepak explains verifyThemes aloud.
 
-### [ ] ENG-011 Step 2: website checks, `lib/website.ts`
-**Prerequisites:** ENG-010. **Tests:** `tests/website.test.ts`, written first from the step. **Spec:** step 2.
-**Steps:** `BOOKING_VENDORS`, `detectBookingEngine`, `isBookNowText`, `analyzeLighthouse`, `NOT_A_WEBSITE_HOSTS`, `isRealWebsite`, `analyzeHtml`.
+### [ ] ENG-011a Step 2: website checks without PageSpeed, `lib/website.ts`
+**Prerequisites:** ENG-010. **Tests:** `tests/website.test.ts` (19 tests), written first from the step; fixture `tests/fixtures/home.html`, invented. **Spec:** step 2.
+**Steps:** `BOOKING_VENDORS`, `detectBookingEngine`, `isBookNowText`, `NOT_A_WEBSITE_HOSTS`, `isRealWebsite`, `analyzeHtml`.
 **Verification:** `npx vitest run tests/website.test.ts && npx tsc --noEmit`.
-**Acceptance:** 9 pass. **Risks:** suffix matching on hosts (`be.synxis.com` must match `synxis.com`; `notsynxis.com` must not): check the test, then the implementation uses `host === d || host.endsWith("." + d)`. **Learning note:** PageSpeed's network-request list is how a JavaScript-built site reveals its booking vendor; a plain HTML fetch would miss it. That's why there are two analyzers with one output type.
-**Public-build:** MKT-007 (how to tell which booking engine a hotel uses from the outside). **Evidence:** green run, diff read.
+**Acceptance:** 19 pass; a mutation (drop the `"." +` in the suffix match) turns test 3 red. **Risks:** suffix matching on hosts (`be.synxis.com` must match `synxis.com`; `notsynxis.com` must not): the implementation uses `host === d || host.endsWith("." + d)`. **Learning note:** the "Book now" check runs on raw HTML (DEC-7), so a button built by JavaScript is invisible to it. ENG-011h measures how often.
+**Public-build:** MKT-007 (how to tell which booking engine a hotel uses from the outside). **Evidence:** green run, diff read, Deepak explains tests 3 and 11.
+
+### [ ] ENG-011b Step 2: `analyzeLighthouse(psi, home)`
+**Prerequisites:** ENG-011a, PageSpeed Insights API enabled on the Google key (Deepak). **Tests:** in `tests/website.test.ts`, written first against `tests/fixtures/pagespeed.json` captured from one real response (hotel name removed). **Spec:** step 2 (DEC-7).
+**Verification:** `npx vitest run tests/website.test.ts && npx tsc --noEmit`. **Acceptance:** speed, HTTPS and engine come from the response; `bookNow` and `tapToCall` come from `home`; the viewport field is settled against the real response and `tapTargetsOk` is removed. **Learning note:** PageSpeed's network-request list is how a JavaScript-built site reveals its booking vendor; a plain HTML fetch would miss it.
+
+### [ ] ENG-011h Website harness: raw HTML against a real browser
+**Prerequisites:** ENG-011a. **Owner:** Claude builds it; Deepak labels 10 sites by eye (about 15 minutes). **Files:** `scripts/website-harness.ts`, `harness/` (gitignored: the site list and saved pages, never committed), `docs/evidence/website-harness.html` (hotel-01.. only).
+**Steps:** for about 25 US hotel sites, run `analyzeHtml` on the raw HTML and on the page as a headless browser renders it; list every disagreement with its cause; compare both against Deepak's labels.
+**Acceptance:** the report shows, per field, how often raw HTML misses what the browser sees, and both kinds of error (missed buttons, false buttons) against the labels. Every blind spot found becomes a unit test with invented HTML before it is fixed; the miss rate is written into DEC-7's cost. **Rules:** one visit per site; no real hotel named next to a result in anything committed or posted.
+**Public-build:** "I ran my checker on 25 real hotel sites; here is what it missed."
 
 ### [ ] ENG-012 Step 4: gap check logic, `lib/gaps.ts`
 **Prerequisites:** ENG-011. **Tests:** `tests/gaps.test.ts`, written first from the step. **Spec:** step 4.

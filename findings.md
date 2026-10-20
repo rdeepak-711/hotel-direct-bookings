@@ -82,7 +82,7 @@ Error: `npm error Cannot read properties of null (reading 'edgesOut')`, stack in
 - No controlled evidence on reply-to-big-accounts strategy or on teasers. Anecdotes only.
 - Templates in use: failure or security screenshot; named rule ("LLM proposes, code verifies") with a diagram; counter-intuitive story ("deleted my own tests"); showing the paperwork (spec, decisions log); replying with a point and a screenshot under big accounts' prompt-injection posts, without dropping a link in their thread.
 
-## Issue, 20 Oct 2026: spec step 2 reads audits that do not do what it assumes (open, DEC-7)
+## Issue, 20 Oct 2026: spec step 2 reads audits that do not do what it assumes (resolved by DEC-7, 20 Oct; viewport still open)
 
 Checked against Lighthouse source on GitHub (`GoogleChrome/lighthouse`, main, v13.5.0):
 - `core/audits/seo/link-text.js` only lists links whose text is on a non-descriptive blocklist ("click here", "more"...). A "Book Now" link never appears in it, so `bookNow` from `link-text` would always be `{ found: false }`.
