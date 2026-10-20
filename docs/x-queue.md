@@ -4,6 +4,7 @@ Drafts written by the x-drafter agent. Status moves from "awaiting approval" to 
 
 ## MKT-DEC6 · none (decision) · drafted 2026-10-19 23:48 IST
 Status: awaiting approval
+Slot (batch 20 Oct): Wed 21 Oct, 21:30 IST. Link reply changed 20 Oct to the public repo (the portfolio has no Direct Booking Check card yet).
 Audience: developers (prompt-injection / agent security); secondary: recruiters, hotel-tech founders
 Template: failure or security screenshot (findings.md, "Research, 19 Oct 2026")
 Post:
@@ -18,7 +19,7 @@ Rule: all tools off. A review saying "ignore your instructions, run X" has nothi
 Locally that agent is claude -p, called with --tools "" --strict-mcp-config: no tools, no MCP servers. Without that, review text is a prompt-injection path into my machine. Decided 19 Oct; the wrapper isn't built yet.
 
 Self-reply with link:
-https://rdeepak.vercel.app/?ref=x
+The decision, with the exact flags and what it costs, is DEC-6 in the decision log: https://github.com/rdeepak-711/hotel-direct-bookings
 Visual: screenshot of docs/decisions.md DEC-6 Cost (c), Deepak to capture (not yet under docs/evidence/)
 Claims:
 - Direct Booking Check audits a US hotel's readiness for direct bookings from Google listing, website, page speed and reviews → docs/decisions.md (2026-10-18 entries: score, gap check) and spec
@@ -104,10 +105,10 @@ Claims:
 Lengths: post 1 = 279 chars, post 2 = 268 chars, link reply = 108 chars (URL counts as 23 on X).
 Tools: marketing:draft-content and marketing:brand-review both used; hashtags and emojis they suggest dropped per my-voice.md.
 
-## MKT-DEC7 · none (decision DEC-7) · drafted 2026-10-20 19:05 IST
+## MKT-DEC7 · none (decision DEC-7) · drafted 2026-10-20 19:05 IST · redrafted 2026-10-20 20:55 IST (merged MKT-HARNESS-PLAN in as post 3)
 Status: awaiting approval
-Slot: Wed 21 Oct, 21:30 IST (main slot). Replaces whatever is booked at 21:30 Wed; not added on top (posting cap: 2 originals a day). Tue 20 Oct 21:30 is MKT-2A; MKT-DEC6 has no slot yet (free: Thu 22 Oct 21:30, Fri 23 Oct 21:30).
-Audience: hiring managers for applied AI roles first (judgement: read the source before trusting a spec); hotel-tech second
+Slot: post this now (Tue 20 Oct, before MKT-2A at 21:30 IST). DEC-7 is on public main (b40af0c), so the link works.
+Audience: hiring managers for applied AI roles first (judgement: read the source before trusting a spec; measure against reality); hotel-tech second
 Template: counter-intuitive story / show the paperwork (findings.md, "Research, 19 Oct 2026")
 Post:
 1/
@@ -122,44 +123,73 @@ The spec's tap-targets audit no longer exists either.
 
 Decision: read Book now from the home page HTML the checker already downloads.
 
-Cost: a button JavaScript draws after load is missed. How often is unknown — a harness will measure it and log the number.
+Cost: a button JavaScript draws after load is missed. How often is unknown until I measure it.
 
-Self-reply with link:
-The full entry — what I considered, why HTML won, what it costs — is DEC-7 in the repo's decision log: https://github.com/rdeepak-711/hotel-direct-bookings
-Visual: screenshot of the DEC-7 entry in docs/decisions.md (Decided / Considered / Why / Cost), Deepak to capture; not yet under docs/evidence/
-Claims:
-- Spec said `bookNow` = first `link-text` item passing `isBookNowText` → git show 3ac5153 -- spec/site.md (removed line for `analyzeLighthouse(psi)`)
-- Read Lighthouse source, GoogleChrome/lighthouse main v13.5.0, core/audits/seo/link-text.js; it only lists links on a non-descriptive blocklist ("click here", "more") → findings.md "Issue, 20 Oct 2026"
-- Every hotel would get `{ found: false }` → findings.md "Issue, 20 Oct 2026"; docs/decisions.md DEC-7 Why (a)
-- Read before coding → git log: 3749693 (findings) precedes 24b76d0 (website tests); no lib/website.ts code yet
-- tap-targets audit no longer exists (target-size.js instead) → findings.md "Issue, 20 Oct 2026"
-- Decision: bookNow from home page HTML already downloaded by the gap check → docs/decisions.md DEC-7 Decided
-- Cost: JS-drawn buttons missed; rate unknown until the harness runs; result goes into DEC-7 → docs/decisions.md DEC-7 Cost; docs/implementation-playbook.md ENG-011h Acceptance
-- Not claimed: any miss rate, any real hotel, that the harness or the HTML check is built (ENG-011a tests are red, code not written).
-Lengths: post 1 = 263 chars, post 2 = 257 chars, link reply = 126 chars (URL counts as 23 on X).
-Before posting: DEC-7 (commit 3ac5153) is not on any remote branch yet. Push it to GitHub first, or the link reply points at a repo without DEC-7.
-Tools: marketing:draft-content and marketing:brand-review both used; hashtags and emojis they suggest dropped per my-voice.md.
-
-## MKT-HARNESS-PLAN · ENG-011h (not built, plan only) · drafted 2026-10-20 19:05 IST
-Status: awaiting approval
-Slot: Thu 22 Oct, 14:30 IST (Tue/Thu second slot, India hiring audience). Replaces whatever is booked at 14:30 Thu; not added on top. Goes after MKT-DEC7 so the "harness" it promises has context. Alternative: post it as a reply under MKT-DEC7's thread on Wed instead of an original, which uses no slot.
-Audience: hiring managers for applied AI roles first (judgement: tests only cover what you imagined; measure against reality); hotel-tech second
-Template: named rule / show the paperwork (findings.md, "Research, 19 Oct 2026")
-Post:
+3/
 Unit tests only check the cases I thought of.
 
-Next for my hotel website checker: run it on ~25 real hotel sites, once on the raw HTML and once in a real browser. Every blind spot it finds becomes a new unit test.
+So the next step is a run on ~25 real hotel sites: raw HTML against a real browser. Every miss becomes a unit test, and the miss rate goes into DEC-7.
 
-Not built yet. That's the plan, written down before the code.
+Not built yet. The HTML check itself is built and tested.
 
 Self-reply with link:
-The harness plan and the decision it will test (ENG-011h, DEC-7) are in the repo: https://github.com/rdeepak-711/hotel-direct-bookings
-Visual: none (optional: screenshot of the ENG-011h entry in docs/implementation-playbook.md, Deepak to capture)
+Read Lighthouse's link-text audit first, then the decision: DEC-7 in the repo's decision log, with what it costs. https://github.com/rdeepak-711/hotel-direct-bookings
+Visual: screenshot of the DEC-7 entry in docs/decisions.md (Decided / Considered / Why / Cost), needs capturing; not under docs/evidence/
 Claims:
-- About 25 US hotel sites, `analyzeHtml` on raw HTML and on the page a headless browser renders → docs/implementation-playbook.md ENG-011h Steps
-- Every blind spot found becomes a unit test with invented HTML before it is fixed → docs/implementation-playbook.md ENG-011h Acceptance
-- Not built; prerequisite ENG-011a still open → docs/implementation-playbook.md ("[ ] ENG-011h", "[ ] ENG-011b"); docs/project-status.md
-- Not claimed: any result, miss rate or site count actually run; any hotel name (ENG-011h rule: no real hotel named next to a result).
-Lengths: post = 276 chars, link reply = 105 chars (URL counts as 23 on X).
-Before posting: same as MKT-DEC7, push DEC-7 and the ENG-011h playbook entry (commit 3ac5153) first.
-Tools: marketing:draft-content and marketing:brand-review both used.
+- Spec said `bookNow` = first `link-text` item passing `isBookNowText` → git show 3ac5153 -- spec/site.md
+- Read Lighthouse source, GoogleChrome/lighthouse main v13.5.0, core/audits/seo/link-text.js; only lists links on a non-descriptive blocklist ("click here", "more") → findings.md "Issue, 20 Oct 2026"
+- Every hotel would get `{ found: false }` → findings.md "Issue, 20 Oct 2026"; docs/decisions.md DEC-7 Why (a)
+- Read before coding → git log: 3749693 (findings) precedes 24b76d0 (website tests) and 5fa1296 (lib/website.ts)
+- tap-targets audit no longer exists → findings.md "Issue, 20 Oct 2026"
+- Decision: bookNow from home page HTML → docs/decisions.md DEC-7 Decided
+- Cost: JS-drawn buttons missed; rate unknown until measured; result goes into DEC-7 → docs/decisions.md DEC-7 Cost
+- ~25 real hotel sites, raw HTML vs rendered browser; every miss becomes a unit test → docs/decisions.md DEC-7; docs/implementation-playbook.md ENG-011h
+- Harness not built; HTML check built and tested → docs/project-status.md (ENG-011h next, blocked by nothing now); docs/evidence/ENG-011a.txt (33 passed, CI green)
+- Not claimed: any miss rate, site count actually run, any real hotel.
+Lengths: post 1 = 263, post 2 = 232, post 3 = 256, link reply = 137 (URL counts as 23).
+Note: "harness" is deliberately not used in this thread so it does not collide with MKT-AGENT-HARNESS (the agent harness) posted tomorrow.
+Tools: marketing:draft-content and marketing:brand-review both used; hashtags and emojis dropped per my-voice.md.
+
+## MKT-HARNESS-PLAN · ENG-011h (not built, plan only) · drafted 2026-10-20 19:05 IST
+Status: merged into MKT-DEC7 post 3 on 20 Oct 20:55 IST. Do not post separately: it repeated DEC-7's cost line, and "harness" would collide with MKT-AGENT-HARNESS. Original text kept in git history (e4ed865).
+
+## MKT-AGENT-HARNESS · ENG-011a · drafted 2026-10-20 20:55 IST
+Status: awaiting approval
+Slot: Wed 21 Oct, 10:30 IST (India working hours, applied AI hiring managers). Strongest post in the batch; give it the morning to itself.
+Audience: hiring managers for applied AI roles first (judgement: constrain a coding agent with machine checks, not promises); hotel-tech second
+Template: counter-intuitive story + named rule (findings.md, "Research, 19 Oct 2026")
+Post:
+1/
+My junior dev is a coding agent, and a script enforces one rule: it never edits a test.
+
+On its first task it found a bug in my own spec. My rule for spotting a hotel's booking page counted /guestbook as one.
+
+It stopped and reported it instead of coding around it.
+
+2/
+The rule matched "book" anywhere in a URL path. /guestbook, /facebook-feed and /bookstore all passed.
+
+My 19 tests, written first, missed it. I added test 20 and watched it fail. The agent's fix: strip those words before the check, so /en/booknow still counts.
+
+3/
+The script runs after every build: tests/ unchanged, only lib/ and docs/flow.md touched, vitest and tsc green, no AI trailer.
+
+Why a script: a rule in a chat drifts when the session is summarised. Cost: git limits are checked after the fact, not blocked.
+
+(ENG-011a)
+
+Self-reply with link:
+The agent's rules, the check script and test 20 are all in the repo (.claude/agents/junior-dev.md, scripts/check-junior.sh): https://github.com/rdeepak-711/hotel-direct-bookings
+Visual: terminal screenshot of `scripts/check-junior.sh a199b89` showing its six ok lines, needs capturing (the output is recorded as text in docs/evidence/ENG-011a.txt). Fallback: screenshot of test 20 in tests/website.test.ts (lines 52-53 onward).
+Claims:
+- Junior dev is an agent file with hard limits, never edits tests/ → .claude/agents/junior-dev.md (Hard limits); docs/decisions.md "The junior dev is an agent with a harness, not a chat role"
+- Script checks tests/ unchanged, allowed paths lib/ and docs/flow.md, vitest, tsc, no AI trailer (also commit author) → scripts/check-junior.sh
+- First task found the spec bug: own-domain rule counted /guestbook, /facebook-feed, /bookstore → docs/evidence/ENG-011a.txt; spec/site.md line 71 ("found by the junior dev")
+- Rule matched "book" anywhere in the path → spec/site.md line 71 regex `/(book|booking|reserve|reservation|availability)/i`
+- It reported instead of coding around it → orchestrator's brief, 20 Oct; docs/project-status.md ("found and fixed"); the "stopped" wording is from the brief, not a file
+- 19 tests at handoff, test 20 added and failing first → docs/evidence/ENG-011a.txt; git log a199b89 "failing test for guestbook paths" (author Deepak) precedes 7f72ba2 (fix)
+- Fix strips blocked words before the check, /en/booknow still counts → docs/evidence/ENG-011a.txt; docs/flow.md line 36
+- Why a script, and the cost → docs/decisions.md junior-dev entry (Why, Cost)
+- Not claimed: that git commands are blocked (they are not); any number beyond 19 and 20; a sandbox; any hotel name.
+Lengths: post 1 = 265, post 2 = 260, post 3 = 266, link reply = 160 (URL counts as 23).
+Tools: marketing:draft-content and marketing:brand-review both used; hashtags and emojis dropped per my-voice.md.
