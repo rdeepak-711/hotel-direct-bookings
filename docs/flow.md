@@ -33,10 +33,11 @@ lib/website.ts
   detectBookingEngine(urls, ownHost) -> BookingEngine | null
       for each url: hostOf(url)
           host matches a BOOKING_VENDORS domain (hostIs)  -> return { domain: host, vendor, onOwnDomain: false } at once
-          host === ownHost, path matches book|booking|reserve|reservation|availability,
+          host === ownHost, path (with NOT_BOOKING words facebook|guestbook|bookshop|bookstore removed)
+          matches book|booking|reserve|reservation|availability,
           path is not an asset file (.css .js .jpg ... .woff2) -> remember the first one
       no vendor found -> the remembered own-domain match { domain: ownHost, vendor: null, onOwnDomain: true }, or null
-  isBookNowText(text) -> booking word present AND none of facebook|guestbook|bookshop|bookstore
+  isBookNowText(text) -> booking word present AND no NOT_BOOKING word (facebook|guestbook|bookshop|bookstore)
   isRealWebsite(url) -> false for null, unparseable, or a host that hostIs one of NOT_A_WEBSITE_HOSTS
   analyzeHtml(html, pageUrl) -> WebsiteChecks (source "html")
       every src="..." / href="..." -> resolved against pageUrl -> urls

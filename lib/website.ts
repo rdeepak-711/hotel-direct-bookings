@@ -25,6 +25,8 @@ export const BOOKING_VENDORS: { vendor: string; domains: string[] }[] = [
 
 const BOOKING_PATH = /(book|booking|reserve|reservation|availability)/i;
 const ASSET_FILE = /\.(css|js|jpe?g|png|gif|svg|webp|ico|woff2?)$/i;
+// Words that contain "book" but are not about booking a room. Shared by the path check and isBookNowText.
+const NOT_BOOKING = /facebook|guestbook|bookshop|bookstore/i;
 
 function hostOf(url: string): string | null {
   try {
@@ -47,7 +49,7 @@ export function detectBookingEngine(urls: string[], ownHost: string): BookingEng
     const vendor = BOOKING_VENDORS.find((v) => v.domains.some((d) => hostIs(host, d)));
     if (vendor) return { domain: host, vendor: vendor.vendor, onOwnDomain: false };
     if (!ownMatch && host === ownHost.toLowerCase()) {
-      const path = new URL(url).pathname;
+      const path = new URL(url).pathname.replace(new RegExp(NOT_BOOKING, "gi"), "");
       if (BOOKING_PATH.test(path) && !ASSET_FILE.test(path)) ownMatch = { domain: ownHost, vendor: null, onOwnDomain: true };
     }
   }
@@ -56,7 +58,7 @@ export function detectBookingEngine(urls: string[], ownHost: string): BookingEng
 
 export function isBookNowText(text: string): boolean {
   const t = text.trim();
-  return /\b(book|reserve|reservations?|check availability|availability)\b/i.test(t) && !/facebook|guestbook|bookshop|bookstore/i.test(t);
+  return /\b(book|reserve|reservations?|check availability|availability)\b/i.test(t) && !NOT_BOOKING.test(t);
 }
 
 export const NOT_A_WEBSITE_HOSTS: string[] = [
