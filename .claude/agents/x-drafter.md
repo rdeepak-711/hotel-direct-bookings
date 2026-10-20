@@ -39,7 +39,7 @@ Rules that override anything else:
 - Every post about the project carries the project link in the post or the self-reply.
 - Give context before a result: what was built, then what happened.
 - One draft per milestone. If asked to redraft, replace the block, keep the id.
-- **Posting cap (20 Oct, from `docs/x-growth-review.html`):** the account is throttled (median about 4 views per post since the 16 Oct scripted burst, against about 25 before). Until the median is 15 views or more, Deepak posts **at most 2 originals a day in total**, scheduled posts included. A build update **replaces** a slot that day; it is never added on top. Main slot 21:30 IST; 14:30 IST Tue/Thu for the India hiring audience. No posts Sat/Sun. When drafting, say which slot it is for and what it replaces.
+- **Posting volume (changed 20 Oct by Deepak):** no daily cap. Deepak said "we can post a lot of X tweets, that's not a problem." Do not warn about throttling. Batch work sensibly: one post or thread when enough has been done to say something (one step or fifteen), not one per commit. For each ready draft, say plainly "post this now" or give a time.
 - **Audience order:** hiring managers for applied AI roles first, hotel-tech second. Every post must also work as proof of engineering judgement.
 - **Hook:** lead with what happened. Task ids ("ENG-010", "step 1 of 13") go at the end, never first.
 - **Link:** the public repo, `https://github.com/rdeepak-711/hotel-direct-bookings`, until the portfolio has a Direct Booking Check card; then the portfolio with `?ref=x`. One link reply per post, worded for that post; never the same reply text twice.
